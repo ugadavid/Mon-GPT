@@ -1,55 +1,76 @@
-# Mon GPT<3 — 0.1.0
+# Mon GPT<3 — 0.2.0
 
-Application Windows locale pour organiser ses discussions ChatGPT dans ses propres projets, sans modifier ChatGPT. Interface française, aucun serveur, compte applicatif ou API OpenAI.
+Application Windows locale pour organiser ses discussions ChatGPT. MG-002 livre le socle graphique « Atelier chaleureux » et la **vue Liste**, avec ouverture directe. Aucun serveur, compte applicatif ou API OpenAI ; aucune modification dans ChatGPT.
 
 ## Lancer
 
-Prérequis : Windows 11 x64, Python 3.13 avec Tcl/Tk et commande `python` accessible. Aucune dépendance pip. Recette réalisée avec Python 3.13.17 et Tk 8.6. Sur Zenith Ice, installer Python avec l'option Tcl/Tk puis cloner le dépôt.
-
-Sur CODEX-VM, le chemin réel est **mon-gpt**, avec un tiret. Depuis PowerShell :
+Windows 11 x64, Python 3.13 avec Tcl/Tk et commande `python` accessible. Aucune dépendance pip ni police à installer. Recette sur CODEX-VM avec Python 3.13.17 / Tk 8.6. Depuis PowerShell :
 
 ```powershell
 & 'C:\Users\codex\Documents\Projets\mon-gpt\lancer.cmd'
 ```
 
-Ou, dans le dépôt : `python -m mon_gpt`. Le double-clic sur `lancer.cmd` convient aussi. Vérifier Tk si nécessaire avec `python -m tkinter`.
+Ou, depuis le dépôt : `python -m mon_gpt`. Le double-clic sur `lancer.cmd` convient aussi. Sur Zenith Ice : installer Python avec Tcl/Tk, cloner le dépôt puis utiliser son lanceur. Vérification de Tk : `python -m tkinter`.
 
-## Utilisation
+## Retrouver et ouvrir
 
-- **+ Projet** crée à la racine depuis Tous les fils/À classer, ou sous le projet sélectionné dans l'arbre. La fiche permet de modifier titre, description, notes, tags, catégories, métadonnées et parent. Le choix du parent exclut le projet et ses descendants.
-- **Manuel** et **Alphabétique français** règlent l'affichage de l'arbre. Monter/Descendre rangent les frères en mode manuel. L'ordre manuel est conservé après un tri alphabétique et après fermeture. Le tri compare sans casse ni accents et traite œ comme oe.
-- **+ Fil** ajoute un titre local et une URL. Un doublon propose d'afficher la fiche existante et de la rattacher au projet sélectionné, sans remplacer titre et notes.
-- Sélectionner un résultat pour éditer sa fiche. Séparer tags et catégories par des virgules. Les informations personnalisées s'écrivent sur plusieurs lignes `clé=valeur` (clé unique, valeur texte).
-- **Emplacements** accepte plusieurs projets avec Ctrl+clic ou Maj+flèche. Désélectionner un emplacement retire uniquement le rattachement. Le bouton de retrait de tous les rattachements conserve la fiche dans Tous les fils et À classer.
-- **Enregistrer**, en bas de la fiche, ou **Ctrl+S** applique les changements. Le panneau droit défile avec sa barre verticale. Les modifications non enregistrées donnent lieu à une demande avant de quitter la fiche ou l'application.
-- **Supprimer** demande confirmation. Supprimer un projet remonte ses enfants au parent et retire ses rattachements, sans supprimer les discussions. Supprimer un fil retire uniquement sa fiche locale et ses rattachements.
-- **Rechercher** (ou Entrée) explore les titres, descriptions/résumés, notes, tags, catégories et clés/valeurs personnalisées, sans casse ni accents. Une recherche textuelle globale ou un filtre tag/catégorie présente aussi les projets. La colonne Type distingue les résultats. Le projet sélectionné dans l'arbre filtre sur ce projet **et ses descendants**. Un fil n'apparaît qu'une fois. Effacer remet à zéro les champs de recherche ; Tous les fils retire le périmètre projet.
-- **Ouvrir le fil** appelle explicitement le navigateur par défaut, après validation HTTPS. Aucune édition distante, lecture des messages ou indexation du contenu.
+Un clic sur le **texte du titre** ou l'icône terracotta **↗** ouvre le fil dans le navigateur par défaut, sans passer par un formulaire. Cliquer dans les autres colonnes ou dans l'espace vide du titre sélectionne seulement. Double-clic sur une ligne ou **Entrée dans la liste** ouvre aussi. Un projet (icône dossier) n'ouvre jamais ChatGPT ; double-clic/Entrée navigue vers son emplacement.
 
-## Liens acceptés
+**Ctrl+K** focalise la recherche unique. Elle explore titres, résumés/descriptions, notes, tags, catégories et métadonnées, sans casse ni accents. Les suggestions et **Filtres** proposent les valeurs du catalogue : choisir un tag, une catégorie ou un projet ; les pastilles × retirent les filtres. Le projet sélectionné inclut **ses descendants**. Partout/Tous les fils retire ce périmètre ; Effacer remet à zéro texte, tag et catégorie. Un fil multi-rattaché reste unique dans les résultats. Entrée dans un champ de recherche/édition n'ouvre pas le navigateur.
 
-`https://chatgpt.com/c/UUID` et `https://chatgpt.com/g/IDENTIFIANT-OU-SLUG/c/UUID` ; identifiant/slug composé de lettres ASCII, chiffres, tirets et soulignements. UUID standard avec tirets, casse indifférente, barre finale facultative. Les paramètres restent dans l'URL source, le fragment est retiré. Seul l'UUID déduplique, indépendamment du slug et des paramètres.
+L'**inspecteur** est facultatif, masqué au premier lancement. Le bouton Inspecteur affiche un aperçu avec Ouvrir/Copier le lien. **Modifier les détails** rend volontairement accessibles tous les champs MG-001. Replier l'inspecteur laisse l'ouverture directe disponible. Les colonnes et séparateurs des panneaux sont ajustables ; cliquer un en-tête trie la liste. Affichage propose les formats compact 1000×680 et confortable 1360×820.
 
-Domaine exact `chatgpt.com` en HTTPS uniquement. Domaines voisins, identifiants utilisateur, ports explicites, schémas exécutables, anciens liens `chat.openai.com` et liens partagés `/share/…` refusés. L'existence de la conversation et les droits d'accès ne sont pas vérifiés.
+## Créer et modifier
 
-## Données et sauvegardes
+**+ Nouveau**, Édition et le clic droit dans l'arbre proposent les créations :
 
-Catalogue : `%LOCALAPPDATA%\MonGPT\catalogue.json`, hors dépôt. Le chemin apparaît au bas de l'application ; **Ouvrir les données** ouvre son dossier. Les dates sont stockées en ISO 8601 avec décalage du fuseau local et affichées au format français. JSON UTF-8, schéma versionné, validation des relations, fichier temporaire puis remplacement atomique. Une seule instance peut écrire dans un même catalogue. Une erreur de lecture arrête l'ouverture avec un message, sans réinitialisation.
+- **Ctrl+Maj+P** : ligne de projet éditable insérée sous le projet sélectionné, ou à la racine depuis Tous les fils/À classer. Entrée crée ; Échap annule sans entrée fantôme. Aucune image à choisir.
+- **Ctrl+N** : zone intégrée à la liste avec titre et URL. Entrée valide, Échap annule. URL invalide et doublon sont signalés dans cette zone. Un bouton explicite retrouve/rattache une fiche existante sans remplacer titre et notes.
+- **F2** : renommer dans une ligne intégrée ; Entrée valide, Échap annule.
+- **Modifier les détails** : résumé/description, notes, tags, catégories, métadonnées `clé=valeur` (une ligne par clé unique), emplacements et parent de projet. Dates automatiques avec fuseau local, affichées au format français.
+- Tags/catégories : choisir une valeur connue dans la liste ou saisir une valeur puis Entrée/+ Ajouter. Les valeurs choisies sont des **pastilles** ; × retire une valeur de la saisie. Les variantes de casse/accents d'une valeur connue la réutilisent. Aucun champ de liste à virgules imposé.
+- **Ctrl+S** ou Enregistrer : appliquer les modifications de fiche. Une saisie non enregistrée reste protégée avant navigation/fermeture. Ouvrir un fil par son menu ne détruit pas la saisie. Le panneau d'édition défile.
 
-**Sauvegarder** exporte toutes les données métier vers un fichier JSON choisi. **Restaurer** valide sans mutation, demande confirmation, sauvegarde l'état courant dans `avant-restauration-DATE.json` dans le dossier des données, puis remplace le catalogue. Un fichier invalide laisse les données intactes. Conserver aussi des sauvegardes hors du disque du PC. Données et exports non chiffrés.
+## Classer
 
-Pour isoler un autre catalogue : `python -m mon_gpt --data-dir "C:\chemin\catalogue"`. Ne pas choisir un dossier versionné pour ses données personnelles. Une mise à jour du code n'efface pas les données ; toute version de schéma inconnue est refusée sans migration silencieuse.
+Glisser gauche un **projet** vers un autre change son parent ; le déposer sur Tous les fils le remet à la racine. Les cycles sont interdits. Le mode Manuel mémorise l'ordre des frères, réglable par **Alt+↑/↓ dans l'arbre** ou Monter/Descendre dans le menu contextuel. Le mode Alphabétique français ne détruit pas cet ordre.
 
-## Démonstration et tests
+Glisser un **fil** vers un projet déplace seulement le rattachement du contexte de départ ; tous les autres restent intacts. Si le départ n'est pas explicite (Tous les fils, recherche globale ou résultat provenant d'un descendant), une zone intégrée demande **quel lien déplacer** avant toute écriture. La destination est indiquée avant validation.
+
+Le **clic droit / touche Menu** offre les actions selon l'objet : ouvrir/copier le lien, créer ici, renommer, modifier, déplacer, ajouter/retirer un rattachement, supprimer. Ajouter un rattachement garde la même fiche et ses notes. Le glisser droit propose à la dépose Déplacer ici / Ajouter un rattachement ici / Annuler ; **son geste physique reste à valider manuellement sous Windows** : gestionnaires testés, outil de recette limité au drag gauche. Le menu contextuel équivalent est validé dans la vraie fenêtre et reste utilisable au clavier.
+
+Supprimer demande confirmation. Un projet supprimé remonte ses enfants au parent et retire ses rattachements **sans supprimer les fils**. Supprimer un fil retire seulement sa fiche locale. Retirer le dernier rattachement conserve le fil dans Tous les fils et À classer. Emplacements accepte aussi Ctrl+clic/Maj+flèche dans l'édition détaillée. Catégories, tags et emplacements restent trois notions distinctes.
+
+## Menus et données
+
+**Fichier** : Sauvegarder le catalogue, Restaurer, Dossier de données, Quitter. **Ctrl+S reste l'enregistrement de fiche**, distinct de la sauvegarde globale. **Affichage** : inspecteur, recherche, filtres et taille de fenêtre. **Aide** rappelle les gestes et raccourcis.
+
+Catalogue : `%LOCALAPPDATA%\MonGPT\catalogue.json`, hors dépôt ; chemin affiché en bas, cliquable pour ouvrir le dossier. JSON UTF-8 **schéma 1 inchangé**, dates ISO 8601 zonées, validation stricte, fichier temporaire puis remplacement atomique, verrou d'instance. Une erreur de lecture arrête l'ouverture sans réinitialiser. Une mise à jour du code ne supprime pas les données.
+
+Sauvegarder exporte toutes les données métier vers un JSON choisi. Restaurer valide sans mutation, demande confirmation, crée `avant-restauration-DATE.json` dans le dossier des données, puis remplace le catalogue. Un fichier invalide laisse les données intactes. Conserver aussi une copie hors du disque du PC ; les données ne sont pas chiffrées.
+
+`interface.json` conserve séparément taille de fenêtre, vue Liste et état de l'inspecteur à la fermeture. Ce fichier de confort est exclu des exports métier ; colonnes, filtres, tri d'affichage et sélection ne persistent pas entre lancements. Le vrai catalogue n'est pas utilisé pour les recettes.
+
+## URL reconnues
+
+`https://chatgpt.com/c/UUID` et `https://chatgpt.com/g/IDENTIFIANT-OU-SLUG/c/UUID`. Slug ASCII : lettres, chiffres, tirets/soulignements. UUID standard avec tirets, casse indifférente ; barre finale facultative. Paramètres conservés, fragment retiré ; seul l'UUID déduplique.
+
+Domaine exact `chatgpt.com`, HTTPS uniquement. Domaines voisins, identifiants utilisateur, ports explicites, schémas exécutables, anciens liens `chat.openai.com` et liens `/share/…` refusés. L'existence du chat et ses droits d'accès ne sont pas vérifiés. Aucun contenu de conversation n'est téléchargé ou indexé.
+
+## Démonstration fictive et tests
 
 ```powershell
-python -m examples.create_demo "$env:LOCALAPPDATA\MonGPT-Demo"
-python -m mon_gpt --data-dir "$env:LOCALAPPDATA\MonGPT-Demo"
+python -m examples.create_ux_demo "$env:LOCALAPPDATA\MonGPT-Demo-UX"
+python -m mon_gpt --data-dir "$env:LOCALAPPDATA\MonGPT-Demo-UX" --simulate-open
 python -m unittest discover -s tests -v
 ```
 
-Le générateur refuse de remplacer un catalogue existant. Les liens sont inventés. Les tests utilisent des dossiers temporaires ; les tests de formulaires nécessitent Windows et Tk. [Architecture](docs/architecture.md) · [Rapport et captures MG-001](reports/MG-001/rapport.md).
+Le générateur refuse de remplacer un catalogue existant. `--simulate-open` est signalé dans le titre et le statut ; les ouvertures validées sont journalisées dans `ouvertures-recette.log`, sans navigateur. Ce mode est interdit sur le dossier utilisateur par défaut. Retirer l'option pour les ouvertures normales. Les tests utilisent des dossiers temporaires et Windows/Tk ; ils sont distincts de la recette visuelle. Le jeu MG-001 reste disponible via `examples.create_demo`.
+
+[Architecture](docs/architecture.md) · [Rapport et captures MG-002](reports/MG-002/rapport.md) · [Rapport MG-001](reports/MG-001/rapport.md).
 
 ## Limites
 
-Saisie manuelle uniquement. Pas de collecte Chrome, serveur local, synchronisation, lecture des messages, glisser-déposer, installateur signé ou exécutable autonome. Recherche en mémoire et réécriture du JSON complet, adaptées à un catalogue personnel ; performances à grande échelle non mesurées. Pas de tri numérique naturel ni de collation linguistique exhaustive. Fenêtre minimale 1000×680 ; les titres longs se lisent dans la fiche ou par défilement horizontal de la liste. Les préférences d'affichage ne persistent pas, seul l'ordre manuel métier persiste. La recette sur Zenith Ice reste à faire.
+**Détaillée, Mosaïque, galerie de couvertures, import d'images et personnalisation visuelle sont prévus, non livrés dans MG-002.** Aucun faux sélecteur actif. Les icônes sont applicatives ; les trois PNG de référence sont inchangés et ne sont pas embarqués dans l'interface. Aucun travail MG-003 engagé.
+
+Saisie manuelle, pas de collecte Chrome, synchronisation, lecture des messages ou installateur autonome. Recherche en mémoire et réécriture du JSON complet ; performances massives non mesurées. Tri français courant sans collation exhaustive ni tri numérique naturel. Taille minimale 1000×680 ; titres/chemins longs consultables dans l'aperçu et les colonnes ajustables/défilantes. Un filtre tag et un filtre catégorie combinables à la fois, une fiche sélectionnée à la fois. Déposer dans la partie visible de l'arbre ; ouvrir/défiler l'arbre avant une destination lointaine ou utiliser le menu Déplacer. Réserve de recette sur le glisser droit physique ; menu équivalent validé. Autres zooms Windows et Zenith Ice restent à vérifier.

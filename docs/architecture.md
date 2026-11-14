@@ -37,3 +37,15 @@ Déplacer `core.py` et ses tests génériques dans une bibliothèque commune ; c
 ## Limites
 
 Parcours des collections en mémoire ; un très gros catalogue demandera des mesures, puis éventuellement SQLite. Tri pour les usages français courants, sans collation linguistique exhaustive. Notes et liens en clair dans les exports. La seule activité réseau possible est l'ouverture explicite d'un fil dans le navigateur.
+
+## MG-002 — Coque et interactions de la Liste (0.2.0)
+
+Le moteur `core.py`, l'adaptateur `chatgpt.py`, `storage.py`, le modèle `Record` et les tests MG-001 sont conservés sans modification. **Aucune migration du schéma 1.** Le changement est dans la couche de présentation : `ui.py` orchestre la navigation, les filtres passés à `Catalog.search`, l'ouverture immédiate et les gestes de classement. `details.py` conserve l'édition détaillée et les protections MG-001, désormais appelées volontairement. `theme.py` centralise la charte et génère quelques petites icônes locales ; `widgets.py` fournit le sélecteur de pastilles. Ce sont des composants ttk concrets, sans nouveau moteur ou framework.
+
+Les créations et renommages sont des brouillons UI : ligne superposée à l'arbre ou zone intégrée à la liste. Aucune écriture avant Entrée/bouton explicite ; Échap détruit seulement le brouillon. Les doublons sont vérifiés par l'adaptateur et requièrent une action explicite inline. La confirmation reste liée à l'UUID vérifié, même si l'URL saisie change ensuite.
+
+Le glisser-déposer ne modifie rien pendant le survol : la cible est validée puis marquée. À la dépose, `App.transfer` compose les opérations génériques existantes `Catalog.move`/`attach`. Il ne connaît aucune URL. Pour les fiches, un déplacement remplace uniquement un rattachement de départ explicite. Les autres liens sont conservés ; un départ ambigu ouvre un choix intégré sans mutation préalable. Le menu contextuel et le clavier utilisent la même orchestration. Le drag droit a des gestionnaires et tests de contrat mais reste une réserve de validation physique Windows, contrairement au menu équivalent réellement testé.
+
+`ui_state.py` lit/écrit `interface.json` dans le dossier actif, avec son propre `version: 1`, et réutilise seulement l'écriture atomique. Il mémorise la vue Liste, la visibilité de l'inspecteur et les dimensions. Ce fichier n'est pas une donnée métier et n'est pas exporté/restauré avec le catalogue. Une préférence illisible n'entraîne aucune réinitialisation métier et est annoncée. L'application n'ajoute aucun champ visuel aux fiches : couvertures et vues suivantes demanderont leur lot dédié.
+
+Le navigateur est une fonction injectable à la frontière UI. Le mode de recette explicite `--simulate-open` utilise la même validation `parse_url` puis journalise localement, sans lancer de navigateur. Le titre et le statut signalent cette simulation ; le dossier utilisateur par défaut est refusé pour ce mode. En usage normal, la même action validée appelle `webbrowser.open` sur le geste de l'utilisateur.

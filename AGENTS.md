@@ -9,3 +9,5 @@ Interface et documentation en français. Ne publier que des exemples fictifs.
 Les URL, identités de conversation et règles propres à ChatGPT appartiennent à `chatgpt.py`. Les informations spécifiques ne doivent pas migrer dans les fiches génériques. Le stockage orchestre les formats ; l'interface orchestre les interactions. Préserver ces frontières pour permettre l'extraction future du socle sans réécriture métier. Aucun système de plugins anticipé.
 
 Lancer `python -m unittest discover -s tests -v` et la recette Windows avant publication. Ne pas versionner les données utilisateur.
+
+MG-002 : préserver l'ouverture directe depuis la Liste et les créations intégrées. Utiliser les tokens de `theme.py`. Le schéma métier 1 reste strict ; les préférences UI restent dans `interface.json`, hors catalogue. Vues Détaillée/Mosaïque, couvertures et imports attendent une mission validée. Les trois PNG de référence dans `missions/MG-002-maquettes` ne doivent pas être modifiés ou embarqués dans le code.
