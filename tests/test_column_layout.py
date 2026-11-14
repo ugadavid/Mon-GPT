@@ -39,7 +39,7 @@ class ColumnLayoutTests(unittest.TestCase):
             self.app.resize(width,height)
             self.root.update()
             menu_bottom=self.app.main_menu.winfo_rooty()+self.app.main_menu.winfo_height()
-            self.assertLessEqual(self.app.left.winfo_rooty()-menu_bottom,8)
+            self.assertLessEqual(self.app.left.winfo_rooty()-menu_bottom,20)
             self.assertEqual(self.app.left.winfo_rooty(),self.app.middle.winfo_rooty())
             self.assertIs(self.app.masthead.master,self.app.middle)
             self.assertLessEqual(self.app.search_line.winfo_width(),760)

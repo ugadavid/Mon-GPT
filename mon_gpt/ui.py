@@ -13,6 +13,7 @@ from .theme import COLORS, FONT, apply_theme, make_icons
 from .atelier import Masthead, Surface, PillButton, CatalogList, AutoScrollbar, skin_menu, shorten
 from .main_menu import MainMenuBar
 from .inspector import InspectorSummary, InspectorScrollbar
+from .navigation import NavigationTree, NavigationScrollbar, navigation_icons
 from . import ui_state, __version__
 
 
@@ -88,10 +89,10 @@ class App(DetailEditor):
 
     def build_shell(self):
         self.panes = ttk.Panedwindow(self.root,orient="horizontal",height=360)
-        self.panes.pack(fill="both",expand=True,padx=18,pady=(3,0))
+        self.panes.pack(fill="both",expand=True,padx=24,pady=(10,0))
         self._sash_ready = False
         self.panes.bind("<Configure>", lambda e: self.place_initial_sash())
-        self.left,self.middle,self.right=(ttk.Frame(self.panes,padding=4) for _ in range(3))
+        self.left,self.middle,self.right=(ttk.Frame(self.panes,padding=6) for _ in range(3))
         self.panes.add(self.left,weight=0)
         self.panes.add(self.middle,weight=1)
         self.left.configure(width=252)
@@ -145,28 +146,34 @@ class App(DetailEditor):
         nav=nav_surface.body
         nav_title=ttk.Frame(nav,style="Paper.TFrame")
         nav_title.pack(fill="x",pady=(3,10))
-        ttk.Label(nav_title,text="Votre espace",style="Inspector.TLabel",font=("Segoe UI",15,"bold")).pack(side="left")
+        ttk.Label(nav_title,text="Votre espace",style="Inspector.TLabel",font=("Segoe UI",12,"bold")).pack(side="left")
         plus=self.button(nav_title,text="+",command=lambda:None,width=31,height=29)
         plus.configure(command=lambda:self.plus.tk_popup(plus.winfo_rootx(),plus.winfo_rooty()+34))
         plus.pack(side="right")
-        self.sorting=ttk.Combobox(nav,textvariable=self.sort,values=["Manuel","Alphabétique français"],state="readonly",width=19)
-        self.sorting.pack(fill="x",pady=(0,10))
+        sort_row=ttk.Frame(nav,style="Paper.TFrame")
+        sort_row.pack(fill="x",pady=(0,9))
+        ttk.Label(sort_row,text="Tri",style="PaperMuted.TLabel",font=("Segoe UI",9)).pack(side="left",padx=(0,7))
+        nav_style=ttk.Style(nav)
+        nav_style.configure("Nav.TCombobox",padding=(5,3),fieldbackground=COLORS["paper"],bordercolor=COLORS["line"],arrowsize=10)
+        self.sorting=ttk.Combobox(sort_row,textvariable=self.sort,values=["Manuel","Alphabétique français"],state="readonly",width=1,style="Nav.TCombobox",font=("Segoe UI",9))
+        self.sorting.pack(side="left",fill="x",expand=True)
         self.sorting.bind("<<ComboboxSelected>>",lambda e:self.refresh_tree())
         tree_box=ttk.Frame(nav,style="Paper.TFrame")
         tree_box.pack(fill="both",expand=True)
-        self.tree=ttk.Treeview(tree_box,show="tree",selectmode="browse",style="Nav.Treeview",height=1)
+        self.nav_icons=navigation_icons(self.root)
+        self.tree=NavigationTree(tree_box)
         self.tree.column("#0",width=194,minwidth=140)
-        sb=AutoScrollbar(tree_box,orient="vertical",command=self.tree.yview)
+        sb=NavigationScrollbar(tree_box,self.tree)
         sb.pack(side="right",fill="y")
         self.tree.configure(yscrollcommand=sb.set)
         self.tree.pack(side="left",expand=True,fill="both")
         self.tree.bind("<<TreeviewSelect>>",self.select_scope)
         for tag,color in [("drop",COLORS["selection"]),("forbidden",COLORS["invalid"])]:
             self.tree.tag_configure(tag,background=color)
-        ttk.Separator(nav).pack(fill="x",pady=11)
-        self.drop_label=ttk.Label(nav,text="↳  Glissez pour classer",style="PaperMuted.TLabel",wraplength=212)
+        ttk.Separator(nav).pack(fill="x",pady=8)
+        self.drop_label=ttk.Label(nav,text="↳  Glissez pour classer",style="PaperMuted.TLabel",font=("Segoe UI",9),wraplength=212)
         self.drop_label.pack(anchor="w",pady=3)
-        self.sidebar_note=ttk.Label(nav,text="Vos projets. Vos repères.\nTout reste sur cet ordinateur.",style="PaperMuted.TLabel",wraplength=212)
+        self.sidebar_note=ttk.Label(nav,text="Clic droit · actions",style="PaperMuted.TLabel",font=("Segoe UI",8),wraplength=212)
         self.sidebar_note.pack(anchor="w",pady=(6,3))
         titlebar=ttk.Frame(self.middle,padding=(10,4,6,9))
         titlebar.pack(fill="x")
@@ -402,12 +409,12 @@ class App(DetailEditor):
     def refresh_tree(self):
         opened = {p for p in self.cat.records if self.tree.exists(p) and self.tree.item(p, "open")}
         self.tree.delete(*self.tree.get_children())
-        self.tree.insert("", "end", iid="all", text="Tous les fils", image=self.icons["all"])
-        self.tree.insert("", "end", iid="unfiled", text="À classer", image=self.icons["unfiled"])
+        self.tree.insert("", "end", iid="all", text="Tous les fils", image=self.nav_icons["all"])
+        self.tree.insert("", "end", iid="unfiled", text="À classer", image=self.nav_icons["unfiled"])
         pending = [(r, "") for r in reversed(self.cat.children(None, self.sort.get() != "Manuel"))]
         while pending:
             r, parent = pending.pop()
-            self.tree.insert(parent, "end", iid=r.id, text=r.title, image=self.icons["project"], open=(r.id in opened or not opened))
+            self.tree.insert(parent, "end", iid=r.id, text=r.title, image=self.nav_icons["project"], open=(r.id in opened or not opened))
             pending.extend((c, r.id) for c in reversed(self.cat.children(r.id, self.sort.get() != "Manuel")))
         if not self.tree.exists(self.scope):
             self.scope = "all"

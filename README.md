@@ -12,6 +12,8 @@ MG-002b-04 compacte l’inspecteur : icône accolée au titre, trois actions sur
 
 MG-002b-05 harmonise le seul éditeur avec cet aperçu : champs papier à bordure fine, libellés courts et pastilles colorées réparties selon la largeur du panneau. Les saisies de tags/catégories occupent la largeur utile ; Tab et Shift+Tab parcourent aussi les champs multiligne. Les protections et l’enregistrement restent identiques. [Rapport et trois captures](reports/MG-002b-05/rapport.md).
 
+MG-002b-06 affine la navigation gauche : dossiers au trait, sélection sauge, niveaux réguliers, tri compact et libellés complets au survol. Les cartes respirent davantage. Les erreurs ordinaires de l’éditeur apparaissent sous leur champ ; la confirmation de suppression se limite au titre et, pour un projet, à son impact. Non, Échap et la croix annulent. [Rapport et quatre captures réelles](reports/MG-002b-06/rapport.md).
+
 ## Lancer
 
 Windows 11 x64, Python 3.13 avec Tcl/Tk et commande `python` accessible. Aucune dépendance pip ni police à installer. Recette sur CODEX-VM avec Python 3.13.17 / Tk 8.6. Depuis PowerShell :

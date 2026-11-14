@@ -8,6 +8,47 @@ from .storage import encode, decode
 from .widgets import ChipPicker, EditorDelete, editor_styles
 from .inspector import InspectorAction
 from .theme import COLORS
+from .chatgpt import parse_url
+
+
+def confirm_delete(parent,message):
+    """Seule confirmation de suppression : Non, Échap et croix annulent."""
+    dialog=tk.Toplevel(parent)
+    dialog.withdraw()
+    dialog.title("Confirmer la suppression")
+    dialog.transient(parent)
+    dialog.resizable(False,False)
+    dialog.configure(background=COLORS["paper"])
+    result=False
+    previous=parent.focus_get()
+    def finish(accepted=False):
+        nonlocal result
+        result=accepted
+        dialog.destroy()
+    body=ttk.Frame(dialog,style="Paper.TFrame",padding=22)
+    body.pack(fill="both",expand=True)
+    ttk.Label(body,text=message,style="Paper.TLabel",font=("Segoe UI",11),wraplength=390,justify="left").pack(anchor="w",pady=(0,20))
+    actions=ttk.Frame(body,style="Paper.TFrame")
+    actions.pack(anchor="e")
+    no=ttk.Button(actions,text="Non",width=8,command=finish)
+    no.pack(side="left",padx=(0,8))
+    yes=ttk.Button(actions,text="Oui",width=8,command=lambda:finish(True))
+    yes.pack(side="left")
+    dialog.protocol("WM_DELETE_WINDOW",finish)
+    dialog.bind("<Escape>",lambda e:finish())
+    dialog.bind("<Return>",lambda e:finish(dialog.focus_get()==yes))
+    dialog.update_idletasks()
+    width,height=dialog.winfo_reqwidth(),dialog.winfo_reqheight()
+    x=parent.winfo_rootx()+(parent.winfo_width()-width)//2
+    y=parent.winfo_rooty()+(parent.winfo_height()-height)//2
+    dialog.geometry(f"+{max(0,x)}+{max(0,y)}")
+    dialog.deiconify()
+    dialog.wait_visibility()
+    dialog.grab_set()
+    no.focus_force()
+    parent.wait_window(dialog)
+    if previous is not None and previous.winfo_exists(): previous.focus_set()
+    return result
 
 
 class DetailEditor:
@@ -61,6 +102,7 @@ class DetailEditor:
         form=ttk.Frame(self.editor,style="Paper.TFrame")
         form.pack(fill="x")
         self.editor_controls={}
+        self.editor_errors={}
         wrapped=[]
         header=ttk.Frame(form,style="Paper.TFrame")
         header.pack(fill="x",pady=(0,8))
@@ -90,7 +132,10 @@ class DetailEditor:
             if lines == 1:
                 var = tk.StringVar(value=value)
                 widget = ttk.Entry(form, textvariable=var,style="Editor.TEntry",font=("Segoe UI",10),width=1)
-                var.trace_add("write", lambda *args: setattr(self, "dirty", True))
+                def changed(*args):
+                    self.dirty=True
+                    if var.get().strip(): self.clear_field_error(key)
+                var.trace_add("write",changed)
                 self.fields[key] = lambda v=var: v.get()
             else:
                 widget = tk.Text(form, height=lines, wrap="word", font=("Segoe UI",10), relief="flat", borderwidth=0, undo=True, background=COLORS["paper"], foreground=COLORS["ink"], highlightbackground=COLORS["line"], highlightcolor=COLORS["pine"], highlightthickness=1,padx=6,pady=5,width=1,insertofftime=500)
@@ -99,6 +144,7 @@ class DetailEditor:
                 def modified(e, w=widget):
                     if w.edit_modified():
                         self.dirty = True
+                        self.clear_field_error(key)
                         w.edit_modified(False)
                 widget.bind("<<Modified>>", modified)
                 widget.bind("<Tab>",text_tab)
@@ -106,6 +152,9 @@ class DetailEditor:
                 self.fields[key] = lambda w=widget: w.get("1.0", "end-1c")
             self.editor_controls[key]=widget
             widget.pack(fill="x")
+            error=ttk.Label(form,text="",background="#F7E6DF",foreground="#8C4F38",font=("Segoe UI",9),padding=(6,4),wraplength=280,justify="left")
+            self.editor_errors[key]=error
+            wrapped.append(error)
         self.pickers = {}
         field("title", "Titre", r.title)
         if r.kind == "item":
@@ -156,6 +205,26 @@ class DetailEditor:
         self.locations.selection_clear(0, "end")
         self.dirty = True
 
+    def clear_field_error(self,key):
+        label=getattr(self,"editor_errors",{}).get(key)
+        if label is not None and label.winfo_exists(): label.pack_forget()
+
+    def field_error(self,key,message):
+        label=getattr(self,"editor_errors",{}).get(key)
+        widget=getattr(self,"editor_controls",{}).get(key)
+        if label is None or widget is None:
+            raise ValueError(message)
+        label.configure(text=message)
+        label.pack(fill="x",after=widget,pady=(3,0))
+        self.root.update_idletasks()
+        if widget.winfo_rooty()<self.canvas.winfo_rooty() or widget.winfo_rooty()+widget.winfo_height()>self.canvas.winfo_rooty()+self.canvas.winfo_height():
+            bounds=self.canvas.bbox("all")
+            if bounds:
+                y=widget.winfo_rooty()-self.editor.winfo_rooty()
+                self.canvas.yview_moveto(max(0,(y-20)/max(1,bounds[3])))
+        widget.focus_set()
+        return False
+
     def save_record(self):
         if self.current is None:
             return False
@@ -163,7 +232,12 @@ class DetailEditor:
             r = self.cat.records[self.current]
             values = {k: (read() if k in ("tags", "categories") else read().strip()) for k, read in self.fields.items()}
             if not values["title"]:
-                raise ValueError("Le titre est obligatoire.")
+                return self.field_error("title","Le titre est obligatoire.")
+            if r.kind=="item":
+                try:
+                    parse_url(values["url"])
+                except ValueError as exc:
+                    return self.field_error("url",str(exc))
             metadata = {}
             for line in values["metadata"].splitlines():
                 if not line.strip():
@@ -171,7 +245,7 @@ class DetailEditor:
                 key, sep, value = line.partition("=")
                 key = key.strip()
                 if not sep or not key or key in metadata:
-                    raise ValueError("Chaque information doit avoir une clé unique, suivie de = et de sa valeur.")
+                    return self.field_error("metadata","Chaque information doit avoir une clé unique, suivie de = et de sa valeur.")
                 metadata[key] = value.strip()
             def mutate():
                 if r.kind == "item":
@@ -199,8 +273,13 @@ class DetailEditor:
         if not self.current:
             return
         r = self.cat.records[self.current]
-        effect = "Les sous-projets seront remontés au parent. Les rattachements à ce projet seront retirés. Toutes les discussions seront conservées." if r.kind == "project" else "La fiche locale et tous ses rattachements seront supprimés. Le fil chez ChatGPT reste intact."
-        if messagebox.askyesno("Confirmer la suppression", f"Supprimer « {r.title} » ?\n\n{effect}", parent=self.root):
+        message=f"Supprimer « {r.title} » ?"
+        if r.kind=="project":
+            children=len(self.cat.children(r.id))
+            links=sum(r.id in item.projects for item in self.cat.records.values() if item.kind=="item")
+            if children or links:
+                message+=f"\n{children} sous-projet(s), {links} rattachement(s) affectés."
+        if confirm_delete(self.root,message):
             def action():
                 self.transaction(lambda: self.cat.delete(r.id))
                 self.scope, self.dirty = "all", False

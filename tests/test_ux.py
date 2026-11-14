@@ -202,7 +202,7 @@ class GestureTests(unittest.TestCase):
 
     def test_delete_project_via_ui_preserves_fiche_and_never_contacts_browser(self):
         self.app.current = self.a.id
-        with patch("mon_gpt.details.messagebox.askyesno", return_value=True):
+        with patch("mon_gpt.details.confirm_delete", return_value=True):
             self.app.delete()
         self.assertIn(self.item.id, self.cat.records)
         self.assertEqual(self.item.projects, [self.b.id])

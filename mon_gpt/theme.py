@@ -54,7 +54,7 @@ def apply_theme(root):
     style.configure("Nav.Treeview", rowheight=40, background=c["paper"], fieldbackground=c["paper"], borderwidth=0, font=("Segoe UI",11))
     style.map("Nav.Treeview", background=[("selected",c["pine"])], foreground=[("selected",c["paper"])])
     style.layout("Nav.Treeview",[("Treeview.treearea",{"sticky":"nswe"})])
-    style.configure("TPanedwindow", background=c["line"])
+    style.configure("TPanedwindow", background=c["ivory"])
     style.configure("TSeparator", background=c["line"])
     style.configure("Vertical.TScrollbar", background=c["line"], troughcolor=c["paper"], arrowsize=9, borderwidth=0)
     for orientation,sticky in [("Vertical","ns"),("Horizontal","we")]:
