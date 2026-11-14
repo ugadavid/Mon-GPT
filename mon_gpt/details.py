@@ -53,13 +53,13 @@ class DetailEditor:
             widget.destroy()
         if identity is None or identity not in self.cat.records:
             ttk.Label(self.editor, text="Sélectionnez une fiche" if self.cat.records else "Votre bibliothèque commence ici", style="Title.TLabel", wraplength=350).pack(anchor="w", pady=14)
-            ttk.Label(self.editor, text="Créez un projet ou ajoutez un fil avec les boutons du haut.\n\nSélectionnez ensuite une fiche pour l'éditer.\nLes notes et classements restent sur cet ordinateur.", wraplength=350, justify="left").pack(anchor="w")
+            ttk.Label(self.editor, text="Créez un projet ou un fil depuis Édition ou le menu + de votre espace.\n\nVos notes restent sur cet ordinateur.", style="PaperMuted.TLabel", wraplength=280, justify="left").pack(anchor="w")
             return
         r = self.cat.records[identity]
-        ttk.Label(self.editor, text="Projet" if r.kind == "project" else "Discussion", style="Title.TLabel").pack(anchor="w")
+        ttk.Label(self.editor, text="Votre fiche locale", style="Inspector.TLabel").pack(anchor="w",pady=(0,8))
         self.fields = {}
         def field(key, label, value, lines=1):
-            ttk.Label(self.editor, text=label).pack(anchor="w", pady=(8, 2))
+            ttk.Label(self.editor, text=label.upper(),style="Caption.TLabel",wraplength=280).pack(anchor="w", pady=(14, 5))
             if key in ("tags", "categories"):
                 picker = ChipPicker(self.editor, getattr(r, key), lambda k=key: [v for row in self.cat.records.values() for v in getattr(row, k)], lambda: setattr(self, "dirty", True))
                 picker.pack(fill="x")
@@ -83,7 +83,7 @@ class DetailEditor:
                 self.fields[key] = lambda w=widget: w.get("1.0", "end-1c")
             widget.pack(fill="x")
         self.pickers = {}
-        ttk.Button(self.editor, text="← Aperçu", command=lambda: self.show_summary(self.current)).pack(anchor="w")
+        self.button(self.editor, text="← Revenir à l'aperçu", command=lambda: self.show_summary(self.current),height=30).pack(anchor="w",pady=(0,8))
         field("title", "Titre local", r.title)
         if r.kind == "item":
             field("url", "Lien ChatGPT", self.adapter.conversations[r.id].url)
@@ -94,30 +94,30 @@ class DetailEditor:
         field("metadata", "Informations personnalisées (une clé=valeur par ligne)", "\n".join(f"{k}={v}" for k, v in r.metadata.items()), 3)
         self.project_ids = sorted((p.id for p in self.cat.records.values() if p.kind == "project"), key=lambda p: self.project_label(p).casefold())
         if r.kind == "item":
-            ttk.Label(self.editor, text="Emplacements — Ctrl+clic pour sélectionner plusieurs").pack(anchor="w", pady=(8, 2))
-            self.locations = tk.Listbox(self.editor, selectmode="extended", exportselection=False, height=4, font=("Segoe UI", 10))
+            ttk.Label(self.editor, text="EMPLACEMENTS · Ctrl+clic pour sélectionner plusieurs",style="Caption.TLabel",wraplength=280).pack(anchor="w", pady=(14, 5))
+            self.locations = tk.Listbox(self.editor, selectmode="extended", exportselection=False, height=4, font=("Segoe UI", 10),background=COLORS["paper"],foreground=COLORS["ink"],selectbackground=COLORS["pine"],selectforeground=COLORS["paper"],relief="flat",highlightbackground=COLORS["line"],highlightthickness=1)
             self.locations.pack(fill="x")
             for n, pid in enumerate(self.project_ids):
                 self.locations.insert("end", self.project_label(pid))
                 if pid in r.projects:
                     self.locations.selection_set(n)
             self.locations.bind("<<ListboxSelect>>", lambda e: setattr(self, "dirty", True))
-            ttk.Button(self.editor, text="Retirer tous les rattachements", command=self.clear_locations).pack(anchor="w")
+            self.button(self.editor, text="Retirer tous les rattachements", command=self.clear_locations,height=30).pack(anchor="w",pady=5)
         else:
             self.parent_ids = [None] + [p for p in self.project_ids if p not in self.cat.descendants(r.id)]
-            ttk.Label(self.editor, text="Déplacer sous").pack(anchor="w", pady=(8, 2))
+            ttk.Label(self.editor, text="DÉPLACER SOUS",style="Caption.TLabel").pack(anchor="w", pady=(14, 5))
             self.parent_box = ttk.Combobox(self.editor, state="readonly", values=["À la racine" if p is None else self.project_label(p) for p in self.parent_ids])
             self.parent_box.current(self.parent_ids.index(r.parent))
             self.parent_box.pack(fill="x")
             self.parent_box.bind("<<ComboboxSelected>>", lambda e: setattr(self, "dirty", True))
-        actions = ttk.Frame(self.editor)
+        actions = ttk.Frame(self.editor,style="Paper.TFrame")
         actions.pack(fill="x", pady=14)
-        ttk.Button(actions, text="Enregistrer", command=self.save_record).pack(side="left")
+        self.button(actions, text="Enregistrer",style="Primary.TButton", command=self.save_record).pack(side="left")
         if r.kind == "item":
-            ttk.Button(actions, text="Ouvrir le fil", command=self.open_thread).pack(side="left", padx=4)
-        ttk.Button(actions, text="Supprimer…", command=self.delete).pack(side="right")
+            self.button(actions, text="↗", command=self.open_thread,width=33).pack(side="left", padx=4)
+        self.button(actions, text="Supprimer…", command=self.delete).pack(side="right")
         fmt = lambda value: datetime.fromisoformat(value).astimezone().strftime("%d/%m/%Y %H:%M:%S")
-        ttk.Label(self.editor, text=f"Créé le {fmt(r.created)}\nModifié le {fmt(r.modified)}", foreground="#5b6567").pack(anchor="w")
+        ttk.Label(self.editor, text=f"Créé le {fmt(r.created)}\nModifié le {fmt(r.modified)}", style="PaperMuted.TLabel").pack(anchor="w")
         self.canvas.yview_moveto(0)
 
     def clear_locations(self):

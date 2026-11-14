@@ -30,8 +30,10 @@ def main():
             with (store.directory / "ouvertures-recette.log").open("a", encoding="utf-8") as log:
                 log.write(url + "\n")
             return True
-    App(root, store, catalog, adapter, opener=opener)
+    app = App(root, store, catalog, adapter, opener=opener)
     root.deiconify()
+    root.update()
+    app.place_initial_sash(force=True)
     root.mainloop()
     return 0
 

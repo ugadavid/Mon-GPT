@@ -2,24 +2,25 @@
 import tkinter as tk
 from tkinter import ttk
 from .core import fold
+from .atelier import PillButton
 
 
 class ChipPicker(ttk.Frame):
     def __init__(self, parent, values, suggestions, changed):
-        super().__init__(parent)
+        super().__init__(parent, style="Paper.TFrame")
         self.values = list(values)
         self.suggestions, self.changed = suggestions, changed
-        self.chips = ttk.Frame(self)
+        self.chips = ttk.Frame(self, style="Paper.TFrame")
         self.chips.pack(fill="x")
-        row = ttk.Frame(self)
+        row = ttk.Frame(self, style="Paper.TFrame")
         row.pack(fill="x", pady=(3, 0))
         self.input = ttk.Combobox(row, values=self.known(), width=18)
         self.input.pack(side="left", fill="x", expand=True)
         self.input.bind("<<ComboboxSelected>>", self.add)
         self.input.bind("<Return>", self.add)
         self.input.bind("<KeyRelease>", self.suggest)
-        ttk.Button(row, text="+ Ajouter", command=self.add).pack(side="left", padx=(5, 0))
-        self.hint = ttk.Label(self, style="Muted.TLabel", wraplength=300)
+        PillButton(row, text="+", command=self.add, width=30, height=30).pack(side="left", padx=(5, 0))
+        self.hint = ttk.Label(self, style="PaperMuted.TLabel", wraplength=280)
         self.hint.pack(anchor="w")
         self.redraw()
 
@@ -52,7 +53,7 @@ class ChipPicker(ttk.Frame):
         for child in self.chips.winfo_children():
             child.destroy()
         for n, value in enumerate(self.values):
-            ttk.Button(self.chips, text=value + " ×", style="Chip.TButton", command=lambda v=value: self.remove(v)).grid(row=n//2, column=n%2, sticky="w", padx=(0, 4), pady=2)
+            PillButton(self.chips, text=value + " ×", tone="chip", height=28, command=lambda v=value: self.remove(v)).grid(row=n//2, column=n%2, sticky="w", padx=(0, 4), pady=2)
         self.hint.configure(text="Choisissez une valeur connue ou saisissez-en une nouvelle." if self.known() else "Aucune valeur connue : créez la première ici.")
 
     def get(self):

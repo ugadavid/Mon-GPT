@@ -10,6 +10,7 @@ from .core import fold, now
 from .chatgpt import parse_url
 from .details import DetailEditor
 from .theme import COLORS, FONT, apply_theme, make_icons
+from .atelier import Masthead, Surface, PillButton, CatalogList, AutoScrollbar, skin_menu
 from . import ui_state, __version__
 
 
@@ -45,14 +46,14 @@ class App(DetailEditor):
 
     def build_menus(self):
         bar = tk.Menu(self.root, tearoff=False)
-        file = tk.Menu(bar, tearoff=False)
+        file = skin_menu(tk.Menu(bar, tearoff=False))
         file.add_command(label="Sauvegarder le catalogue…", command=self.export)
         file.add_command(label="Restaurer le catalogue…", command=self.restore)
         file.add_separator()
         file.add_command(label="Dossier de données", command=self.open_data)
         file.add_command(label="Quitter", command=self.close)
         bar.add_cascade(label="Fichier", menu=file)
-        edit = tk.Menu(bar, tearoff=False)
+        edit = skin_menu(tk.Menu(bar, tearoff=False))
         edit.add_command(label="Nouveau fil", accelerator="Ctrl+N", command=lambda: self.new("item"))
         edit.add_command(label="Nouveau projet", accelerator="Ctrl+Maj+P", command=lambda: self.new("project"))
         edit.add_separator()
@@ -60,7 +61,7 @@ class App(DetailEditor):
         edit.add_command(label="Modifier la fiche", command=lambda: self.edit_selected())
         edit.add_command(label="Enregistrer la fiche", accelerator="Ctrl+S", command=self.save_record)
         bar.add_cascade(label="Édition", menu=edit)
-        view = tk.Menu(bar, tearoff=False)
+        view = skin_menu(tk.Menu(bar, tearoff=False))
         view.add_command(label="Liste · vue actuelle", state="disabled")
         view.add_command(label="Afficher / masquer l'inspecteur", command=self.toggle_inspector)
         view.add_command(label="Rechercher", accelerator="Ctrl+K", command=self.focus_search)
@@ -69,123 +70,181 @@ class App(DetailEditor):
         view.add_command(label="Fenêtre compacte · 1000 × 680", command=lambda: self.resize(1000, 680))
         view.add_command(label="Fenêtre confortable · 1360 × 820", command=lambda: self.resize(1360, 820))
         bar.add_cascade(label="Affichage", menu=view)
-        help_menu = tk.Menu(bar, tearoff=False)
+        help_menu = skin_menu(tk.Menu(bar, tearoff=False))
         help_menu.add_command(label="Gestes et raccourcis", command=self.help)
         help_menu.add_command(label="À propos de Mon GPT<3", command=lambda: messagebox.showinfo("Mon GPT<3", f"Version {__version__} · Atelier chaleureux\nCatalogue local, aucune modification dans ChatGPT.\nDétaillée, Mosaïque et couvertures : prévues, non livrées.", parent=self.root))
         bar.add_cascade(label="Aide", menu=help_menu)
-        self.root.configure(menu=bar)
-        self.plus = tk.Menu(self.root, tearoff=False)
+        menubar = ttk.Frame(self.root, padding=(22, 4))
+        menubar.pack(fill="x")
+        for label, menu in [("Fichier", file), ("Édition", edit), ("Affichage", view), ("Aide", help_menu)]:
+            button = self.button(menubar, text=label + "  ⌄", command=lambda: None, height=28)
+            button.configure(command=lambda m=menu, b=button: m.tk_popup(b.winfo_rootx(), b.winfo_rooty()+b.winfo_height()+4))
+            button.pack(side="left", padx=(0, 3))
+        ttk.Label(menubar, text="VOTRE ATELIER PERSONNEL", style="Muted.TLabel", font=("Segoe UI",8)).pack(side="right")
+        self.plus = skin_menu(tk.Menu(self.root, tearoff=False))
         self.plus.add_command(label="Nouveau fil", accelerator="Ctrl+N", command=lambda: self.new("item"))
         self.plus.add_command(label="Nouveau projet", accelerator="Ctrl+Maj+P", command=lambda: self.new("project"))
 
+    def button(self, parent, text, command=lambda: None, style=None, **kwargs):
+        tone = {"Primary.TButton": "primary", "Open.TButton": "warm", "Chip.TButton": "chip"}.get(style, "quiet")
+        return PillButton(parent, text, command, tone=tone, **kwargs)
+
     def build_shell(self):
-        header = ttk.Frame(self.root, padding=(22, 14))
-        header.pack(fill="x")
-        ttk.Label(header, text="♡", foreground=COLORS["terracotta"], font=("Segoe UI", 27)).pack(side="left", padx=(0, 8))
-        ttk.Label(header, text="Mon GPT<3", style="Title.TLabel").pack(side="left")
-        ttk.Label(header, text="  Votre organisation, en local", style="Muted.TLabel").pack(side="left")
-        ttk.Button(header, text="Inspecteur", command=self.toggle_inspector).pack(side="right")
-        ttk.Button(header, text="+ Nouveau ▾", style="Primary.TButton", command=lambda: self.plus.tk_popup(header.winfo_rootx()+header.winfo_width()-260, header.winfo_rooty()+48)).pack(side="right", padx=8)
-        search_area = ttk.Frame(self.root, padding=(22, 0, 22, 10))
+        Masthead(self.root).pack(fill="x", padx=4)
+        search_area = ttk.Frame(self.root, padding=(24, 12, 24, 7))
         search_area.pack(fill="x")
         line = ttk.Frame(search_area)
         line.pack(fill="x")
-        ttk.Label(line, text="Rechercher", style="Heading.TLabel").pack(side="left", padx=(0, 12))
-        self.search_entry = ttk.Entry(line, textvariable=self.query, font=("Segoe UI", 12))
-        self.search_entry.pack(side="left", expand=True, fill="x")
-        self.search_entry.bind("<Return>", self.search_enter)
-        self.search_entry.bind("<KeyRelease>", self.search_changed)
-        self.search_entry.bind("<Down>", self.focus_suggestions)
-        ttk.Button(line, text="Filtres ▾", command=lambda: self.show_suggestions(True)).pack(side="left", padx=6)
-        ttk.Button(line, text="Effacer", command=self.clear_filters).pack(side="left")
+        search_shell = Surface(line,height=52,padding=6)
+        search_shell.pack(side="left",expand=True,fill="x")
+        search_card = search_shell.body
+        tk.Label(search_card, text="⌕", background=COLORS["paper"], foreground=COLORS["pine"], font=("Segoe UI",22)).pack(side="left", padx=(12,4))
+        field = ttk.Frame(search_card, style="Paper.TFrame")
+        field.pack(side="left", expand=True, fill="x", pady=3)
+        self.search_entry = ttk.Entry(field, textvariable=self.query, font=("Segoe UI",12), style="Search.TEntry")
+        self.search_entry.pack(fill="x")
+        placeholder = tk.Label(field, text="Rechercher un fil, un projet, une idée…", font=("Segoe UI",11), foreground=COLORS["muted"], background=COLORS["paper"])
+        def placeholder_state(event=None):
+            if self.query.get() or self.root.focus_get()==self.search_entry:
+                placeholder.place_forget()
+            else:
+                placeholder.place(x=9,y=8)
+        placeholder.bind("<Button-1>",lambda e:self.search_entry.focus_set())
+        self.query.trace_add("write",lambda *args:placeholder_state())
+        self.search_entry.bind("<FocusIn>",placeholder_state)
+        self.search_entry.bind("<FocusOut>",placeholder_state)
+        placeholder_state()
+        tk.Label(search_card, text="Ctrl K", background=COLORS["paper"], foreground=COLORS["muted"], font=("Segoe UI",9)).pack(side="right",padx=12)
+        self.search_entry.bind("<Return>",self.search_enter)
+        self.search_entry.bind("<KeyRelease>",self.search_changed)
+        self.search_entry.bind("<Down>",self.focus_suggestions)
+        self.button(line,text="≡  Filtres",command=lambda:self.show_suggestions(True),height=42).pack(side="left",padx=(9,5))
+        self.button(line,text="×",command=self.clear_filters,width=40,height=42).pack(side="left")
         self.chips = ttk.Frame(search_area)
-        self.chips.pack(fill="x", pady=(7, 0))
-        self.suggestion_box = ttk.Frame(search_area)
-        self.suggestions = tk.Listbox(self.suggestion_box, height=5, font=FONT, background=COLORS["ivory"], foreground=COLORS["ink"], selectbackground=COLORS["selection"], selectforeground=COLORS["pine"], relief="solid", borderwidth=1, exportselection=False)
+        self.chips.pack(fill="x",pady=(8,1))
+        self.suggestion_box = ttk.Frame(search_area,style="Paper.TFrame",padding=12)
+        ttk.Label(self.suggestion_box,text="SUGGESTIONS  ·  TOUT LE CATALOGUE",style="Caption.TLabel").pack(anchor="w",pady=(0,5))
+        self.suggestions = tk.Listbox(self.suggestion_box,height=5,font=("Segoe UI",11),background=COLORS["paper"],foreground=COLORS["ink"],selectbackground=COLORS["pine"],selectforeground=COLORS["paper"],relief="flat",borderwidth=0,highlightthickness=0,exportselection=False)
         self.suggestions.pack(fill="x")
-        self.suggestions.bind("<ButtonRelease-1>", self.choose_suggestion)
-        self.suggestions.bind("<Return>", self.choose_suggestion)
-        self.suggestions.bind("<Escape>", lambda e: self.hide_suggestions())
-        self.panes = ttk.Panedwindow(self.root, orient="horizontal", height=400)
-        self.panes.pack(fill="both", expand=True, padx=18)
-        self.left, self.middle, self.right = (ttk.Frame(self.panes, padding=8) for _ in range(3))
-        self.panes.add(self.left, weight=0)
-        self.panes.add(self.middle, weight=1)
-        self.left.configure(width=250)
-        ttk.Label(self.left, text="Mon organisation", style="Heading.TLabel").pack(anchor="w", pady=(2, 10))
-        self.sorting = ttk.Combobox(self.left, textvariable=self.sort, values=["Manuel", "Alphabétique français"], state="readonly", width=22)
-        self.sorting.pack(fill="x", pady=(0, 8))
-        self.sorting.bind("<<ComboboxSelected>>", lambda e: self.refresh_tree())
-        tree_box = ttk.Frame(self.left)
-        tree_box.pack(fill="both", expand=True)
-        self.tree = ttk.Treeview(tree_box, show="tree", selectmode="browse", style="Nav.Treeview", height=1)
-        self.tree.column("#0", width=238, minwidth=150)
-        sb = ttk.Scrollbar(tree_box, orient="vertical", command=self.tree.yview)
-        sb.pack(side="right", fill="y")
+        self.suggestions.bind("<ButtonRelease-1>",self.choose_suggestion)
+        self.suggestions.bind("<Return>",self.choose_suggestion)
+        self.suggestions.bind("<Escape>",lambda e:self.hide_suggestions())
+        self.panes = ttk.Panedwindow(self.root,orient="horizontal",height=360)
+        self.panes.pack(fill="both",expand=True,padx=18,pady=(3,0))
+        self._sash_ready = False
+        self.panes.bind("<Configure>", lambda e: self.place_initial_sash())
+        self.left,self.middle,self.right=(ttk.Frame(self.panes,padding=4) for _ in range(3))
+        self.panes.add(self.left,weight=0)
+        self.panes.add(self.middle,weight=1)
+        self.left.configure(width=252)
+        nav_surface=Surface(self.left,width=230,height=120)
+        nav_surface.pack(fill="both",expand=True)
+        nav=nav_surface.body
+        nav_title=ttk.Frame(nav,style="Paper.TFrame")
+        nav_title.pack(fill="x",pady=(3,10))
+        ttk.Label(nav_title,text="Votre espace",style="Inspector.TLabel",font=("Segoe UI",15,"bold")).pack(side="left")
+        plus=self.button(nav_title,text="+",command=lambda:None,width=31,height=29)
+        plus.configure(command=lambda:self.plus.tk_popup(plus.winfo_rootx(),plus.winfo_rooty()+34))
+        plus.pack(side="right")
+        self.sorting=ttk.Combobox(nav,textvariable=self.sort,values=["Manuel","Alphabétique français"],state="readonly",width=19)
+        self.sorting.pack(fill="x",pady=(0,10))
+        self.sorting.bind("<<ComboboxSelected>>",lambda e:self.refresh_tree())
+        tree_box=ttk.Frame(nav,style="Paper.TFrame")
+        tree_box.pack(fill="both",expand=True)
+        self.tree=ttk.Treeview(tree_box,show="tree",selectmode="browse",style="Nav.Treeview",height=1)
+        self.tree.column("#0",width=194,minwidth=140)
+        sb=AutoScrollbar(tree_box,orient="vertical",command=self.tree.yview)
+        sb.pack(side="right",fill="y")
         self.tree.configure(yscrollcommand=sb.set)
-        self.tree.pack(side="left", expand=True, fill="both")
-        self.tree.bind("<<TreeviewSelect>>", self.select_scope)
-        for tag, color in [("drop", COLORS["selection"]), ("forbidden", COLORS["invalid"])]:
-            self.tree.tag_configure(tag, background=color)
-        ttk.Separator(self.left).pack(fill="x", pady=8)
-        ttk.Label(self.left, text="Déposez un projet dans l'arbre.\nPour la racine : Tous les fils.\nClic droit : classer et organiser.", style="Muted.TLabel", wraplength=235).pack(anchor="w", pady=4)
-        titlebar = ttk.Frame(self.middle)
-        titlebar.pack(fill="x", pady=(2, 10))
-        self.results_label = ttk.Label(titlebar, text="Tous les fils", style="Heading.TLabel")
-        self.results_label.pack(side="left", fill="x", expand=True)
-        ttk.Label(titlebar, text="≡ Liste", foreground=COLORS["pine"]).pack(side="right")
-        self.work = ttk.Frame(self.middle)
-        self.work.pack(fill="x")
-        self.work_error = tk.StringVar()
-        self.work_content = ttk.Frame(self.work)
+        self.tree.pack(side="left",expand=True,fill="both")
+        self.tree.bind("<<TreeviewSelect>>",self.select_scope)
+        for tag,color in [("drop",COLORS["selection"]),("forbidden",COLORS["invalid"])]:
+            self.tree.tag_configure(tag,background=color)
+        ttk.Separator(nav).pack(fill="x",pady=11)
+        self.drop_label=ttk.Label(nav,text="↳  Glissez pour classer",style="PaperMuted.TLabel",wraplength=212)
+        self.drop_label.pack(anchor="w",pady=3)
+        self.sidebar_note=ttk.Label(nav,text="Vos projets. Vos repères.\nTout reste sur cet ordinateur.",style="PaperMuted.TLabel",wraplength=212)
+        self.sidebar_note.pack(anchor="w",pady=(6,3))
+        titlebar=ttk.Frame(self.middle,padding=(10,4,6,9))
+        titlebar.pack(fill="x")
+        title_text=ttk.Frame(titlebar)
+        title_text.pack(side="left",expand=True,fill="x")
+        self.results_label=ttk.Label(title_text,text="Tous les fils",style="Heading.TLabel",font=("Segoe UI",19,"bold"))
+        self.results_label.pack(anchor="w")
+        titlebar.bind("<Configure>",lambda e:self.results_label.configure(wraplength=max(160,e.width-180)))
+        self.result_count=ttk.Label(title_text,text="",style="Muted.TLabel",font=("Segoe UI",9))
+        self.result_count.pack(anchor="w",pady=(2,0))
+        self.button(titlebar,text="Aperçu",command=self.toggle_inspector,height=32).pack(side="right",padx=(5,0))
+        self.button(titlebar,text="+ Fil",command=lambda:self.new("item"),height=32).pack(side="right")
+        self.work=ttk.Frame(self.middle,padding=12,style="Paper.TFrame")
+        self.work_error=tk.StringVar()
+        self.work_content=ttk.Frame(self.work,style="Paper.TFrame")
         self.work_content.pack(fill="x")
-        ttk.Label(self.work, textvariable=self.work_error, style="Error.TLabel", wraplength=650).pack(anchor="w")
-        box = ttk.Frame(self.middle)
-        self.results_box = box
-        box.pack(fill="both", expand=True)
-        self.results = ttk.Treeview(box, columns=("title", "context", "tags", "modified"), show="tree headings", selectmode="browse", height=1)
-        self.results.heading("#0", text="↗")
-        self.results.column("#0", width=37, minwidth=37, stretch=False)
-        for key, label, width in [("title", "Titre · ouvrir d'un clic", 390), ("context", "Emplacements", 150), ("tags", "Tags / catégories", 130), ("modified", "Modifié", 100)]:
-            self.results.heading(key, text=label, command=lambda k=key: self.sort_results(k))
-            self.results.column(key, width=width, minwidth=230 if key == "title" else 80, stretch=(key == "title"))
-        sb = ttk.Scrollbar(box, orient="vertical", command=self.results.yview)
-        sb.pack(side="right", fill="y")
+        error_label=ttk.Label(self.work,textvariable=self.work_error,style="Error.TLabel",background=COLORS["paper"],wraplength=650)
+        self.work_error.trace_add("write",lambda *args:error_label.pack(anchor="w",pady=(6,0)) if self.work_error.get() else error_label.pack_forget())
+        self.results_box=box=ttk.Frame(self.middle,padding=(3,3,3,8))
+        box.pack(fill="both",expand=True)
+        self.results=CatalogList(box)
+        self.results.heading("#0",text="")
+        self.results.column("#0",width=44,minwidth=44,stretch=False)
+        for key,label,width in [("title","DISCUSSIONS",340),("context","EMPLACEMENTS",165),("tags","REPÈRES",195),("modified","MODIFIÉ",97)]:
+            self.results.heading(key,text=label,command=lambda k=key:self.sort_results(k))
+            self.results.column(key,width=width,minwidth=230 if key=="title" else 80,stretch=(key=="title"))
+        sb=AutoScrollbar(box,orient="vertical",command=self.results.yview)
+        sb.pack(side="right",fill="y")
         self.results.configure(yscrollcommand=sb.set)
-        self.results.pack(side="left", fill="both", expand=True)
-        horizontal = ttk.Scrollbar(self.middle, orient="horizontal", command=self.results.xview)
-        self.horizontal_scroll = horizontal
-        horizontal.pack(fill="x")
-        self.results.configure(xscrollcommand=horizontal.set)
-        self.results.bind("<<TreeviewSelect>>", self.select_record)
-        self.results.bind("<Return>", self.result_enter)
-        self.results.bind("<Double-Button-1>", self.result_double)
-        self.results.bind("<Motion>", self.hover_result)
-        self.empty = ttk.Label(self.middle, text="", style="Muted.TLabel", padding=(10, 8), wraplength=650)
+        self.results.pack(side="left",fill="both",expand=True)
+        self.horizontal_scroll=AutoScrollbar(self.middle,orient="horizontal",command=self.results.xview)
+        self.horizontal_scroll.pack(fill="x",padx=10)
+        self.results.configure(xscrollcommand=self.horizontal_scroll.set)
+        self.results.bind("<<TreeviewSelect>>",self.select_record)
+        self.results.bind("<Return>",self.result_enter)
+        self.results.bind("<Double-Button-1>",self.result_double)
+        self.results.bind("<Motion>",self.hover_result,add=True)
+        self.empty=ttk.Label(self.middle,text="",style="Muted.TLabel",padding=(12,6),wraplength=600)
         self.empty.pack(anchor="w")
-        ttk.Label(self.middle, text="Titre ou ↗ : ouvrir  ·  Autre colonne : sélectionner  ·  Entrée : ouvrir  ·  F2 : renommer", style="Muted.TLabel", wraplength=900).pack(anchor="w", pady=(3, 5))
-        self.canvas = tk.Canvas(self.right, highlightthickness=0, background=COLORS["ivory"])
-        sb = ttk.Scrollbar(self.right, orient="vertical", command=self.canvas.yview)
-        sb.pack(side="right", fill="y")
-        self.canvas.pack(side="left", fill="both", expand=True)
+        ttk.Label(self.middle,text="↗  Un clic sur le titre pour reprendre le fil.   Entrée : ouvrir  ·  F2 : renommer",style="Muted.TLabel",font=("Segoe UI",9),wraplength=800).pack(anchor="w",padx=12,pady=(0,4))
+        inspector_surface=Surface(self.right,padding=8,width=330,height=120)
+        inspector_surface.pack(fill="both",expand=True)
+        holder=inspector_surface.body
+        self.canvas=tk.Canvas(holder,highlightthickness=0,background=COLORS["paper"],height=80)
+        sb=AutoScrollbar(holder,orient="vertical",command=self.canvas.yview)
+        sb.pack(side="right",fill="y")
+        self.canvas.pack(side="left",fill="both",expand=True)
         self.canvas.configure(yscrollcommand=sb.set)
-        self.editor = ttk.Frame(self.canvas, padding=12)
-        window = self.canvas.create_window(0, 0, window=self.editor, anchor="nw")
-        self.editor.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
-        self.canvas.bind("<Configure>", lambda e: self.canvas.itemconfigure(window, width=e.width))
-        for widget in (self.tree, self.results):
-            for button in (1, 3):
-                widget.bind(f"<ButtonPress-{button}>", lambda e, w=widget, b=button: self.drag_press(e, w, b), add=True)
-                widget.bind(f"<B{button}-Motion>", self.drag_motion, add=True)
-                widget.bind(f"<ButtonRelease-{button}>", lambda e, w=widget, b=button: self.drag_release(e, w, b), add=True)
-        footer = ttk.Frame(self.root, padding=(22, 8))
+        self.editor=ttk.Frame(self.canvas,padding=15,style="Paper.TFrame")
+        window=self.canvas.create_window(0,0,window=self.editor,anchor="nw")
+        self.editor.bind("<Configure>",lambda e:self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+        self.canvas.bind("<Configure>",lambda e:self.canvas.itemconfigure(window,width=e.width))
+        self.root.bind_all("<MouseWheel>",self.inspector_wheel,add=True)
+        for widget in (self.tree,self.results):
+            for button in (1,3):
+                widget.bind(f"<ButtonPress-{button}>",lambda e,w=widget,b=button:self.drag_press(e,w,b),add=True)
+                widget.bind(f"<B{button}-Motion>",self.drag_motion,add=True)
+                widget.bind(f"<ButtonRelease-{button}>",lambda e,w=widget,b=button:self.drag_release(e,w,b),add=True)
+        footer=ttk.Frame(self.root,padding=(26,8))
         footer.pack(fill="x")
-        ttk.Label(footer, textvariable=self.status, style="Muted.TLabel", wraplength=1350).pack(anchor="w")
-        self.data_label = ttk.Label(footer, text="Catalogue local · " + str(self.store.path), style="Muted.TLabel", cursor="hand2")
-        self.data_label.pack(anchor="w", pady=(4, 0))
-        self.data_label.bind("<Button-1>", lambda e: self.open_data())
-        self.work.pack_forget()
-        self.root.after_idle(lambda: self.panes.sashpos(0, 265))
+        ttk.Label(footer,textvariable=self.status,style="Muted.TLabel",font=("Segoe UI",9),wraplength=1260).pack(anchor="w")
+        self.data_label=ttk.Label(footer,text="⌂  Catalogue local · "+str(self.store.path),style="Muted.TLabel",font=("Segoe UI",8),cursor="hand2")
+        self.data_label.pack(anchor="w",pady=(3,0))
+        self.data_label.bind("<Button-1>",lambda e:self.open_data())
+        self.root.after_idle(self.place_initial_sash)
+        self.root.bind("<Configure>",self.adapt_window,add=True)
+
+    def adapt_window(self,event):
+        if event.widget!=self.root:
+            return
+        if self.root.winfo_width()<1100:
+            self.sidebar_note.pack_forget()
+        elif not self.sidebar_note.winfo_manager():
+            self.sidebar_note.pack(anchor="w",pady=(6,3))
+
+    def place_initial_sash(self, force=False):
+        if (force or not self._sash_ready) and self.panes.winfo_ismapped() and self.panes.winfo_width()>600:
+            if len(self.panes.panes())==3:
+                self.panes.sashpos(1,max(550,self.panes.winfo_width()-370))
+            self.panes.sashpos(0,263)
+            self._sash_ready = self.panes.sashpos(0)>100
 
     def bind_keys(self):
         for key, action in [("<Control-k>", self.focus_search), ("<Control-n>", lambda: self.new("item")), ("<Control-Shift-P>", lambda: self.new("project")), ("<Control-s>", self.save_record), ("<F2>", self.rename_selected), ("<Escape>", self.escape)]:
@@ -197,6 +256,21 @@ class App(DetailEditor):
 
     def open_data(self):
         self.safe(lambda: os.startfile(self.store.directory))
+
+    def inspector_wheel(self, event):
+        if not self.inspector_visible:
+            return
+        widget = event.widget
+        while widget is not None and widget != self.right:
+            widget = getattr(widget, "master", None)
+        if widget != self.right:
+            return
+        if isinstance(event.widget, tk.Text) and event.widget.yview() != (0.0, 1.0):
+            return
+        delta = event.delta
+        if delta:
+            self.canvas.yview_scroll(-int(delta/120 or (1 if delta>0 else -1))*3,"units")
+        return "break"
 
     def resize(self, width, height):
         self.root.state("normal")
@@ -277,10 +351,10 @@ class App(DetailEditor):
         for child in self.chips.winfo_children():
             child.destroy()
         scope_text = "Projet : " + self.cat.records[self.scope].title[:36] + " · descendants ×" if self.scope in self.cat.records else ("À classer ×" if self.scope == "unfiled" else "Partout")
-        ttk.Button(self.chips, text=scope_text, style="Chip.TButton", command=self.global_scope).pack(side="left", padx=(0, 5))
+        self.button(self.chips, text=scope_text, style="Chip.TButton", command=self.global_scope).pack(side="left", padx=(0, 5))
         for var, label in [(self.tag, "Tag"), (self.category, "Catégorie")]:
             if var.get():
-                ttk.Button(self.chips, text=f"{label} : {var.get()} ×", style="Chip.TButton", command=lambda v=var: self.remove_filter(v)).pack(side="left", padx=(0, 5))
+                self.button(self.chips, text=f"{label} : {var.get()} ×", style="Chip.TButton", command=lambda v=var: self.remove_filter(v)).pack(side="left", padx=(0, 5))
         if not self.tag.get() and not self.category.get():
             ttk.Label(self.chips, text="Titres, notes, tags, catégories, informations personnalisées · Ctrl+K", style="Muted.TLabel").pack(side="left")
 
@@ -331,6 +405,7 @@ class App(DetailEditor):
         self.results.delete(*self.results.get_children())
         scope = self.scope if self.scope in self.cat.records else None
         rows = self.cat.search(self.query.get().strip(), scope, self.tag.get().strip(), self.category.get().strip(), self.scope == "unfiled")
+        rows = [r for r in rows if r.id != scope]
         if not scope and not self.query.get().strip() and not self.tag.get() and not self.category.get():
             rows = [r for r in rows if r.kind == "item"]
         def values(r):
@@ -341,12 +416,17 @@ class App(DetailEditor):
         rows.sort(key=lambda r: fold(values(r)[self.sort_column]), reverse=self.sort_reverse)
         for r in rows:
             v = values(r)
-            self.results.insert("", "end", iid=r.id, image=self.icons[r.kind], values=(r.title, v["context"], v["tags"], datetime.fromisoformat(r.modified).strftime("%d/%m/%Y")))
+            self.results.insert("", "end", iid=r.id, image=self.icons[r.kind], tags=(r.kind,), badges=r.tags+r.categories, badge_types=["tag"]*len(r.tags)+["category"]*len(r.categories), values=(r.title, v["context"], v["tags"], datetime.fromisoformat(r.modified).strftime("%d/%m/%Y")))
         if selected and self.results.exists(selected):
             self.results.selection_set(selected)
             self.results.focus(selected)
-        self.results_label.configure(text=f"{len(rows)} résultat(s) · " + ("Projet et descendants" if scope else ("À classer" if self.scope == "unfiled" else "Tous les fils")))
-        self.empty.configure(text="" if rows else "Aucun résultat. Modifiez la recherche ou les filtres, ou créez votre premier fil avec + Nouveau.")
+        self.results_label.configure(text=self.cat.records[scope].title if scope else ("À classer" if self.scope == "unfiled" else "Votre bibliothèque"))
+        self.result_count.configure(text=f"{len(rows)} résultat(s) · " + ("descendants inclus" if scope else "vos discussions, à portée de main"))
+        self.empty.configure(text="" if rows else "Ajoutez un fil avec + Fil, ou changez la recherche.")
+        if rows:
+            self.empty.pack_forget()
+        elif not self.empty.winfo_manager():
+            self.empty.pack(anchor="w",padx=6)
         self.refresh_chips()
 
     def sort_results(self, column):
@@ -391,25 +471,50 @@ class App(DetailEditor):
     def show_summary(self, identity, checked=False):
         if not checked and not self.can_leave():
             return
-        self.current, self.dirty, self.editing = identity, False, False
+        self.current,self.dirty,self.editing=identity,False,False
         for child in self.editor.winfo_children():
             child.destroy()
-        ttk.Button(self.editor, text="Replier l'inspecteur →", command=self.toggle_inspector).pack(anchor="e")
+        top=ttk.Frame(self.editor,style="Paper.TFrame")
+        top.pack(fill="x",pady=(0,16))
+        ttk.Label(top,text="LE COIN DES IDÉES",style="Caption.TLabel").pack(side="left")
+        self.button(top,text="×",command=self.toggle_inspector,width=28,height=27).pack(side="right")
         if identity not in self.cat.records:
-            ttk.Label(self.editor, text="Un aperçu, quand vous voulez", style="Heading.TLabel", wraplength=290).pack(anchor="w", pady=14)
-            ttk.Label(self.editor, text="Sélectionnez une ligne par son emplacement. Ouvrez un fil directement par son titre.", wraplength=290).pack(anchor="w")
+            ttk.Label(self.editor,text="Un fil à reprendre ?",style="Inspector.TLabel",wraplength=270).pack(anchor="w",pady=(22,12))
+            ttk.Label(self.editor,text="Sélectionnez une ligne pour retrouver ses repères. Un clic sur le titre suffit pour ouvrir la discussion.",style="PaperMuted.TLabel",wraplength=270).pack(anchor="w")
             return
-        r = self.cat.records[identity]
-        ttk.Label(self.editor, text="Projet" if r.kind == "project" else "Discussion", style="Muted.TLabel").pack(anchor="w", pady=(18, 4))
-        ttk.Label(self.editor, text=r.title, style="Heading.TLabel", wraplength=300).pack(anchor="w", pady=(0, 15))
-        if r.kind == "item":
-            ttk.Button(self.editor, text="↗ Ouvrir le fil", style="Open.TButton", command=lambda: self.open_thread(identity)).pack(fill="x")
-            ttk.Button(self.editor, text="Copier le lien", command=lambda: self.copy_link(identity)).pack(fill="x", pady=6)
-        ttk.Button(self.editor, text="Modifier les détails", command=lambda: self.show_record(identity)).pack(fill="x", pady=8)
-        for label, value in [("Résumé" if r.kind == "item" else "Description", r.description), ("Emplacements", "\n".join(self.project_label(p) for p in r.projects) if r.kind == "item" else (self.project_label(r.parent) if r.parent else "À la racine")), ("Tags", " · ".join(r.tags)), ("Catégories", " · ".join(r.categories)), ("Notes", r.notes[:250] + ("…" if len(r.notes)>250 else ""))]:
-            ttk.Separator(self.editor).pack(fill="x", pady=10)
-            ttk.Label(self.editor, text=label, style="Muted.TLabel").pack(anchor="w")
-            ttk.Label(self.editor, text=value or "Non renseigné", wraplength=300, justify="left").pack(anchor="w", pady=(3, 0))
+        r=self.cat.records[identity]
+        tk.Label(self.editor,image=self.icons[r.kind],background=COLORS["paper"]).pack(anchor="w",pady=(0,10))
+        ttk.Label(self.editor,text=r.title,style="Inspector.TLabel",wraplength=280,justify="left").pack(anchor="w",pady=(0,9))
+        ttk.Label(self.editor,text="Projet local" if r.kind=="project" else f"Discussion · {len(r.projects)} emplacement(s)",style="PaperMuted.TLabel").pack(anchor="w",pady=(0,18))
+        if r.kind=="item":
+            self.button(self.editor,text="↗  Ouvrir le fil",style="Primary.TButton",command=lambda:self.open_thread(identity),height=43).pack(fill="x")
+        actions=ttk.Frame(self.editor,style="Paper.TFrame")
+        actions.pack(fill="x",pady=(9,15))
+        if r.kind=="item":
+            self.button(actions,text="Copier le lien",command=lambda:self.copy_link(identity),height=31).pack(side="left",padx=(0,5))
+        self.button(actions,text="Modifier la fiche",command=lambda:self.show_record(identity),height=31).pack(side="left")
+        def section(title):
+            ttk.Separator(self.editor).pack(fill="x",pady=(10,14))
+            ttk.Label(self.editor,text=title,style="Caption.TLabel").pack(anchor="w",pady=(0,8))
+        section("EN QUELQUES MOTS")
+        ttk.Label(self.editor,text=r.description or "Quelques mots pour retrouver le fil de vos idées…",style="Paper.TLabel",wraplength=280,justify="left").pack(anchor="w")
+        section("EMPLACEMENTS")
+        locations=r.projects if r.kind=="item" else ([r.parent] if r.parent else [])
+        for pid in locations:
+            ttk.Label(self.editor,text="▱  "+self.project_label(pid),style="PaperMuted.TLabel",wraplength=280,justify="left").pack(anchor="w",pady=3)
+        if not locations:
+            ttk.Label(self.editor,text="À classer" if r.kind=="item" else "À la racine de votre atelier",style="PaperMuted.TLabel").pack(anchor="w")
+        section("VOS REPÈRES")
+        for label,values in [("Tags",r.tags),("Catégories",r.categories)]:
+            ttk.Label(self.editor,text=label,style="PaperMuted.TLabel").pack(anchor="w",pady=(0,4))
+            row=ttk.Frame(self.editor,style="Paper.TFrame")
+            row.pack(fill="x",pady=(0,8))
+            for n,value in enumerate(values):
+                self.button(row,text=value,style="Chip.TButton",command=lambda:self.show_record(identity),height=27).grid(row=n//2,column=n%2,sticky="w",padx=(0,4),pady=2)
+            if not values:
+                ttk.Label(row,text="Aucun repère pour le moment",style="PaperMuted.TLabel").pack(anchor="w")
+        section("NOTES DE CARNET")
+        tk.Label(self.editor,text=r.notes[:300]+("…" if len(r.notes)>300 else "") if r.notes else "Un endroit pour vos pistes et vos petites idées.",background=COLORS["hover"],foreground=COLORS["ink"],font=("Segoe UI",10),wraplength=250,justify="left",padx=12,pady=13).pack(fill="x")
         self.canvas.yview_moveto(0)
 
     def show_record(self, identity):
@@ -458,7 +563,7 @@ class App(DetailEditor):
             return True
         if column == "#1":
             x, y, width, height = self.results.bbox(identity, "title")
-            return event.x <= x + min(width, self.font.measure(self.cat.records[identity].title)+14)
+            return event.x <= x + min(width, self.results.title_font.measure(self.cat.records[identity].title)+18)
         return False
 
     def open_click(self, identity):
@@ -517,7 +622,7 @@ class App(DetailEditor):
             self.root.update_idletasks()
             self.inline = ttk.Entry(self.tree)
             x, y, width, height = self.tree.bbox("__draft__")
-            self.inline.place(x=x+24, y=y, width=max(150, width-25), height=height)
+            self.inline.place(x=x+38, y=y, width=max(140, width-40), height=height)
             self.inline.focus_set()
             self.draft = {"kind": "project", "parent": parent}
             self.inline.bind("<Return>", self.commit_inline)
@@ -526,17 +631,18 @@ class App(DetailEditor):
             return
         self.draft = {"kind": "item", "parent": parent}
         self.work.pack(fill="x", before=self.results_box)
-        ttk.Label(self.work_content, text="Nouveau fil · " + (self.project_label(parent) if parent else "À classer"), style="Heading.TLabel").pack(anchor="w", pady=4)
+        ttk.Label(self.work_content,text="Un nouveau fil à garder",style="WorkTitle.TLabel").pack(anchor="w",pady=4)
+        ttk.Label(self.work_content,text="Dans : " + (self.project_label(parent) if parent else "À classer"),style="PaperMuted.TLabel",wraplength=650).pack(anchor="w",pady=(0,6))
         self.new_title = ttk.Entry(self.work_content)
         self.new_title.pack(fill="x", pady=3)
         self.new_title.insert(0, "")
-        ttk.Label(self.work_content, text="Titre ci-dessus · Lien ChatGPT ci-dessous", style="Muted.TLabel").pack(anchor="w")
+        ttk.Label(self.work_content, text="Un titre qui vous parle, puis son lien ChatGPT.", style="PaperMuted.TLabel").pack(anchor="w")
         self.new_url = ttk.Entry(self.work_content)
         self.new_url.pack(fill="x", pady=3)
-        row = ttk.Frame(self.work_content)
+        row = ttk.Frame(self.work_content,style="Paper.TFrame")
         row.pack(fill="x", pady=4)
-        ttk.Button(row, text="Ajouter le fil", style="Primary.TButton", command=self.submit_item).pack(side="left")
-        ttk.Button(row, text="Annuler · Échap", command=self.clear_work).pack(side="left", padx=5)
+        self.button(row, text="Ajouter le fil", style="Primary.TButton", command=self.submit_item).pack(side="left")
+        self.button(row, text="Annuler · Échap", command=self.clear_work).pack(side="left", padx=5)
         for entry in (self.new_title, self.new_url):
             entry.bind("<Return>", self.submit_item)
         self.new_title.focus_set()
@@ -553,7 +659,7 @@ class App(DetailEditor):
             if existing and not use_existing:
                 self.work_error.set("Ce fil existe déjà. Son titre et ses notes seront conservés.")
                 if not self.draft.get("duplicate_button"):
-                    button = ttk.Button(self.work_content, text="Afficher la fiche existante" + (" et rattacher ici" if parent else ""))
+                    button = self.button(self.work_content, text="Afficher la fiche existante" + (" et rattacher ici" if parent else ""))
                     button.pack(anchor="w", pady=4)
                     self.draft["duplicate_button"] = button
                 self.draft["duplicate_button"].configure(command=lambda expected=identity: self.submit_item(use_existing=True, expected_identity=expected))
@@ -669,7 +775,7 @@ class App(DetailEditor):
             action()
 
     def context_menu(self, identity, x, y):
-        menu = tk.Menu(self.root, tearoff=False)
+        menu = skin_menu(tk.Menu(self.root, tearoff=False))
         r = self.cat.records.get(identity)
         if r and r.kind == "item":
             menu.add_command(label="↗ Ouvrir le fil", command=lambda: self.open_thread(identity))
@@ -735,12 +841,12 @@ class App(DetailEditor):
         self.draft = {"kind": "transfer", "id": identity}
         self.work.pack(fill="x", before=self.results_box)
         title = {"move": "Déplacer", "add": "Ajouter un rattachement", "remove": "Retirer un rattachement"}[mode]
-        ttk.Label(self.work_content, text=f"{title} · {r.title}", style="Heading.TLabel", wraplength=650).pack(anchor="w", pady=4)
+        ttk.Label(self.work_content, text=f"{title} · {r.title}", style="Inspector.TLabel", wraplength=650).pack(anchor="w", pady=4)
         source_ids = list(r.projects) if r.kind == "item" else []
         self.source_box = None
         context = origin if origin is not None else self.scope
         if r.kind == "item" and mode in ("move", "remove") and source_ids:
-            ttk.Label(self.work_content, text="Seul ce rattachement sera retiré ; tous les autres seront conservés.").pack(anchor="w")
+            ttk.Label(self.work_content, text="Seul ce rattachement sera retiré ; les autres seront conservés.",style="PaperMuted.TLabel",wraplength=600).pack(anchor="w")
             self.source_box = ttk.Combobox(self.work_content, state="readonly", values=[self.project_label(p) for p in source_ids])
             self.source_box.pack(fill="x", pady=4)
             if context in source_ids:
@@ -752,14 +858,14 @@ class App(DetailEditor):
         destinations += sorted((p.id for p in self.cat.records.values() if p.kind == "project" and p.id not in forbidden), key=self.project_label)
         self.destination_box = None
         if mode != "remove":
-            ttk.Label(self.work_content, text="Destination").pack(anchor="w")
+            ttk.Label(self.work_content, text="DESTINATION",style="Caption.TLabel").pack(anchor="w")
             self.destination_box = ttk.Combobox(self.work_content, state="readonly", values=[self.project_label(p) if p else "À la racine" for p in destinations])
             self.destination_box.pack(fill="x", pady=4)
             if destination in destinations:
                 self.destination_box.current(destinations.index(destination))
             elif destinations:
                 self.destination_box.set("Choisir une destination…")
-        row = ttk.Frame(self.work_content)
+        row = ttk.Frame(self.work_content,style="Paper.TFrame")
         row.pack(fill="x", pady=6)
         def apply():
             try:
@@ -782,8 +888,8 @@ class App(DetailEditor):
                 self.status.set("Classement mis à jour · même fiche, notes conservées.")
             except (ValueError, OSError) as exc:
                 self.work_error.set(str(exc))
-        ttk.Button(row, text=title, style="Primary.TButton", command=apply).pack(side="left")
-        ttk.Button(row, text="Annuler", command=self.clear_work).pack(side="left", padx=5)
+        self.button(row, text=title, style="Primary.TButton", command=apply).pack(side="left")
+        self.button(row, text="Annuler", command=self.clear_work).pack(side="left", padx=5)
         self.apply_transfer = apply
 
     def drag_press(self, event, widget, button):
@@ -796,6 +902,7 @@ class App(DetailEditor):
                 self.tree.item(identity, tags=())
         self.tree.configure(cursor="")
         self.results.configure(cursor="")
+        self.drop_label.configure(text="↳  Glissez pour classer",foreground=COLORS["muted"])
 
     def drop_target(self, x_root, y_root):
         x, y = x_root-self.tree.winfo_rootx(), y_root-self.tree.winfo_rooty()
@@ -821,6 +928,7 @@ class App(DetailEditor):
             self.tree.item(target, tags=("drop" if allowed else "forbidden",))
             self.tree.see(target)
         self.drag["widget"].configure(cursor="hand2" if allowed else "no")
+        self.drop_label.configure(text=("↳  Déposer dans " + (self.cat.records[target].title if target in self.cat.records else "la racine")) if allowed else "×  Cible interdite",foreground=COLORS["pine"] if allowed else COLORS["error"])
         self.status.set(("Déposer ici : " + (self.project_label(target) if target in self.cat.records else "À la racine") + (" · choix Déplacer / Ajouter à la dépose" if self.drag["button"] == 3 else " · déplacer le lien de départ seulement")) if allowed else "Cible interdite · aucun changement tant qu'une dépose valide n'est pas faite.")
 
     def drag_release(self, event, widget, button):
@@ -836,7 +944,7 @@ class App(DetailEditor):
                 self.status.set("Déplacement annulé : cible interdite, catalogue inchangé.")
                 return "break"
             if button == 3 and self.cat.records[identity].kind == "item":
-                menu = tk.Menu(self.root, tearoff=False)
+                menu = skin_menu(tk.Menu(self.root, tearoff=False))
                 menu.add_command(label="Déplacer ici", command=lambda: self.drop_action(identity, target, "move", drag["origin"]))
                 menu.add_command(label="Ajouter un rattachement ici", command=lambda: self.drop_action(identity, target, "add", drag["origin"]))
                 menu.add_command(label="Annuler", command=lambda: self.status.set("Dépose annulée · catalogue inchangé."))
@@ -856,17 +964,19 @@ class App(DetailEditor):
         if not self.can_leave():
             return
         r = self.cat.records[identity]
-        if r.kind == "item" and mode == "move" and r.projects and origin not in r.projects:
+        source = origin if origin in r.projects else (r.projects[0] if len(r.projects)==1 else None)
+        if r.kind == "item" and mode == "move" and len(r.projects)>1 and source is None:
             self.transfer_panel(identity, mode, target, origin)
             self.status.set("Choisissez le lien de départ : aucun autre rattachement ne sera retiré.")
             return
         def action():
-            self.transaction(lambda: self.transfer(identity, None if target == "all" else target, mode, origin if r.kind == "item" and origin in r.projects else None))
+            self.transaction(lambda: self.transfer(identity, None if target == "all" else target, mode, source if r.kind=="item" else None))
             self.refresh_tree()
             self.refresh_results()
             if self.inspector_visible:
                 self.show_summary(self.current, checked=True)
             self.status.set("Rattachement ajouté · même fiche, notes conservées." if mode == "add" else "Déplacement effectué · autres rattachements conservés.")
+            self.drop_label.configure(text="✓  Classé dans " + (self.cat.records[target].title if target in self.cat.records else "la racine"),foreground=COLORS["pine"])
         self.safe(action)
 
     def close(self):
