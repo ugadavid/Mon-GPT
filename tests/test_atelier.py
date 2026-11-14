@@ -65,7 +65,9 @@ class AtelierTests(unittest.TestCase):
     def test_inspector_wheel_does_not_steal_tree_or_list_focus(self):
         self.root.deiconify()
         self.app.ensure_inspector()
+        self.item.notes="Note fictive longue pour vérifier un défilement réel.\n"*100
         self.app.show_summary(self.item.id,checked=True)
+        self.app.summary.notes.toggle()
         self.root.update()
         before=self.app.canvas.yview()
         focused=self.root.focus_get()

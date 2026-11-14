@@ -12,6 +12,7 @@ from .details import DetailEditor
 from .theme import COLORS, FONT, apply_theme, make_icons
 from .atelier import Masthead, Surface, PillButton, CatalogList, AutoScrollbar, skin_menu, shorten
 from .main_menu import MainMenuBar
+from .inspector import InspectorSummary, InspectorScrollbar
 from . import ui_state, __version__
 
 
@@ -216,7 +217,7 @@ class App(DetailEditor):
         inspector_surface.pack(fill="both",expand=True)
         holder=inspector_surface.body
         self.canvas=tk.Canvas(holder,highlightthickness=0,background=COLORS["paper"],height=80)
-        sb=AutoScrollbar(holder,orient="vertical",command=self.canvas.yview)
+        sb=self.inspector_scrollbar=InspectorScrollbar(holder,self.canvas)
         sb.pack(side="right",fill="y")
         self.canvas.pack(side="left",fill="both",expand=True)
         self.canvas.configure(yscrollcommand=sb.set)
@@ -499,47 +500,9 @@ class App(DetailEditor):
         self.current,self.dirty,self.editing=identity,False,False
         for child in self.editor.winfo_children():
             child.destroy()
-        top=ttk.Frame(self.editor,style="Paper.TFrame")
-        top.pack(fill="x",pady=(0,16))
-        ttk.Label(top,text="LE COIN DES IDÉES",style="Caption.TLabel").pack(side="left")
-        self.button(top,text="×",command=self.toggle_inspector,width=28,height=27).pack(side="right")
-        if identity not in self.cat.records:
-            ttk.Label(self.editor,text="Un fil à reprendre ?",style="Inspector.TLabel",wraplength=270).pack(anchor="w",pady=(22,12))
-            ttk.Label(self.editor,text="Sélectionnez une ligne pour retrouver ses repères. Un clic sur le titre suffit pour ouvrir la discussion.",style="PaperMuted.TLabel",wraplength=270).pack(anchor="w")
-            return
-        r=self.cat.records[identity]
-        tk.Label(self.editor,image=self.icons[r.kind],background=COLORS["paper"]).pack(anchor="w",pady=(0,10))
-        ttk.Label(self.editor,text=r.title,style="Inspector.TLabel",wraplength=280,justify="left").pack(anchor="w",pady=(0,9))
-        ttk.Label(self.editor,text="Projet local" if r.kind=="project" else f"Discussion · {len(r.projects)} emplacement(s)",style="PaperMuted.TLabel").pack(anchor="w",pady=(0,18))
-        if r.kind=="item":
-            self.button(self.editor,text="↗  Ouvrir le fil",style="Primary.TButton",command=lambda:self.open_thread(identity),height=43).pack(fill="x")
-        actions=ttk.Frame(self.editor,style="Paper.TFrame")
-        actions.pack(fill="x",pady=(9,15))
-        if r.kind=="item":
-            self.button(actions,text="Copier le lien",command=lambda:self.copy_link(identity),height=31).pack(side="left",padx=(0,5))
-        self.button(actions,text="Modifier la fiche",command=lambda:self.show_record(identity),height=31).pack(side="left")
-        def section(title):
-            ttk.Separator(self.editor).pack(fill="x",pady=(10,14))
-            ttk.Label(self.editor,text=title,style="Caption.TLabel").pack(anchor="w",pady=(0,8))
-        section("EN QUELQUES MOTS")
-        ttk.Label(self.editor,text=r.description or "Quelques mots pour retrouver le fil de vos idées…",style="Paper.TLabel",wraplength=280,justify="left").pack(anchor="w")
-        section("EMPLACEMENTS")
-        locations=r.projects if r.kind=="item" else ([r.parent] if r.parent else [])
-        for pid in locations:
-            ttk.Label(self.editor,text="▱  "+self.project_label(pid),style="PaperMuted.TLabel",wraplength=280,justify="left").pack(anchor="w",pady=3)
-        if not locations:
-            ttk.Label(self.editor,text="À classer" if r.kind=="item" else "À la racine de votre atelier",style="PaperMuted.TLabel").pack(anchor="w")
-        section("VOS REPÈRES")
-        for label,values in [("Tags",r.tags),("Catégories",r.categories)]:
-            ttk.Label(self.editor,text=label,style="PaperMuted.TLabel").pack(anchor="w",pady=(0,4))
-            row=ttk.Frame(self.editor,style="Paper.TFrame")
-            row.pack(fill="x",pady=(0,8))
-            for n,value in enumerate(values):
-                self.button(row,text=value,style="Chip.TButton",command=lambda:self.show_record(identity),height=27).grid(row=n//2,column=n%2,sticky="w",padx=(0,4),pady=2)
-            if not values:
-                ttk.Label(row,text="Aucun repère pour le moment",style="PaperMuted.TLabel").pack(anchor="w")
-        section("NOTES DE CARNET")
-        tk.Label(self.editor,text=r.notes[:300]+("…" if len(r.notes)>300 else "") if r.notes else "Un endroit pour vos pistes et vos petites idées.",background=COLORS["hover"],foreground=COLORS["ink"],font=("Segoe UI",10),wraplength=250,justify="left",padx=12,pady=13).pack(fill="x")
+        self.summary=InspectorSummary(self.editor,self.cat.records.get(identity),self.project_label,
+            self.toggle_inspector,lambda:self.open_thread(identity),lambda:self.copy_link(identity),lambda:self.show_record(identity))
+        self.summary.pack(fill="x")
         self.canvas.yview_moveto(0)
 
     def show_record(self, identity):

@@ -8,6 +8,8 @@ MG-002b-02 place les colonnes directement sous le menu validé : arbre et aperç
 
 MG-002b-03 affine uniquement la Liste : lignes de 42 px, catégories et tags séparés, petites icônes au trait et lien à droite. Le titre et le lien restent visibles pendant le défilement horizontal des colonnes secondaires. En largeur très réduite, `+N` indique les repères repliés ; le survol d’une ligne restitue son titre entier et tous ses repères. Les en-têtes trient et leurs limites se redimensionnent. Flèche droite dans la Liste focalise l’action de fin de ligne ; Entrée ouvre la sélection. [Rapport et quatre captures](reports/MG-002b-03/rapport.md).
 
+MG-002b-04 compacte l’inspecteur : icône accolée au titre, trois actions sur une ligne (ouvrir, copier, modifier), info-bulles et activation clavier. Résumé, emplacements, catégories, tags et informations restent distincts. Les notes longues sont repliables et lisibles intégralement ; une scrollbar dédiée apparaît lorsque le contenu dépasse. [Rapport et trois captures](reports/MG-002b-04/rapport.md).
+
 ## Lancer
 
 Windows 11 x64, Python 3.13 avec Tcl/Tk et commande `python` accessible. Aucune dépendance pip ni police à installer. Recette sur CODEX-VM avec Python 3.13.17 / Tk 8.6. Depuis PowerShell :
