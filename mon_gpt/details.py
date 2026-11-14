@@ -5,7 +5,8 @@ from tkinter import ttk, messagebox, filedialog
 from datetime import datetime
 from .core import now
 from .storage import encode, decode
-from .widgets import ChipPicker
+from .widgets import ChipPicker, EditorDelete, editor_styles
+from .inspector import InspectorAction
 from .theme import COLORS
 
 
@@ -56,23 +57,43 @@ class DetailEditor:
             ttk.Label(self.editor, text="Créez un projet ou un fil depuis Édition ou le menu + de votre espace.\n\nVos notes restent sur cet ordinateur.", style="PaperMuted.TLabel", wraplength=280, justify="left").pack(anchor="w")
             return
         r = self.cat.records[identity]
-        ttk.Label(self.editor, text="Votre fiche locale", style="Inspector.TLabel").pack(anchor="w",pady=(0,8))
+        editor_styles(self.editor)
+        form=ttk.Frame(self.editor,style="Paper.TFrame")
+        form.pack(fill="x")
+        self.editor_controls={}
+        wrapped=[]
+        header=ttk.Frame(form,style="Paper.TFrame")
+        header.pack(fill="x",pady=(0,8))
+        self.button(header,text="← Aperçu",command=lambda:self.show_summary(self.current),width=92,height=28).pack(side="right")
+        ttk.Label(header,text="Modifier la fiche",style="Paper.TLabel",font=("Segoe UI",12,"bold"),foreground=COLORS["pine"]).pack(side="left")
         self.fields = {}
-        def field(key, label, value, lines=1):
-            ttk.Label(self.editor, text=label.upper(),style="Caption.TLabel",wraplength=280).pack(anchor="w", pady=(14, 5))
+        def label(text):
+            widget=ttk.Label(form,text=text,style="Paper.TLabel",font=("Segoe UI",10,"bold"),wraplength=280)
+            widget.pack(anchor="w",pady=(9,4))
+            wrapped.append(widget)
+        def hint(text):
+            widget=ttk.Label(form,text=text,style="PaperMuted.TLabel",font=("Segoe UI",8),wraplength=280)
+            widget.pack(anchor="w",pady=(3,0))
+            wrapped.append(widget)
+        def text_tab(event,back=False):
+            target=event.widget.tk_focusPrev() if back else event.widget.tk_focusNext()
+            target.focus_set()
+            return "break"
+        def field(key, title, value, lines=1):
+            label(title)
             if key in ("tags", "categories"):
-                picker = ChipPicker(self.editor, getattr(r, key), lambda k=key: [v for row in self.cat.records.values() for v in getattr(row, k)], lambda: setattr(self, "dirty", True))
+                picker = ChipPicker(form, getattr(r, key), lambda k=key: [v for row in self.cat.records.values() for v in getattr(row, k)], lambda: setattr(self, "dirty", True),category=key=="categories")
                 picker.pack(fill="x")
                 self.fields[key] = picker.get
                 self.pickers[key] = picker
                 return
             if lines == 1:
                 var = tk.StringVar(value=value)
-                widget = ttk.Entry(self.editor, textvariable=var)
+                widget = ttk.Entry(form, textvariable=var,style="Editor.TEntry",font=("Segoe UI",10),width=1)
                 var.trace_add("write", lambda *args: setattr(self, "dirty", True))
                 self.fields[key] = lambda v=var: v.get()
             else:
-                widget = tk.Text(self.editor, height=lines, wrap="word", font=("Segoe UI", 11), relief="solid", borderwidth=1, undo=True, background=COLORS["ivory"], foreground=COLORS["ink"], highlightcolor=COLORS["pine"], highlightthickness=1)
+                widget = tk.Text(form, height=lines, wrap="word", font=("Segoe UI",10), relief="flat", borderwidth=0, undo=True, background=COLORS["paper"], foreground=COLORS["ink"], highlightbackground=COLORS["line"], highlightcolor=COLORS["pine"], highlightthickness=1,padx=6,pady=5,width=1,insertofftime=500)
                 widget.insert("1.0", value)
                 widget.edit_modified(False)
                 def modified(e, w=widget):
@@ -80,44 +101,55 @@ class DetailEditor:
                         self.dirty = True
                         w.edit_modified(False)
                 widget.bind("<<Modified>>", modified)
+                widget.bind("<Tab>",text_tab)
+                widget.bind("<Shift-Tab>",lambda e:text_tab(e,True))
                 self.fields[key] = lambda w=widget: w.get("1.0", "end-1c")
+            self.editor_controls[key]=widget
             widget.pack(fill="x")
         self.pickers = {}
-        self.button(self.editor, text="← Revenir à l'aperçu", command=lambda: self.show_summary(self.current),height=30).pack(anchor="w",pady=(0,8))
-        field("title", "Titre local", r.title)
+        field("title", "Titre", r.title)
         if r.kind == "item":
-            field("url", "Lien ChatGPT", self.adapter.conversations[r.id].url)
+            field("url", "Lien", self.adapter.conversations[r.id].url)
         field("description", "Description" if r.kind == "project" else "Résumé", r.description, 2)
         field("notes", "Notes", r.notes, 3)
-        field("tags", "Tags · étiquettes", r.tags)
-        field("categories", "Catégories · classification", r.categories)
-        field("metadata", "Informations personnalisées (une clé=valeur par ligne)", "\n".join(f"{k}={v}" for k, v in r.metadata.items()), 3)
+        field("tags", "Tags", r.tags)
+        field("categories", "Catégories", r.categories)
+        field("metadata", "Informations", "\n".join(f"{k}={v}" for k, v in r.metadata.items()), 2)
+        hint("Une information par ligne : clé=valeur.")
         self.project_ids = sorted((p.id for p in self.cat.records.values() if p.kind == "project"), key=lambda p: self.project_label(p).casefold())
         if r.kind == "item":
-            ttk.Label(self.editor, text="EMPLACEMENTS · Ctrl+clic pour sélectionner plusieurs",style="Caption.TLabel",wraplength=280).pack(anchor="w", pady=(14, 5))
-            self.locations = tk.Listbox(self.editor, selectmode="extended", exportselection=False, height=4, font=("Segoe UI", 10),background=COLORS["paper"],foreground=COLORS["ink"],selectbackground=COLORS["pine"],selectforeground=COLORS["paper"],relief="flat",highlightbackground=COLORS["line"],highlightthickness=1)
+            label("Emplacements")
+            self.locations = tk.Listbox(form, selectmode="extended", exportselection=False, height=3, font=("Segoe UI",10),background=COLORS["paper"],foreground=COLORS["ink"],selectbackground=COLORS["pine"],selectforeground=COLORS["paper"],relief="flat",borderwidth=0,highlightbackground=COLORS["line"],highlightcolor=COLORS["pine"],highlightthickness=1,width=1)
             self.locations.pack(fill="x")
             for n, pid in enumerate(self.project_ids):
                 self.locations.insert("end", self.project_label(pid))
                 if pid in r.projects:
                     self.locations.selection_set(n)
             self.locations.bind("<<ListboxSelect>>", lambda e: setattr(self, "dirty", True))
-            self.button(self.editor, text="Retirer tous les rattachements", command=self.clear_locations,height=30).pack(anchor="w",pady=5)
+            hint("Ctrl+clic : plusieurs emplacements.")
+            self.button(form, text="Retirer les rattachements", command=self.clear_locations,height=28).pack(anchor="w",pady=(4,0))
         else:
             self.parent_ids = [None] + [p for p in self.project_ids if p not in self.cat.descendants(r.id)]
-            ttk.Label(self.editor, text="DÉPLACER SOUS",style="Caption.TLabel").pack(anchor="w", pady=(14, 5))
-            self.parent_box = ttk.Combobox(self.editor, state="readonly", values=["À la racine" if p is None else self.project_label(p) for p in self.parent_ids])
+            label("Projet parent")
+            self.parent_box = ttk.Combobox(form, state="readonly", values=["À la racine" if p is None else self.project_label(p) for p in self.parent_ids],style="Editor.TCombobox",font=("Segoe UI",10),width=1)
             self.parent_box.current(self.parent_ids.index(r.parent))
             self.parent_box.pack(fill="x")
             self.parent_box.bind("<<ComboboxSelected>>", lambda e: setattr(self, "dirty", True))
-        actions = ttk.Frame(self.editor,style="Paper.TFrame")
-        actions.pack(fill="x", pady=14)
-        self.button(actions, text="Enregistrer",style="Primary.TButton", command=self.save_record).pack(side="left")
+        actions = ttk.Frame(form,style="Paper.TFrame")
+        actions.pack(fill="x", pady=(12,8))
+        save_button=self.button(actions,text="Enregistrer",style="Primary.TButton",command=self.save_record,width=108,height=32)
+        open_button=None
         if r.kind == "item":
-            self.button(actions, text="↗", command=self.open_thread,width=33).pack(side="left", padx=4)
-        self.button(actions, text="Supprimer…", command=self.delete).pack(side="right")
-        fmt = lambda value: datetime.fromisoformat(value).astimezone().strftime("%d/%m/%Y %H:%M:%S")
-        ttk.Label(self.editor, text=f"Créé le {fmt(r.created)}\nModifié le {fmt(r.modified)}", style="PaperMuted.TLabel").pack(anchor="w")
+            open_button=InspectorAction(actions,"open","Ouvrir le fil",self.open_thread)
+        delete_button=EditorDelete(actions,text="Supprimer…",command=self.delete,width=102,height=32)
+        delete_button.pack(side="right")
+        if open_button: open_button.pack(side="right",padx=5)
+        save_button.pack(side="left")
+        fmt = lambda value: datetime.fromisoformat(value).astimezone().strftime("%d/%m/%Y %H:%M")
+        dates=ttk.Label(form,text=f"Créé le {fmt(r.created)}\nModifié le {fmt(r.modified)}",style="PaperMuted.TLabel",font=("Segoe UI",8),wraplength=280)
+        dates.pack(anchor="w")
+        wrapped.append(dates)
+        form.bind("<Configure>",lambda e:[w.configure(wraplength=max(40,e.width)) for w in wrapped])
         self.canvas.yview_moveto(0)
 
     def clear_locations(self):

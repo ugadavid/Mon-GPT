@@ -10,6 +10,8 @@ MG-002b-03 affine uniquement la Liste : lignes de 42 px, catégories et tags sé
 
 MG-002b-04 compacte l’inspecteur : icône accolée au titre, trois actions sur une ligne (ouvrir, copier, modifier), info-bulles et activation clavier. Résumé, emplacements, catégories, tags et informations restent distincts. Les notes longues sont repliables et lisibles intégralement ; une scrollbar dédiée apparaît lorsque le contenu dépasse. [Rapport et trois captures](reports/MG-002b-04/rapport.md).
 
+MG-002b-05 harmonise le seul éditeur avec cet aperçu : champs papier à bordure fine, libellés courts et pastilles colorées réparties selon la largeur du panneau. Les saisies de tags/catégories occupent la largeur utile ; Tab et Shift+Tab parcourent aussi les champs multiligne. Les protections et l’enregistrement restent identiques. [Rapport et trois captures](reports/MG-002b-05/rapport.md).
+
 ## Lancer
 
 Windows 11 x64, Python 3.13 avec Tcl/Tk et commande `python` accessible. Aucune dépendance pip ni police à installer. Recette sur CODEX-VM avec Python 3.13.17 / Tk 8.6. Depuis PowerShell :
