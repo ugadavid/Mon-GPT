@@ -1,0 +1,51 @@
+test_current_project_is_hidden_only_in_presentation (test_atelier.AtelierTests.test_current_project_is_hidden_only_in_presentation) ... ok
+test_inspector_restored_before_mapping_keeps_all_panes_visible (test_atelier.AtelierTests.test_inspector_restored_before_mapping_keeps_all_panes_visible) ... ok
+test_inspector_wheel_does_not_steal_tree_or_list_focus (test_atelier.AtelierTests.test_inspector_wheel_does_not_steal_tree_or_list_focus) ... ok
+test_multi_attachment_drop_asks_without_removing_anything (test_atelier.AtelierTests.test_multi_attachment_drop_asks_without_removing_anything) ... ok
+test_styled_menu_click_uses_clicked_row_not_stale_hover (test_atelier.AtelierTests.test_styled_menu_click_uses_clicked_row_not_stale_hover) ... ok
+test_styled_menu_escape_and_keyboard_invoke (test_atelier.AtelierTests.test_styled_menu_escape_and_keyboard_invoke) ... ok
+test_unambiguous_global_drop_is_immediate (test_atelier.AtelierTests.test_unambiguous_global_drop_is_immediate) ... ok
+test_atomic_failure_does_not_truncate_and_corrupt_load_is_error (test_catalog.CatalogTests.test_atomic_failure_does_not_truncate_and_corrupt_load_is_error) ... ok
+test_complete_export_restore_and_prebackup (test_catalog.CatalogTests.test_complete_export_restore_and_prebackup) ... ok
+test_core_has_no_application_dependencies (test_catalog.CatalogTests.test_core_has_no_application_dependencies) ... ok
+test_generic_search_french_metadata_and_unique_results (test_catalog.CatalogTests.test_generic_search_french_metadata_and_unique_results) ... ok
+test_hierarchy_move_cycles_and_safe_deletion (test_catalog.CatalogTests.test_hierarchy_move_cycles_and_safe_deletion) ... ok
+test_identity_and_url_safety (test_catalog.CatalogTests.test_identity_and_url_safety) ... ok
+test_invalid_restore_leaves_file_intact (test_catalog.CatalogTests.test_invalid_restore_leaves_file_intact) ... ok
+test_manual_order_survives_sort_and_restart (test_catalog.CatalogTests.test_manual_order_survives_sort_and_restart) ... ok
+test_multiple_locations_and_unfiled (test_catalog.CatalogTests.test_multiple_locations_and_unfiled) ... ok
+test_single_writer_lock (test_catalog.CatalogTests.test_single_writer_lock) ... ok
+test_generic_organization_and_search (test_core_standalone.StandaloneTests.test_generic_organization_and_search) ... ok
+test_relation_types_are_enforced (test_core_standalone.StandaloneTests.test_relation_types_are_enforced) ... ok
+test_click_uses_hit_row_and_restores_focus (test_main_menu.MainMenuTests.test_click_uses_hit_row_and_restores_focus) ... ok
+test_escape_restores_content_focus_and_releases_grab (test_main_menu.MainMenuTests.test_escape_restores_content_focus_and_releases_grab) ... ok
+test_hover_switch_and_outside_click_close_without_action (test_main_menu.MainMenuTests.test_hover_switch_and_outside_click_close_without_action) ... ok
+test_keyboard_crosses_headings_skips_disabled_and_invokes_once (test_main_menu.MainMenuTests.test_keyboard_crosses_headings_skips_disabled_and_invokes_once) ... ok
+test_failed_write_rolls_back_memory_and_preserves_form (test_ui.FormTests.test_failed_write_rolls_back_memory_and_preserves_form) ... ok
+test_open_revalidates_url_before_browser (test_ui.FormTests.test_open_revalidates_url_before_browser) ... ok
+test_project_tag_filter_without_search_text (test_ui.FormTests.test_project_tag_filter_without_search_text) ... ok
+test_save_common_fields_and_multiple_locations (test_ui.FormTests.test_save_common_fields_and_multiple_locations) ... ok
+test_unsaved_cancel_prevents_leaving (test_ui.FormTests.test_unsaved_cancel_prevents_leaving) ... ok
+test_ambiguous_move_panel_and_cancel_have_no_mutation (test_ux.GestureTests.test_ambiguous_move_panel_and_cancel_have_no_mutation) ... ok
+test_click_title_opens_but_context_click_does_not (test_ux.GestureTests.test_click_title_opens_but_context_click_does_not) ... ok
+test_compact_layout_keeps_scroll_and_data_path_visible (test_ux.GestureTests.test_compact_layout_keeps_scroll_and_data_path_visible) ... ok
+test_delete_project_via_ui_preserves_fiche_and_never_contacts_browser (test_ux.GestureTests.test_delete_project_via_ui_preserves_fiche_and_never_contacts_browser) ... ok
+test_duplicate_action_cannot_apply_to_a_changed_url (test_ux.GestureTests.test_duplicate_action_cannot_apply_to_a_changed_url) ... ok
+test_enter_is_scoped_to_results_not_search_or_editor (test_ux.GestureTests.test_enter_is_scoped_to_results_not_search_or_editor) ... ok
+test_filter_suggestions_chips_and_unique_results (test_ux.GestureTests.test_filter_suggestions_chips_and_unique_results) ... ok
+test_item_inline_invalid_duplicate_and_cancel (test_ux.GestureTests.test_item_inline_invalid_duplicate_and_cancel) ... ok
+test_known_chips_new_values_and_persistence (test_ux.GestureTests.test_known_chips_new_values_and_persistence) ... ok
+test_preferences_are_separate_and_corruption_does_not_touch_catalog (test_ux.GestureTests.test_preferences_are_separate_and_corruption_does_not_touch_catalog) ... ok
+test_project_cycle_rejected_and_manual_order_preserved (test_ux.GestureTests.test_project_cycle_rejected_and_manual_order_preserved) ... ok
+test_project_inline_cancel_has_no_ghost_or_popup (test_ux.GestureTests.test_project_inline_cancel_has_no_ghost_or_popup) ... ok
+test_rename_and_manual_order_keyboard_bindings (test_ux.GestureTests.test_rename_and_manual_order_keyboard_bindings) ... ok
+test_restore_via_menu_keeps_hidden_inspector_and_schema_one (test_ux.GestureTests.test_restore_via_menu_keeps_hidden_inspector_and_schema_one) ... ok
+test_right_drop_menu_defers_mutation_until_choice (test_ux.GestureTests.test_right_drop_menu_defers_mutation_until_choice) ... ok
+test_schema_one_remains_strict_and_business_modules_unchanged (test_ux.GestureTests.test_schema_one_remains_strict_and_business_modules_unchanged) ... ok
+test_selection_does_not_show_inspector_or_open (test_ux.GestureTests.test_selection_does_not_show_inspector_or_open) ... ok
+test_transfer_preserves_other_links_notes_and_identity (test_ux.GestureTests.test_transfer_preserves_other_links_notes_and_identity) ... ok
+
+----------------------------------------------------------------------
+Ran 46 tests in 26.422s
+
+OK

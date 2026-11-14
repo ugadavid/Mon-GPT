@@ -11,6 +11,7 @@ from .chatgpt import parse_url
 from .details import DetailEditor
 from .theme import COLORS, FONT, apply_theme, make_icons
 from .atelier import Masthead, Surface, PillButton, CatalogList, AutoScrollbar, skin_menu
+from .main_menu import MainMenuBar
 from . import ui_state, __version__
 
 
@@ -46,14 +47,14 @@ class App(DetailEditor):
 
     def build_menus(self):
         bar = tk.Menu(self.root, tearoff=False)
-        file = skin_menu(tk.Menu(bar, tearoff=False))
+        file = tk.Menu(bar, tearoff=False)
         file.add_command(label="Sauvegarder le catalogue…", command=self.export)
         file.add_command(label="Restaurer le catalogue…", command=self.restore)
         file.add_separator()
         file.add_command(label="Dossier de données", command=self.open_data)
         file.add_command(label="Quitter", command=self.close)
         bar.add_cascade(label="Fichier", menu=file)
-        edit = skin_menu(tk.Menu(bar, tearoff=False))
+        edit = tk.Menu(bar, tearoff=False)
         edit.add_command(label="Nouveau fil", accelerator="Ctrl+N", command=lambda: self.new("item"))
         edit.add_command(label="Nouveau projet", accelerator="Ctrl+Maj+P", command=lambda: self.new("project"))
         edit.add_separator()
@@ -61,7 +62,7 @@ class App(DetailEditor):
         edit.add_command(label="Modifier la fiche", command=lambda: self.edit_selected())
         edit.add_command(label="Enregistrer la fiche", accelerator="Ctrl+S", command=self.save_record)
         bar.add_cascade(label="Édition", menu=edit)
-        view = skin_menu(tk.Menu(bar, tearoff=False))
+        view = tk.Menu(bar, tearoff=False)
         view.add_command(label="Liste · vue actuelle", state="disabled")
         view.add_command(label="Afficher / masquer l'inspecteur", command=self.toggle_inspector)
         view.add_command(label="Rechercher", accelerator="Ctrl+K", command=self.focus_search)
@@ -70,17 +71,12 @@ class App(DetailEditor):
         view.add_command(label="Fenêtre compacte · 1000 × 680", command=lambda: self.resize(1000, 680))
         view.add_command(label="Fenêtre confortable · 1360 × 820", command=lambda: self.resize(1360, 820))
         bar.add_cascade(label="Affichage", menu=view)
-        help_menu = skin_menu(tk.Menu(bar, tearoff=False))
+        help_menu = tk.Menu(bar, tearoff=False)
         help_menu.add_command(label="Gestes et raccourcis", command=self.help)
         help_menu.add_command(label="À propos de Mon GPT<3", command=lambda: messagebox.showinfo("Mon GPT<3", f"Version {__version__} · Atelier chaleureux\nCatalogue local, aucune modification dans ChatGPT.\nDétaillée, Mosaïque et couvertures : prévues, non livrées.", parent=self.root))
         bar.add_cascade(label="Aide", menu=help_menu)
-        menubar = ttk.Frame(self.root, padding=(22, 4))
-        menubar.pack(fill="x")
-        for label, menu in [("Fichier", file), ("Édition", edit), ("Affichage", view), ("Aide", help_menu)]:
-            button = self.button(menubar, text=label + "  ⌄", command=lambda: None, height=28)
-            button.configure(command=lambda m=menu, b=button: m.tk_popup(b.winfo_rootx(), b.winfo_rooty()+b.winfo_height()+4))
-            button.pack(side="left", padx=(0, 3))
-        ttk.Label(menubar, text="VOTRE ATELIER PERSONNEL", style="Muted.TLabel", font=("Segoe UI",8)).pack(side="right")
+        self.main_menu = MainMenuBar(self.root, [("Fichier", file), ("Édition", edit), ("Affichage", view), ("Aide", help_menu)])
+        self.main_menu.pack(fill="x")
         self.plus = skin_menu(tk.Menu(self.root, tearoff=False))
         self.plus.add_command(label="Nouveau fil", accelerator="Ctrl+N", command=lambda: self.new("item"))
         self.plus.add_command(label="Nouveau projet", accelerator="Ctrl+Maj+P", command=lambda: self.new("project"))
