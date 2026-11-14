@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.venv/
+build/
+dist/
+data/
+*.lock
+catalogue.json
+*sauvegarde*.json
+avant-restauration-*.json
