@@ -2,7 +2,9 @@
 
 Application Windows locale pour organiser ses discussions ChatGPT. MG-002a donne corps à l’« Atelier chaleureux » : bandeau illustré, cartes papier, titres affirmés, icônes harmonisées, badges et menus dessinés. La **vue Liste** conserve l’ouverture directe. Aucun serveur, compte applicatif ou API OpenAI ; aucune modification dans ChatGPT.
 
-![La vraie application sur CODEX-VM](reports/MG-002a/01-liste-1360.png)
+![La vraie application sur CODEX-VM](reports/MG-002b-02/01-apercu-ferme-1360.png)
+
+MG-002b-02 place les colonnes directement sous le menu validé : arbre et aperçu utilisent toute la hauteur, tandis que l’identité et la recherche compacte restent au centre. La recherche est plafonnée en largeur ; les pastilles n’occupent une ligne que si un périmètre ou un filtre est actif. [Rapport et trois captures](reports/MG-002b-02/rapport.md).
 
 ## Lancer
 

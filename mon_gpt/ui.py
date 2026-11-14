@@ -10,7 +10,7 @@ from .core import fold, now
 from .chatgpt import parse_url
 from .details import DetailEditor
 from .theme import COLORS, FONT, apply_theme, make_icons
-from .atelier import Masthead, Surface, PillButton, CatalogList, AutoScrollbar, skin_menu
+from .atelier import Masthead, Surface, PillButton, CatalogList, AutoScrollbar, skin_menu, shorten
 from .main_menu import MainMenuBar
 from . import ui_state, __version__
 
@@ -86,45 +86,6 @@ class App(DetailEditor):
         return PillButton(parent, text, command, tone=tone, **kwargs)
 
     def build_shell(self):
-        Masthead(self.root).pack(fill="x", padx=4)
-        search_area = ttk.Frame(self.root, padding=(24, 12, 24, 7))
-        search_area.pack(fill="x")
-        line = ttk.Frame(search_area)
-        line.pack(fill="x")
-        search_shell = Surface(line,height=52,padding=6)
-        search_shell.pack(side="left",expand=True,fill="x")
-        search_card = search_shell.body
-        tk.Label(search_card, text="⌕", background=COLORS["paper"], foreground=COLORS["pine"], font=("Segoe UI",22)).pack(side="left", padx=(12,4))
-        field = ttk.Frame(search_card, style="Paper.TFrame")
-        field.pack(side="left", expand=True, fill="x", pady=3)
-        self.search_entry = ttk.Entry(field, textvariable=self.query, font=("Segoe UI",12), style="Search.TEntry")
-        self.search_entry.pack(fill="x")
-        placeholder = tk.Label(field, text="Rechercher un fil, un projet, une idée…", font=("Segoe UI",11), foreground=COLORS["muted"], background=COLORS["paper"])
-        def placeholder_state(event=None):
-            if self.query.get() or self.root.focus_get()==self.search_entry:
-                placeholder.place_forget()
-            else:
-                placeholder.place(x=9,y=8)
-        placeholder.bind("<Button-1>",lambda e:self.search_entry.focus_set())
-        self.query.trace_add("write",lambda *args:placeholder_state())
-        self.search_entry.bind("<FocusIn>",placeholder_state)
-        self.search_entry.bind("<FocusOut>",placeholder_state)
-        placeholder_state()
-        tk.Label(search_card, text="Ctrl K", background=COLORS["paper"], foreground=COLORS["muted"], font=("Segoe UI",9)).pack(side="right",padx=12)
-        self.search_entry.bind("<Return>",self.search_enter)
-        self.search_entry.bind("<KeyRelease>",self.search_changed)
-        self.search_entry.bind("<Down>",self.focus_suggestions)
-        self.button(line,text="≡  Filtres",command=lambda:self.show_suggestions(True),height=42).pack(side="left",padx=(9,5))
-        self.button(line,text="×",command=self.clear_filters,width=40,height=42).pack(side="left")
-        self.chips = ttk.Frame(search_area)
-        self.chips.pack(fill="x",pady=(8,1))
-        self.suggestion_box = ttk.Frame(search_area,style="Paper.TFrame",padding=12)
-        ttk.Label(self.suggestion_box,text="SUGGESTIONS  ·  TOUT LE CATALOGUE",style="Caption.TLabel").pack(anchor="w",pady=(0,5))
-        self.suggestions = tk.Listbox(self.suggestion_box,height=5,font=("Segoe UI",11),background=COLORS["paper"],foreground=COLORS["ink"],selectbackground=COLORS["pine"],selectforeground=COLORS["paper"],relief="flat",borderwidth=0,highlightthickness=0,exportselection=False)
-        self.suggestions.pack(fill="x")
-        self.suggestions.bind("<ButtonRelease-1>",self.choose_suggestion)
-        self.suggestions.bind("<Return>",self.choose_suggestion)
-        self.suggestions.bind("<Escape>",lambda e:self.hide_suggestions())
         self.panes = ttk.Panedwindow(self.root,orient="horizontal",height=360)
         self.panes.pack(fill="both",expand=True,padx=18,pady=(3,0))
         self._sash_ready = False
@@ -133,6 +94,51 @@ class App(DetailEditor):
         self.panes.add(self.left,weight=0)
         self.panes.add(self.middle,weight=1)
         self.left.configure(width=252)
+        self.masthead=Masthead(self.middle)
+        self.masthead.pack(fill="x",padx=4)
+        self.search_area=search_area = ttk.Frame(self.middle, padding=(8, 4, 8, 6))
+        search_area.pack(fill="x")
+        self.search_line=line = ttk.Frame(search_area,width=760,height=40)
+        line.pack(anchor="w")
+        line.pack_propagate(False)
+        self.search_shell=search_shell = Surface(line,height=38,padding=4)
+        search_card = search_shell.body
+        tk.Label(search_card, text="⌕", background=COLORS["paper"], foreground=COLORS["pine"], font=("Segoe UI",18)).pack(side="left", padx=(7,3))
+        field = ttk.Frame(search_card, style="Paper.TFrame")
+        field.pack(side="left", expand=True, fill="x", pady=3)
+        self.search_entry = ttk.Entry(field, textvariable=self.query, font=("Segoe UI",10), style="Search.TEntry")
+        self.search_entry.pack(fill="x")
+        placeholder = tk.Label(field, text="Rechercher un fil, un projet…", font=("Segoe UI",10), foreground=COLORS["muted"], background=COLORS["paper"])
+        def placeholder_state(event=None):
+            if self.query.get() or self.root.focus_get()==self.search_entry:
+                placeholder.place_forget()
+            else:
+                placeholder.place(x=7,y=2)
+        placeholder.bind("<Button-1>",lambda e:self.search_entry.focus_set())
+        self.query.trace_add("write",lambda *args:placeholder_state())
+        self.search_entry.bind("<FocusIn>",placeholder_state)
+        self.search_entry.bind("<FocusOut>",placeholder_state)
+        placeholder_state()
+        self.search_hint=tk.Label(search_card, text="Ctrl K", background=COLORS["paper"], foreground=COLORS["muted"], font=("Segoe UI",8))
+        self.search_entry.bind("<Return>",self.search_enter)
+        self.search_entry.bind("<KeyRelease>",self.search_changed)
+        self.search_entry.bind("<Down>",self.focus_suggestions)
+        self.search_filters=self.button(line,text="Filtres",command=lambda:self.show_suggestions(True),width=65,height=34)
+        self.search_clear=self.button(line,text="×",command=self.clear_filters,width=30,height=34)
+        self.search_clear.pack(side="right")
+        self.search_filters.pack(side="right",padx=(6,4))
+        search_shell.pack(side="left",expand=True,fill="x")
+        search_area.bind("<Configure>",self.layout_search)
+        self.chips = ttk.Frame(search_area,height=32)
+        self.chips.pack_propagate(False)
+        self.chips.bind("<Configure>",lambda e:self.refresh_chips())
+        self.suggestion_box = ttk.Frame(search_area,style="Paper.TFrame",padding=12)
+        ttk.Label(self.suggestion_box,text="SUGGESTIONS  ·  TOUT LE CATALOGUE",style="Caption.TLabel").pack(anchor="w",pady=(0,5))
+        self.suggestions = tk.Listbox(self.suggestion_box,height=5,font=("Segoe UI",11),background=COLORS["paper"],foreground=COLORS["ink"],selectbackground=COLORS["pine"],selectforeground=COLORS["paper"],relief="flat",borderwidth=0,highlightthickness=0,exportselection=False)
+        self.suggestions.pack(fill="x")
+        self.suggestions.bind("<ButtonRelease-1>",self.choose_suggestion)
+        self.suggestions.bind("<Return>",self.choose_suggestion)
+        self.suggestions.bind("<Escape>",lambda e:self.hide_suggestions())
         nav_surface=Surface(self.left,width=230,height=120)
         nav_surface.pack(fill="both",expand=True)
         nav=nav_surface.body
@@ -164,14 +170,20 @@ class App(DetailEditor):
         titlebar=ttk.Frame(self.middle,padding=(10,4,6,9))
         titlebar.pack(fill="x")
         title_text=ttk.Frame(titlebar)
-        title_text.pack(side="left",expand=True,fill="x")
         self.results_label=ttk.Label(title_text,text="Tous les fils",style="Heading.TLabel",font=("Segoe UI",19,"bold"))
         self.results_label.pack(anchor="w")
-        titlebar.bind("<Configure>",lambda e:self.results_label.configure(wraplength=max(160,e.width-180)))
+        def layout_title(event):
+            width=max(100,event.width-150)
+            self.results_label.configure(wraplength=width,font=("Segoe UI",14 if event.width<500 else 19,"bold"))
+            self.result_count.configure(wraplength=width)
+        titlebar.bind("<Configure>",layout_title)
         self.result_count=ttk.Label(title_text,text="",style="Muted.TLabel",font=("Segoe UI",9))
         self.result_count.pack(anchor="w",pady=(2,0))
-        self.button(titlebar,text="Aperçu",command=self.toggle_inspector,height=32).pack(side="right",padx=(5,0))
-        self.button(titlebar,text="+ Fil",command=lambda:self.new("item"),height=32).pack(side="right")
+        self.preview_button=self.button(titlebar,text="Aperçu",command=self.toggle_inspector,height=32)
+        self.preview_button.pack(side="right",padx=(5,0))
+        self.new_fil_button=self.button(titlebar,text="+ Fil",command=lambda:self.new("item"),height=32)
+        self.new_fil_button.pack(side="right")
+        title_text.pack(side="left",expand=True,fill="x")
         self.work=ttk.Frame(self.middle,padding=12,style="Paper.TFrame")
         self.work_error=tk.StringVar()
         self.work_content=ttk.Frame(self.work,style="Paper.TFrame")
@@ -234,6 +246,14 @@ class App(DetailEditor):
             self.sidebar_note.pack_forget()
         elif not self.sidebar_note.winfo_manager():
             self.sidebar_note.pack(anchor="w",pady=(6,3))
+
+    def layout_search(self,event):
+        width=max(1,min(760,event.width-16))
+        self.search_line.configure(width=width)
+        if width>=600:
+            self.search_hint.pack(side="right",padx=8)
+        else:
+            self.search_hint.pack_forget()
 
     def place_initial_sash(self, force=False):
         if (force or not self._sash_ready) and self.panes.winfo_ismapped() and self.panes.winfo_width()>600:
@@ -346,13 +366,21 @@ class App(DetailEditor):
     def refresh_chips(self):
         for child in self.chips.winfo_children():
             child.destroy()
-        scope_text = "Projet : " + self.cat.records[self.scope].title[:36] + " · descendants ×" if self.scope in self.cat.records else ("À classer ×" if self.scope == "unfiled" else "Partout")
-        self.button(self.chips, text=scope_text, style="Chip.TButton", command=self.global_scope).pack(side="left", padx=(0, 5))
+        choices=[]
+        if self.scope!="all":
+            scope_text = "Projet : " + self.cat.records[self.scope].title + " · descendants ×" if self.scope in self.cat.records else "À classer ×"
+            choices.append((scope_text,self.global_scope))
         for var, label in [(self.tag, "Tag"), (self.category, "Catégorie")]:
             if var.get():
-                self.button(self.chips, text=f"{label} : {var.get()} ×", style="Chip.TButton", command=lambda v=var: self.remove_filter(v)).pack(side="left", padx=(0, 5))
-        if not self.tag.get() and not self.category.get():
-            ttk.Label(self.chips, text="Titres, notes, tags, catégories, informations personnalisées · Ctrl+K", style="Muted.TLabel").pack(side="left")
+                choices.append((f"{label} : {var.get()} ×",lambda v=var:self.remove_filter(v)))
+        if not choices:
+            self.chips.pack_forget()
+            return
+        self.chips.pack(fill="x",pady=(4,0),after=self.search_line)
+        slot=max(30,(self.chips.winfo_width()-5*len(choices))//len(choices))
+        for label,command in choices:
+            width=min(slot,self.font.measure(label)+28)
+            self.button(self.chips,text=shorten(self.font,label,max(4,width-24)),width=width,height=30,style="Chip.TButton",command=command).pack(side="left",padx=(0,5))
 
     def global_scope(self):
         if self.can_leave():

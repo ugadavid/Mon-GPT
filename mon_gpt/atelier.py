@@ -82,25 +82,24 @@ class Surface(tk.Canvas):
 
 class Masthead(tk.Canvas):
     def __init__(self, parent):
-        super().__init__(parent, height=114, background=C["ivory"], highlightthickness=0)
+        super().__init__(parent, height=80, background=C["ivory"], highlightthickness=0)
         self.bind("<Configure>", self.draw)
 
     def draw(self, event=None):
         self.delete("all")
         w = self.winfo_width()
-        target_height=90 if w<1100 else 114
-        if int(self.cget("height"))!=target_height:
-            self.configure(height=target_height)
         # Le repère de marque : carnet et plume, dessinés, pas un actif binaire.
-        rounded(self, 26, 26, 80, 80, 15, fill=C["pine"], outline="")
-        self.create_line(44,64,63,39, fill=C["paper"], width=3, capstyle="round")
-        self.create_polygon(50,54,48,42,64,35,63,47, fill="#E5C9A1", outline="")
-        self.create_line(43,66,65,66, fill="#92AA8A", width=2, capstyle="round")
-        self.create_text(96, 39, text="Mon GPT<3", anchor="w", font=("Segoe UI",27,"bold"), fill=C["pine"])
-        self.create_text(98, 73, text="Votre organisation, en local.", anchor="w", font=("Segoe UI",11), fill=C["muted"])
-        self.create_text(28, 104, text="UN PEU D'ORDRE.  BEAUCOUP D'IDÉES.", anchor="w", font=("Segoe UI",8,"bold"), fill=C["link"])
+        rounded(self, 8, 12, 46, 50, 10, fill=C["pine"], outline="")
+        self.create_line(20,40,34,22, fill=C["paper"], width=2, capstyle="round")
+        self.create_polygon(24,33,23,24,35,18,34,27, fill="#E5C9A1", outline="")
+        self.create_line(19,42,35,42, fill="#92AA8A", width=1.5, capstyle="round")
+        self.create_text(60, 23, text="Mon GPT<3", anchor="w", font=("Segoe UI",22 if w>=500 else 19,"bold"), fill=C["pine"])
+        self.create_text(61, 47, text="Votre organisation, en local.", anchor="w", font=("Segoe UI",9), fill=C["muted"])
+        self.create_text(10, 69, text="UN PEU D'ORDRE.  BEAUCOUP D'IDÉES.", anchor="w", font=("Segoe UI",7,"bold"), fill=C["link"])
         # Paysage d'atelier : collines, soleil, pages et feuillage.
-        start = max(465, w-500)
+        before=set(self.find_all())
+        available=w
+        w,start=500,0
         self.create_oval(w-170,7,w-106,71, fill="#E9C58E", outline="")
         self.create_polygon(start,109,start+80,62,start+175,80,start+260,37,w,82,w,114, fill="#E5E6CF", smooth=True, outline="")
         self.create_polygon(start+40,114,start+160,73,start+260,104,w-75,64,w,88,w,114, fill="#CAD5B9", smooth=True, outline="")
@@ -115,9 +114,12 @@ class Masthead(tk.Canvas):
             self.create_line(x,110,x,y-30*scale,fill=C["pine"],width=2)
             for side,dy in [(-1,-23),(1,-13),(-1,-4)]:
                 self.create_oval(x if side>0 else x-17*scale,y+dy,x+17*scale if side>0 else x,y+dy+13*scale, fill=C["pine"] if side>0 else "#6F9275", outline="")
-        self.create_line(24,113,w-24,113,fill=C["line"])
-        if w<1100:
-            self.scale("all",0,0,1,.78)
+        for item in set(self.find_all())-before:
+            self.addtag_withtag("landscape",item)
+        scale=.45 if available>=560 else .25 if available>=420 else .15
+        self.scale("landscape",0,0,scale,scale)
+        self.move("landscape",available-500*scale-8,78-114*scale)
+        self.create_line(8,79,available-8,79,fill=C["line"])
 
 
 class AutoScrollbar(ttk.Scrollbar):
