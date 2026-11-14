@@ -232,7 +232,8 @@ def skin_menu(menu):
 
 class CatalogList(tk.Canvas):
     """Liste à colonnes dessinées : API limitée aux interactions déjà utilisées."""
-    row_height, header_height = 62, 42
+    row_height, header_height = 42, 34
+    keys = ["#0","title","context","categories","tags","modified","open","details"]
 
     def __init__(self, parent):
         super().__init__(parent, background=C["ivory"], highlightthickness=0, takefocus=1, height=60)
@@ -240,18 +241,23 @@ class CatalogList(tk.Canvas):
         self.selected, self.focused, self.hovered = None, None, None
         self.top, self.left = 0, 0
         self.ycommand, self.xcommand = None, None
-        self.title_font = Font(self,font=("Segoe UI",12,"bold"))
+        self.title_font = Font(self,font=("Segoe UI",10,"bold"))
         self.small_font = Font(self,font=("Segoe UI",9))
         self.body_font = Font(self,font=("Segoe UI",10))
         self.bind("<Configure>",lambda e:self.draw())
         self.bind("<Button-1>",self.select_click)
         self.bind("<Motion>",self.motion)
-        self.bind("<Leave>",lambda e:self.hover(None))
+        self.bind("<Leave>",lambda e:(self.hide_tip(),self.hover(None)))
         self.bind("<Up>",lambda e:self.navigate(-1))
         self.bind("<Down>",lambda e:self.navigate(1))
         self.bind("<MouseWheel>",lambda e:self.yview("scroll",-int(e.delta/120 or (1 if e.delta>0 else -1))*2,"units"))
         self.bind("<FocusIn>",lambda e:self.draw())
         self.bind("<FocusOut>",lambda e:self.draw())
+        self.action_focus=False
+        self.sort_column,self.sort_reverse="title",False
+        self.tip_timer,self.tip=None,None
+        self.bind("<Right>",lambda e:self.focus_action(True))
+        self.bind("<Left>",lambda e:self.focus_action(False))
         self.resize_column = None
         self.pending_draw = None
         self.bind("<B1-Motion>",self.resize_motion)
@@ -272,10 +278,55 @@ class CatalogList(tk.Canvas):
         return self.columns.get(column,{}).get(option) if option else self.columns.get(column,{})
 
     def widths(self):
-        keys=["#0","title","context","tags","modified"]
-        sizes=[self.columns.get(k,{}).get("width",100) for k in keys]
-        sizes[1]=max(sizes[1],self.winfo_width()-sum(sizes[:1]+sizes[2:])-8)
-        return sizes
+        return [self.layout().get(key,(0,0))[1] for key in self.keys]
+
+    def layout(self):
+        """Titre et action épinglés ; seules les colonnes secondaires défilent."""
+        width=max(1,self.winfo_width())
+        icon,action=32,36
+        if width<440:
+            self.secondary_order=[]
+            self.secondary_start,self.secondary_visible=width-action-32,32
+            return {"#0":(0,icon),"title":(icon,max(1,width-icon-action-32)),"details":(width-action-32,32),"open":(width-action,action)}
+        order=["context","categories","tags"] if width>=900 else ["categories","tags","context"]
+        self.secondary_order=order
+        total=sum(self.columns.get(k,{}).get("width",150) for k in order)
+        preferred=self.columns.get("title",{}).get("width",300)
+        title=max(180,min(preferred,int(width*.44)))
+        title=max(title,width-icon-action-total)
+        self.secondary_start=icon+title
+        self.secondary_visible=max(1,width-action-self.secondary_start)
+        self.left=min(self.left,max(0,total-self.secondary_visible))
+        result={"#0":(0,icon),"title":(icon,title),"open":(width-action,action)}
+        x=self.secondary_start-self.left
+        for key in order:
+            size=self.columns.get(key,{}).get("width",150)
+            result[key]=(x,size)
+            x+=size
+        return result
+
+    def visible_box(self,key):
+        layout=self.layout()
+        if key not in layout: return (0,0)
+        x,width=layout[key]
+        if key in self.secondary_order:
+            start=max(x,self.secondary_start)
+            end=min(x+width,self.winfo_width()-36)
+            return (start,max(0,end-start))
+        return x,width
+
+    def open_hit(self,identity,x,y):
+        if identity not in self.rows or "project" in self.rows[identity].get("tags",()): return False
+        if self.identify_row(y)!=identity or not 0<=x<self.winfo_width(): return False
+        layout=self.layout()
+        tx,tw=layout["title"]
+        text=shorten(self.title_font,self.rows[identity]["values"][0],tw-16)
+        return x<32 or tx+6<=x<=tx+6+self.title_font.measure(text) or layout["open"][0]<=x<self.winfo_width()
+
+    def focus_action(self,value):
+        self.action_focus=value
+        self.draw()
+        return "break"
 
     def insert(self,parent,index,iid,**kwargs):
         self.rows[iid]=dict(kwargs)
@@ -296,6 +347,7 @@ class CatalogList(tk.Canvas):
         self.draw()
 
     def destroy(self):
+        self.hide_tip()
         if getattr(self,"pending_draw",None) is not None:
             self.after_cancel(self.pending_draw)
             self.pending_draw=None
@@ -328,12 +380,11 @@ class CatalogList(tk.Canvas):
 
     def bbox(self,identity,column=None):
         if identity not in self.rows: return ""
-        keys=["#0","title","context","tags","modified"]
-        index=keys.index(column) if column in keys else 0
-        widths=self.widths()
+        layout=self.layout()
         y=self.header_height+list(self.rows).index(identity)*self.row_height-self.top
         if y+self.row_height<=self.header_height or y>=self.winfo_height(): return ""
-        return (sum(widths[:index])-self.left,y,widths[index] if column else sum(widths),self.row_height)
+        x,width=layout.get(column,(0,0)) if column else (0,self.winfo_width())
+        return (x,y,width,self.row_height)
 
     def identify_row(self,y):
         if y<self.header_height: return ""
@@ -341,25 +392,23 @@ class CatalogList(tk.Canvas):
         return list(self.rows)[index] if 0<=index<len(self.rows) else ""
 
     def identify_column(self,x):
-        position=-self.left
-        for i,width in enumerate(self.widths()):
-            position+=width
-            if x<position: return f"#{i}"
+        self.layout()
+        for key in ["#0","title","open","details"]+self.secondary_order:
+            start,width=self.visible_box(key)
+            if width and start<=x<start+width: return f"#{self.keys.index(key)}"
         return ""
 
     def select_click(self,event):
+        self.hide_tip()
         self.focus_set()
         if event.y<self.header_height:
-            x=-self.left
-            keys=["#0","title","context","tags","modified"]
-            for key,width in zip(keys,self.widths()):
-                x+=width
-                if abs(event.x-x)<7:
+            for key,(x,width) in self.layout().items():
+                if key not in ("#0","open","details") and abs(event.x-x-width)<5 and 32<event.x<self.winfo_width()-36:
                     self.resize_column=(key,event.x,self.columns[key]["width"])
                     return
             col=self.identify_column(event.x)
             if col:
-                fn=self.headings.get(keys[int(col[1:])],{}).get("command")
+                fn=self.headings.get(self.keys[int(col[1:])],{}).get("command")
                 if fn: fn()
             return
         identity=self.identify_row(event.y)
@@ -384,6 +433,32 @@ class CatalogList(tk.Canvas):
 
     def motion(self,event):
         self.hover(self.identify_row(event.y))
+        self.hide_tip()
+        identity=self.identify_row(event.y)
+        if identity:
+            self.tip_timer=self.after(600,lambda:self.show_tip(identity,event.y))
+
+    def hide_tip(self):
+        if getattr(self,"tip_timer",None) is not None:
+            self.after_cancel(self.tip_timer)
+            self.tip_timer=None
+        if getattr(self,"tip",None) is not None:
+            self.tip.destroy()
+            self.tip=None
+
+    def show_tip(self,identity,y):
+        self.tip_timer=None
+        if identity not in self.rows: return
+        data=self.rows[identity]
+        vals=data["values"]
+        text=vals[0]+"\nProjet / emplacements : "+vals[1]
+        text+="\nCatégories : "+(" · ".join(data.get("categories",[])) or "—")
+        text+="\nTags : "+(" · ".join(data.get("labels",[])) or "—")
+        if self.winfo_width()<900: text+="\nColonnes secondaires repliées ou défilantes."
+        self.tip=tk.Label(self,text=text,font=("Segoe UI",9),background=C["ivory"],foreground=C["ink"],justify="left",anchor="w",padx=10,pady=8,wraplength=max(100,self.winfo_width()-48),highlightthickness=1,highlightbackground=C["line"])
+        self.tip.update_idletasks()
+        self.tip.place(x=12,y=max(self.header_height,min(y+20,self.winfo_height()-self.tip.winfo_reqheight()-8)),width=max(1,self.winfo_width()-24))
+        self.tip.lift()
 
     def hover(self,identity):
         if identity!=self.hovered:
@@ -402,78 +477,102 @@ class CatalogList(tk.Canvas):
         total=max(1,len(self.rows)*self.row_height)
         visible=max(1,self.winfo_height()-self.header_height)
         if args:
+            self.hide_tip()
             self.top=float(args[1])*total if args[0]=="moveto" else self.top+int(args[1])*(self.row_height if args[2]=="units" else visible)
             self.top=max(0,min(self.top,max(0,total-visible)))
             self.draw()
         return (self.top/total,min(1,(self.top+visible)/total))
 
     def xview(self,*args):
-        total=max(1,sum(self.widths()))
-        visible=max(1,self.winfo_width())
+        self.layout()
+        if not self.secondary_order: return (0,1)
+        total=max(1,sum(self.columns.get(k,{}).get("width",150) for k in self.secondary_order))
+        visible=self.secondary_visible
         if args:
+            self.hide_tip()
             self.left=float(args[1])*total if args[0]=="moveto" else self.left+int(args[1])*40
             self.left=max(0,min(self.left,max(0,total-visible)))
             self.draw()
         return (self.left/total,min(1,(self.left+visible)/total))
 
+    def row_icon(self,x,y,project,color):
+        if project:
+            points=[x-8,y+6,x-8,y-6,x-2,y-6,x+1,y-3,x+8,y-3,x+8,y+6,x-8,y+6]
+        else:
+            points=[x-8,y-6,x+8,y-6,x+8,y+4,x-1,y+4,x-5,y+8,x-5,y+4,x-8,y+4,x-8,y-6]
+        self.create_line(*points,fill=color,width=1.4,joinstyle="round")
+
+    def draw_badges(self,labels,x,y,width,category):
+        if width<28: return
+        end=x+width-6
+        for n,label in enumerate(labels):
+            bw=self.small_font.measure(label)+16
+            reserve=27 if n<len(labels)-1 else 0
+            if x+bw+reserve>end:
+                self.create_text(x,y,text="+"+str(len(labels)-n),anchor="w",font=self.small_font,fill=C["muted"])
+                return
+            palette=["#DDE4CF","#EDD4C6","#E8DEBF","#D6E2D8"] if category else ["#F0E7DA","#E7DDE7","#E4E9DC","#EBDFD8"]
+            color=palette[sum((i+1)*ord(c) for i,c in enumerate(label.casefold()))%len(palette)]
+            rounded(self,x,y-11,x+bw,y+11,11,fill=color,outline="#C6CBB7" if category else "")
+            self.create_text(x+8,y,text=label,anchor="w",font=self.small_font,fill=C["ink"])
+            x+=bw+5
+
     def draw(self):
         self.delete_canvas()
         width,height=self.winfo_width(),self.winfo_height()
-        row_height=54 if width<800 else 62
-        if row_height!=self.row_height:
-            self.top=self.top/self.row_height*row_height
-            self.row_height=row_height
-        rounded(self,1,1,width-1,height-1,16,fill=C["paper"],outline=C["line"])
-        sizes=self.widths()
-        self.left=min(self.left,max(0,sum(sizes)-width))
-        self.top=min(self.top,max(0,len(self.rows)*self.row_height-(height-self.header_height)))
+        layout=self.layout()
+        rounded(self,1,1,width-1,height-1,12,fill=C["paper"],outline=C["line"])
+        self.top=max(0,min(self.top,max(0,len(self.rows)*self.row_height-(height-self.header_height))))
         for index,(identity,data) in enumerate(self.rows.items()):
             y=self.header_height+index*self.row_height-self.top
             if y+self.row_height<=self.header_height or y>=height: continue
+            cy=y+self.row_height/2
             selected=identity==self.selected
-            fill=C["selection"] if selected else C["hover"] if identity==self.hovered else C["paper"]
-            rounded(self,4,y+3,width-6,y+self.row_height-3,11,fill=fill,outline=C["pine"] if selected and self.focus_get()==self else "")
-            if selected: rounded(self,5,y+15,9,y+self.row_height-15,2,fill=C["pine"],outline="")
+            fill="#E3E9D8" if selected else "#F1F0E7" if identity==self.hovered else C["paper"]
+            rounded(self,4,y+2,width-5,y+self.row_height-2,6,fill=fill,outline="")
+            if selected and self.focus_get()==self:
+                rounded(self,4,y+2,width-5,y+self.row_height-2,6,fill="",outline="#91A38B")
+            self.create_line(10,y+self.row_height-1,width-10,y+self.row_height-1,fill="#EEE9E0")
             vals=data.get("values",("",)*4)
-            is_project="project" in data.get("tags",())
-            x=-self.left
-            self.create_image(x+25,y+self.row_height/2,image=data.get("image"))
-            x+=sizes[0]
-            self.create_text(x+10,y+24,text=shorten(self.title_font,vals[0],sizes[1]-24),font=self.title_font,fill=C["pine"] if selected else C["ink"],anchor="w")
-            self.create_text(x+10,y+45,text="PROJET" if is_project else "↗  Ouvrir la discussion",font=("Segoe UI",8),fill=C["muted"] if is_project else C["link"],anchor="w")
-            x+=sizes[1]
-            self.create_text(x+10,y+32,text=shorten(self.body_font,vals[1],sizes[2]-20),font=self.body_font,fill=C["muted"],anchor="w")
-            x+=sizes[2]
-            tags=data.get("badges",[v.strip() for v in vals[2].split(" · ") if v.strip()])
-            bx=x+8
-            for n,badge in enumerate(tags):
-                text=shorten(self.small_font,str(badge),max(24,sizes[3]-30))
-                bw=self.small_font.measure(text)+18
-                if bx+bw>x+sizes[3]-5:
-                    self.create_text(bx,y+32,text="+"+str(len(tags)-n),anchor="w",font=self.small_font,fill=C["muted"])
-                    break
-                is_tag=data.get("badge_types",["tag"]*len(tags))[n]=="tag"
-                rounded(self,bx,y+20,bx+bw,y+44,12,fill=C["tag"] if is_tag else C["category"],outline="")
-                self.create_text(bx+9,y+32,text=text,anchor="w",font=self.small_font,fill=C["pine"] if is_tag else C["link"])
-                bx+=bw+5
-            x+=sizes[3]
-            self.create_text(x+9,y+32,text=vals[3],font=self.small_font,fill=C["muted"],anchor="w")
-        # En-tête fixe ; dessiné après les lignes pour masquer le défilement dessous.
-        self.create_rectangle(8,8,width-8,self.header_height,fill=C["paper"],outline="")
-        x=-self.left
-        for key,size in zip(["#0","title","context","tags","modified"],sizes):
+            project="project" in data.get("tags",())
+            self.row_icon(17,cy,project,C["link"] if project else C["pine"])
+            tx,tw=layout["title"]
+            self.create_text(tx+6,cy,text=shorten(self.title_font,vals[0],tw-16),font=self.title_font,fill=C["ink"],anchor="w")
+            for key in self.secondary_order:
+                x,size=self.visible_box(key)
+                if size<20: continue
+                if key=="context":
+                    self.create_text(x+7,cy,text=shorten(self.small_font,vals[1],size-14),font=self.small_font,fill=C["muted"],anchor="w")
+                else:
+                    labels=data.get("categories" if key=="categories" else "labels",[])
+                    self.draw_badges(labels,x+6,cy,size-8,key=="categories")
+            if "details" in layout:
+                x,size=layout["details"]
+                count=len(data.get("categories",[]))+len(data.get("labels",[]))
+                self.create_text(x+size/2,cy,text="+"+str(count) if count else "⋯",font=self.small_font,fill=C["muted"])
+            if not project:
+                x,size=layout["open"]
+                if selected and self.action_focus and self.focus_get()==self:
+                    rounded(self,x+4,cy-13,x+size-4,cy+13,4,fill="",outline=C["pine"])
+                self.create_line(x+11,cy+3,x+11,cy+7,x+23,cy+7,x+23,cy+3,fill=C["pine"],width=1.25)
+                self.create_line(x+15,cy+2,x+24,cy-7,x+18,cy-7,fill=C["pine"],width=1.3)
+                self.create_line(x+24,cy-7,x+24,cy-1,fill=C["pine"],width=1.3)
+        # En-tête fixe, au-dessus du défilement des lignes.
+        self.create_rectangle(4,3,width-4,self.header_height,fill="#F0EBE2",outline="")
+        for key in ["#0","title"]+self.secondary_order+["details","open"]:
+            x,size=self.visible_box(key)
+            if size<20: continue
             text=self.headings.get(key,{}).get("text","")
-            self.create_text(x+10,22,text=shorten(self.small_font,text,size-15),anchor="w",font=("Segoe UI",9,"bold"),fill=C["muted"])
-            x+=size
-        self.create_line(8,self.header_height-1,width-8,self.header_height-1,fill=C["line"])
+            if key=="details": text="⋯"
+            if key=="open": text="↗"
+            if key==self.sort_column: text+=(" ↓" if self.sort_reverse else " ↑")
+            self.create_text(x+7,18,text=shorten(self.small_font,text,size-12),anchor="w",font=self.small_font,fill=C["muted"])
+        self.create_line(6,self.header_height-1,width-6,self.header_height-1,fill=C["line"])
         if not self.rows and height>160:
-            cx,cy=width/2,min(height/2,self.header_height+140)
-            rounded(self,cx-34,cy-55,cx+34,cy+9,12,fill=C["selection"],outline="")
-            self.create_line(cx-16,cy-34,cx+16,cy-34,fill=C["pine"],width=2)
-            self.create_line(cx-16,cy-22,cx+8,cy-22,fill=C["pine"],width=2)
-            self.create_line(cx-16,cy-10,cx+13,cy-10,fill=C["pine"],width=2)
-            self.create_text(cx,cy+39,text="Rien ici, pour le moment.",font=("Segoe UI",15,"bold"),fill=C["pine"])
-            self.create_text(cx,cy+70,text="Changez de recherche, ou ajoutez un fil.",font=("Segoe UI",10),fill=C["muted"],width=max(150,width-60))
+            cx,cy=width/2,min(height/2,self.header_height+120)
+            self.row_icon(cx,cy-30,False,C["pine"])
+            self.create_text(cx,cy+8,text="Aucun résultat",font=("Segoe UI",12,"bold"),fill=C["pine"])
+            self.create_text(cx,cy+38,text="Changez de recherche, ou ajoutez un fil.",font=self.body_font,fill=C["muted"],width=max(150,width-40))
         if self.ycommand: self.ycommand(*self.yview())
         if self.xcommand: self.xcommand(*self.xview())
 

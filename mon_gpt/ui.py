@@ -170,11 +170,11 @@ class App(DetailEditor):
         titlebar=ttk.Frame(self.middle,padding=(10,4,6,9))
         titlebar.pack(fill="x")
         title_text=ttk.Frame(titlebar)
-        self.results_label=ttk.Label(title_text,text="Tous les fils",style="Heading.TLabel",font=("Segoe UI",19,"bold"))
+        self.results_label=ttk.Label(title_text,text="Discussions",style="Heading.TLabel",font=("Segoe UI",12,"bold"))
         self.results_label.pack(anchor="w")
         def layout_title(event):
             width=max(100,event.width-150)
-            self.results_label.configure(wraplength=width,font=("Segoe UI",14 if event.width<500 else 19,"bold"))
+            self.results_label.configure(wraplength=width,font=("Segoe UI",12,"bold"))
             self.result_count.configure(wraplength=width)
         titlebar.bind("<Configure>",layout_title)
         self.result_count=ttk.Label(title_text,text="",style="Muted.TLabel",font=("Segoe UI",9))
@@ -194,10 +194,10 @@ class App(DetailEditor):
         box.pack(fill="both",expand=True)
         self.results=CatalogList(box)
         self.results.heading("#0",text="")
-        self.results.column("#0",width=44,minwidth=44,stretch=False)
-        for key,label,width in [("title","DISCUSSIONS",340),("context","EMPLACEMENTS",165),("tags","REPÈRES",195),("modified","MODIFIÉ",97)]:
+        self.results.column("#0",width=32,minwidth=32,stretch=False)
+        for key,label,width in [("title","Titre local",310),("context","Projet / emplacements",150),("categories","Catégories",150),("tags","Tags",150)]:
             self.results.heading(key,text=label,command=lambda k=key:self.sort_results(k))
-            self.results.column(key,width=width,minwidth=230 if key=="title" else 80,stretch=(key=="title"))
+            self.results.column(key,width=width,minwidth=180 if key=="title" else 65,stretch=(key=="title"))
         sb=AutoScrollbar(box,orient="vertical",command=self.results.yview)
         sb.pack(side="right",fill="y")
         self.results.configure(yscrollcommand=sb.set)
@@ -436,16 +436,17 @@ class App(DetailEditor):
             context = self.project_label(r.parent) if r.kind == "project" and r.parent else (" · ".join(self.project_label(p) for p in r.projects) if r.kind == "item" else "À la racine")
             if r.kind == "item" and not r.projects:
                 context = "À classer"
-            return {"title": r.title, "context": context, "tags": " · ".join(r.tags + r.categories), "modified": r.modified}
+            return {"title": r.title, "context": context, "categories": " · ".join(r.categories), "tags": " · ".join(r.tags), "modified": r.modified}
         rows.sort(key=lambda r: fold(values(r)[self.sort_column]), reverse=self.sort_reverse)
         for r in rows:
             v = values(r)
-            self.results.insert("", "end", iid=r.id, image=self.icons[r.kind], tags=(r.kind,), badges=r.tags+r.categories, badge_types=["tag"]*len(r.tags)+["category"]*len(r.categories), values=(r.title, v["context"], v["tags"], datetime.fromisoformat(r.modified).strftime("%d/%m/%Y")))
+            self.results.insert("", "end", iid=r.id, image=self.icons[r.kind], tags=(r.kind,), categories=r.categories, labels=r.tags, values=(r.title, v["context"], v["tags"], datetime.fromisoformat(r.modified).strftime("%d/%m/%Y")))
         if selected and self.results.exists(selected):
             self.results.selection_set(selected)
             self.results.focus(selected)
-        self.results_label.configure(text=self.cat.records[scope].title if scope else ("À classer" if self.scope == "unfiled" else "Votre bibliothèque"))
-        self.result_count.configure(text=f"{len(rows)} résultat(s) · " + ("descendants inclus" if scope else "vos discussions, à portée de main"))
+        self.results.sort_column,self.results.sort_reverse=self.sort_column,self.sort_reverse
+        self.results_label.configure(text="Discussions")
+        self.result_count.configure(text=f"{len(rows)} résultat(s) · " + (self.cat.records[scope].title if scope else ("À classer" if self.scope=="unfiled" else "Tous les fils")))
         self.empty.configure(text="" if rows else "Ajoutez un fil avec + Fil, ou changez la recherche.")
         if rows:
             self.empty.pack_forget()
@@ -582,13 +583,7 @@ class App(DetailEditor):
     def title_hit(self, event, identity):
         if self.cat.records[identity].kind != "item":
             return False
-        column = self.results.identify_column(event.x)
-        if column == "#0":
-            return True
-        if column == "#1":
-            x, y, width, height = self.results.bbox(identity, "title")
-            return event.x <= x + min(width, self.results.title_font.measure(self.cat.records[identity].title)+18)
-        return False
+        return self.results.open_hit(identity,event.x,event.y)
 
     def open_click(self, identity):
         previous, timestamp = self.last_open

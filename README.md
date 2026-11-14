@@ -2,9 +2,11 @@
 
 Application Windows locale pour organiser ses discussions ChatGPT. MG-002a donne corps à l’« Atelier chaleureux » : bandeau illustré, cartes papier, titres affirmés, icônes harmonisées, badges et menus dessinés. La **vue Liste** conserve l’ouverture directe. Aucun serveur, compte applicatif ou API OpenAI ; aucune modification dans ChatGPT.
 
-![La vraie application sur CODEX-VM](reports/MG-002b-02/01-apercu-ferme-1360.png)
+![La vraie application sur CODEX-VM](reports/MG-002b-03/01-liste-sans-apercu.png)
 
 MG-002b-02 place les colonnes directement sous le menu validé : arbre et aperçu utilisent toute la hauteur, tandis que l’identité et la recherche compacte restent au centre. La recherche est plafonnée en largeur ; les pastilles n’occupent une ligne que si un périmètre ou un filtre est actif. [Rapport et trois captures](reports/MG-002b-02/rapport.md).
+
+MG-002b-03 affine uniquement la Liste : lignes de 42 px, catégories et tags séparés, petites icônes au trait et lien à droite. Le titre et le lien restent visibles pendant le défilement horizontal des colonnes secondaires. En largeur très réduite, `+N` indique les repères repliés ; le survol d’une ligne restitue son titre entier et tous ses repères. Les en-têtes trient et leurs limites se redimensionnent. Flèche droite dans la Liste focalise l’action de fin de ligne ; Entrée ouvre la sélection. [Rapport et quatre captures](reports/MG-002b-03/rapport.md).
 
 ## Lancer
 
@@ -18,7 +20,7 @@ Ou, depuis le dépôt : `python -m mon_gpt`. Le double-clic sur `lancer.cmd` con
 
 ## Retrouver et ouvrir
 
-Un clic sur le **texte du titre** ou l'icône terracotta **↗** ouvre le fil dans le navigateur par défaut, sans passer par un formulaire. Cliquer dans les autres colonnes ou dans l'espace vide du titre sélectionne seulement. Double-clic sur une ligne ou **Entrée dans la liste** ouvre aussi. Un projet (icône dossier) n'ouvre jamais ChatGPT ; double-clic/Entrée navigue vers son emplacement.
+Un clic sur le **texte du titre**, l’icône du fil ou le **petit lien à droite de la ligne** ouvre le fil dans le navigateur par défaut, sans passer par un formulaire. Cliquer dans les autres colonnes ou dans l'espace vide du titre sélectionne seulement. Double-clic sur une ligne ou **Entrée dans la liste** ouvre aussi. Un projet (icône dossier) n'ouvre jamais ChatGPT ; double-clic/Entrée navigue vers son emplacement.
 
 **Ctrl+K** focalise la recherche unique. Elle explore titres, résumés/descriptions, notes, tags, catégories et métadonnées, sans casse ni accents. Les suggestions et **Filtres** proposent les valeurs du catalogue : choisir un tag, une catégorie ou un projet ; les pastilles × retirent les filtres. Le projet sélectionné inclut **ses descendants**. Partout/Tous les fils retire ce périmètre ; Effacer remet à zéro texte, tag et catégorie. Un fil multi-rattaché reste unique dans les résultats. Entrée dans un champ de recherche/édition n'ouvre pas le navigateur.
 
