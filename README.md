@@ -1,8 +1,10 @@
-# Mon GPT<3 — 0.3.1
+# Mon GPT<3 — 0.4.0
 
 Application Windows locale pour organiser ses discussions ChatGPT. MG-002a donne corps à l’« Atelier chaleureux » : bandeau illustré, cartes papier, titres affirmés, icônes harmonisées, badges et menus dessinés. La **vue Liste** conserve l’ouverture directe. Aucun serveur, compte applicatif ou API OpenAI ; aucune modification dans ChatGPT.
 
-![La vraie application sur CODEX-VM](reports/MG-003b/01-navigation-montagne.png)
+![La vraie application sur CODEX-VM](reports/MG-004/02-detaillee.png)
+
+**MG-004 : la vue Détaillée.** De petites couvertures entières, les icônes colorées des projets, titres, extraits de résumés, emplacements et pastilles composent des cartes légères. **Liste | Détaillée**, près de Discussions ou dans Affichage, change la présentation en gardant sélection, recherche, filtres, tri et fiche ouverte. La vue choisie est mémorisée à la fermeture dans les préférences, hors catalogue. [Rapport et cinq captures comparatives réelles](reports/MG-004/rapport.md). Mosaïque reste réservée à une prochaine mission.
 
 **MG-003b : les repères deviennent visibles.** L’arbre affiche l’icône et la couleur de chaque projet ; la fiche regroupe ses trois sélecteurs sur une rangée. Le bandeau montre toute l’image en 16:9 dans son gabarit existant. Sept illustrations locales, dont la prairie solaire par défaut, 36 icônes au trait et les seize nuances conservées en pastilles rondes. Les images personnelles restent incluses dans les sauvegardes complètes. [Rapport et cinq captures réelles](reports/MG-003b/rapport.md) · [Origine des illustrations](docs/illustrations-MG-003a.md).
 
@@ -33,6 +35,14 @@ Un clic sur le **texte du titre**, l’icône du fil ou le **petit lien à droit
 **Ctrl+K** focalise la recherche unique. Elle explore titres, résumés/descriptions, notes, tags, catégories et métadonnées, sans casse ni accents. Les suggestions et **Filtres** proposent les valeurs du catalogue : choisir un tag, une catégorie ou un projet ; les pastilles × retirent les filtres. Le projet sélectionné inclut **ses descendants**. Partout/Tous les fils retire ce périmètre ; Effacer remet à zéro texte, tag et catégorie. Un fil multi-rattaché reste unique dans les résultats. Entrée dans un champ de recherche/édition n'ouvre pas le navigateur.
 
 L'**inspecteur** est facultatif, masqué au premier lancement. La commande discrète **Aperçu**, ou Affichage, affiche ses sections et Ouvrir/Copier le lien. **Modifier la fiche** rend volontairement accessibles tous les champs MG-001. Sa molette agit uniquement sous le pointeur dans ce panneau. Replier l'inspecteur laisse l'ouverture directe disponible. Les colonnes et séparateurs des panneaux sont ajustables ; cliquer un en-tête trie la liste. Affichage propose les formats compact 1000×680 et confortable 1360×820 ; le compact resserre le bandeau et les lignes. Un projet n’apparaît plus parmi ses propres résultats, ses descendants restent inclus.
+
+## Parcourir en Détaillée
+
+Cliquer **Détaillée** sous Discussions, ou choisir **Affichage → Détaillée**. Les cartes montrent une couverture 16:9 entière, avec des marges pour les portraits. L’icône et la couleur héritent du projet actif selon la même règle que le bandeau. Les résultats, leur tri et leurs UUID restent communs avec la Liste ; aucun projet supplémentaire n’apparaît dans Tous les fils.
+
+Le titre ou **↗** ouvre directement une discussion ; l’image, les pastilles et le reste de la carte sélectionnent seulement. Double-clic et Entrée sur le résultat focalisé gardent le comportement de la Liste. Un projet utilise sa propre couverture et ne s’ouvre jamais dans ChatGPT : Entrée/double-clic navigue vers son périmètre. Flèches haut/bas parcourent les cartes, droite focalise l’action d’ouverture. Un titre coupé, le résumé et les repères complets sont accessibles au survol. En petite largeur, quelques pastilles se replient en `+N`.
+
+Le bouton **Tri** de Détaillée reprend les quatre tris des en-têtes de Liste ; choisir le tri actif inverse son sens. Clic droit, F2, glisser gauche vers un projet et les raccourcis existants restent disponibles. Aucun nouveau raccourci de vue. Le choix Liste/Détaillée est le seul nouvel état mémorisé ; recherche et filtres restent ceux de la session.
 
 ## Créer et modifier
 

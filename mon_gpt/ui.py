@@ -17,6 +17,7 @@ from .navigation import NavigationTree, NavigationScrollbar, navigation_icons
 from .identity import resolve_identity
 from .identity_ui import ContextMasthead, ProjectVisualStrip
 from .project_icons import ProjectIconCache
+from .results import ResultsView
 from . import ui_state, __version__
 
 
@@ -32,6 +33,7 @@ class App(DetailEditor):
         self.search_timer = None
         self.preferences_path = store.directory / "interface.json"
         preferences, warning = ui_state.load(self.preferences_path)
+        self.view=tk.StringVar(value=preferences.get("view","list"))
         apply_theme(root)
         self.icons = make_icons(root)
         self.project_icons=ProjectIconCache(root)
@@ -69,7 +71,10 @@ class App(DetailEditor):
         edit.add_command(label="Enregistrer la fiche", accelerator="Ctrl+S", command=self.save_record)
         bar.add_cascade(label="Édition", menu=edit)
         view = tk.Menu(bar, tearoff=False)
-        view.add_command(label="Liste · vue actuelle", state="disabled")
+        self.view_menu=view
+        view.add_command(label="Liste", command=lambda:self.set_view("list"))
+        view.add_command(label="Détaillée", command=lambda:self.set_view("detail"))
+        self.update_view_menu()
         view.add_command(label="Afficher / masquer l'inspecteur", command=self.toggle_inspector)
         view.add_command(label="Rechercher", accelerator="Ctrl+K", command=self.focus_search)
         view.add_command(label="Retirer les filtres", command=self.clear_filters)
@@ -79,13 +84,49 @@ class App(DetailEditor):
         bar.add_cascade(label="Affichage", menu=view)
         help_menu = tk.Menu(bar, tearoff=False)
         help_menu.add_command(label="Gestes et raccourcis", command=self.help)
-        help_menu.add_command(label="À propos de Mon GPT<3", command=lambda: messagebox.showinfo("Mon GPT<3", f"Version {__version__} · Atelier chaleureux\nCatalogue local, aucune modification dans ChatGPT.\nDétaillée et Mosaïque : prévues, non livrées.", parent=self.root))
+        help_menu.add_command(label="À propos de Mon GPT<3", command=lambda: messagebox.showinfo("Mon GPT<3", f"Version {__version__} · Atelier chaleureux\nCatalogue local, aucune modification dans ChatGPT.\nListe et Détaillée disponibles. Mosaïque : prévue, non livrée.", parent=self.root))
         bar.add_cascade(label="Aide", menu=help_menu)
         self.main_menu = MainMenuBar(self.root, [("Fichier", file), ("Édition", edit), ("Affichage", view), ("Aide", help_menu)])
         self.main_menu.pack(fill="x")
         self.plus = skin_menu(tk.Menu(self.root, tearoff=False))
         self.plus.add_command(label="Nouveau fil", accelerator="Ctrl+N", command=lambda: self.new("item"))
         self.plus.add_command(label="Nouveau projet", accelerator="Ctrl+Maj+P", command=lambda: self.new("project"))
+
+    def update_view_menu(self):
+        for index,(key,label) in enumerate((("list","Liste"),("detail","Détaillée"))):
+            self.view_menu.entryconfigure(index,label=label+(" · vue actuelle" if self.view.get()==key else ""))
+
+    def update_view_buttons(self):
+        for key,button in self.view_buttons.items():
+            button.tone="chip" if self.view.get()==key else "quiet"
+            button.draw()
+        if hasattr(self,"detail_sort_button"):
+            if self.view.get()=="detail": self.detail_sort_button.pack(side="right")
+            else: self.detail_sort_button.pack_forget()
+
+    def detail_sort_popup(self):
+        menu=skin_menu(tk.Menu(self.root,tearoff=False))
+        for key,label in (("title","Titre"),("context","Emplacements"),("categories","Catégories"),("tags","Tags")):
+            menu.add_command(label=label+(" ↓" if self.sort_reverse else " ↑") if key==self.sort_column else label,command=lambda k=key:self.sort_results(k))
+        self.active_menu=menu
+        button=self.detail_sort_button
+        menu.tk_popup(button.winfo_rootx(),button.winfo_rooty()+button.winfo_height())
+
+    def set_view(self,view):
+        if view not in ("list","detail") or view==self.view.get(): return
+        # Une bascule de présentation ne quitte pas une fiche en cours d’édition.
+        self.clear_drop()
+        self.drag=None
+        self.view.set(view)
+        self.results.set_view(view)
+        if self.inline is not None and self.inline.master==self.results:
+            bbox=self.results.bbox(self.draft["id"],"title")
+            if bbox:
+                x,y,width,height=bbox
+                self.inline.place(x=x,y=y,width=max(40,width),height=height)
+        self.update_view_menu()
+        self.update_view_buttons()
+        if self.root.focus_get()==self.results: self.results.focus_set()
 
     def button(self, parent, text, command=lambda: None, style=None, **kwargs):
         tone = {"Primary.TButton": "primary", "Open.TButton": "warm", "Chip.TButton": "chip"}.get(style, "quiet")
@@ -196,6 +237,15 @@ class App(DetailEditor):
         self.new_fil_button=self.button(titlebar,text="+ Fil",command=lambda:self.new("item"),height=32)
         self.new_fil_button.pack(side="right")
         title_text.pack(side="left",expand=True,fill="x")
+        self.viewbar=ttk.Frame(self.middle,padding=(9,0,6,5))
+        self.viewbar.pack(fill="x")
+        self.view_buttons={}
+        for key,label in (("list","Liste"),("detail","Détaillée")):
+            button=self.button(self.viewbar,text=label,command=lambda k=key:self.set_view(k),width=80 if key=="detail" else 63,height=28)
+            button.pack(side="left",padx=(0,4))
+            self.view_buttons[key]=button
+        self.detail_sort_button=self.button(self.viewbar,text="Tri · Titre ↑",command=self.detail_sort_popup,width=112,height=28)
+        self.update_view_buttons()
         self.work=ttk.Frame(self.middle,padding=12,style="Paper.TFrame")
         self.work_error=tk.StringVar()
         self.work_content=ttk.Frame(self.work,style="Paper.TFrame")
@@ -204,7 +254,7 @@ class App(DetailEditor):
         self.work_error.trace_add("write",lambda *args:error_label.pack(anchor="w",pady=(6,0)) if self.work_error.get() else error_label.pack_forget())
         self.results_box=box=ttk.Frame(self.middle,padding=(3,3,3,8))
         box.pack(fill="both",expand=True)
-        self.results=CatalogList(box)
+        self.results=ResultsView(box,self.store.images,self.project_icons,self.view.get())
         self.results.heading("#0",text="")
         self.results.column("#0",width=32,minwidth=32,stretch=False)
         for key,label,width in [("title","Titre local",310),("context","Projet / emplacements",150),("categories","Catégories",150),("tags","Tags",150)]:
@@ -452,7 +502,7 @@ class App(DetailEditor):
         rows.sort(key=lambda r: fold(values(r)[self.sort_column]), reverse=self.sort_reverse)
         for r in rows:
             v = values(r)
-            self.results.insert("", "end", iid=r.id, image=self.icons[r.kind], tags=(r.kind,), categories=r.categories, labels=r.tags, values=(r.title, v["context"], v["tags"], datetime.fromisoformat(r.modified).strftime("%d/%m/%Y")))
+            self.results.insert("", "end", iid=r.id, image=self.icons[r.kind], tags=(r.kind,), categories=r.categories, labels=r.tags, summary=r.description, visual=resolve_identity(self.cat,r.id,self.scope), values=(r.title, v["context"], v["tags"], datetime.fromisoformat(r.modified).strftime("%d/%m/%Y")))
         if selected and self.results.exists(selected):
             self.results.selection_set(selected)
             self.results.focus(selected)
@@ -471,6 +521,8 @@ class App(DetailEditor):
     def sort_results(self, column):
         self.sort_reverse = not self.sort_reverse if self.sort_column == column else False
         self.sort_column = column
+        label={"title":"Titre","context":"Lieu","categories":"Catégories","tags":"Tags"}[column]
+        self.detail_sort_button.configure(text="Tri · "+label+(" ↓" if self.sort_reverse else " ↑"))
         self.refresh_results()
 
     def select_record(self, event=None):
@@ -999,7 +1051,7 @@ class App(DetailEditor):
         if not self.can_leave():
             return
         try:
-            ui_state.save(self.preferences_path, self.inspector_visible, f"{max(1000,self.root.winfo_width())}x{max(680,self.root.winfo_height())}")
+            ui_state.save(self.preferences_path, self.inspector_visible, f"{max(1000,self.root.winfo_width())}x{max(680,self.root.winfo_height())}", self.view.get())
         except OSError as exc:
             messagebox.showwarning("Préférences non enregistrées", f"Le catalogue reste intact.\n{exc}", parent=self.root)
         if self.search_timer:

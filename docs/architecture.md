@@ -1,6 +1,6 @@
 # Architecture — Mon GPT<3
 
-État actuel : 0.3.1, 15 novembre 2026. Les sections MG-002/MG-002a décrivent leur état historique avant MG-003a ; MG-003b précise les corrections de présentation actuelles.
+État actuel : 0.4.0, 15 novembre 2026. Les sections MG-002/MG-002a décrivent leur état historique avant MG-003a ; MG-003b précise les corrections de présentation actuelles.
 
 ## Choix techniques
 
@@ -79,3 +79,13 @@ La restauration revalide, vérifie les collisions et sauvegarde d’abord l’ex
 `ContextMasthead` remplace les vignettes recadrées du bandeau par `contained_picture` : scène entière contenue dans un cadre exactement 16:9 calculé après les textes existants, au plus 128×72 dans les 80 px de hauteur inchangés. L’icône reste à l’extérieur de l’image. Aucune modification du menu, de la recherche, de la Liste ou des colonnes. La rangée `ProjectVisualStrip` est interactive dans la fiche et strictement passive en aperçu projet ; l’aperçu des fils reste identique. Les layers gardent leurs transactions et commandes précédentes, avec grille d’icônes réactive et palette ronde 4×4.
 
 `pack:soleil` est le défaut pour les repères sans image explicite et le paysage neutre. Les six références existantes restent valides avec leur contenu original. `identity.py` reste pur ; ni le schéma 2, ni `core.py`, `chatgpt.py`, `storage.py` et `images.py` ne changent. La migration, l’import et le ZIP complet sont conservés.
+
+## MG-004 — Deux rendus de résultats (0.4.0)
+
+`results.ResultsView` prolonge le contrat public de `atelier.CatalogList` : collection unique de lignes, sélection/focus, `insert`, `delete`, `item`, `bbox`, `identify_row`, `open_hit`, défilement et événements. Le mode `list` délègue intégralement au dessin et à la géométrie historiques ; `atelier.py` reste inchangé. Le mode `detail` adapte dessin, hitboxes, infobulle et géométrie : cartes de 126 px, couverture 112×63 ou 80×45, titre, deux lignes de résumé au plus, contexte et pastilles. En petite largeur, les pastilles utilisent aussi l’espace sous l’image. Le survol est recalculé après défilement.
+
+`ui.refresh_results` reste le seul appel à `Catalog.search`, le seul filtrage de périmètre et le seul tri. Il transmet, en plus des données de Liste existantes, le résumé et le résultat du résolveur pur `resolve_identity`. `ResultsView` ne connaît ni catalogue, ni adaptateur, ni URL : toutes les ouvertures, mutations, protections, menus et DnD continuent dans l’orchestration existante sur le même widget. Une bascule n’appelle pas la recherche, ne recharge pas l’inspecteur, ne quitte pas son brouillon et n’écrit aucune fiche. Le renommage inline est repositionné sans perdre son texte.
+
+Les couvertures visibles sont chargées par `ImageLibrary` puis `contained_picture`, sans recadrage. Cache PhotoImage LRU de 192 entrées par référence/taille, limité aux tailles de vignettes effectives ; photos retenues pendant le rendu. Les icônes réutilisent `ProjectIconCache`. Pas de décodage d’image à chaque survol. La sélection est rendue visible au changement de mode ; la Liste retrouve ses colonnes et sa géométrie historiques.
+
+`interface.json` reste en version 1 : `view` accepte `list` ou `detail`, ancien `list` compatible, valeur inconnue rejetée avec repli sûr et avertissement. La sauvegarde à la fermeture utilise le mode courant, jamais le catalogue. Les quatre tris existent dans les deux vues ; Détaillée les expose par un petit menu central. Les nouvelles commandes Affichage utilisent le menu habillé existant sans le redessiner. Le cœur, le résolveur, le schéma 2, ChatGPT, les importations et ZIP sont inchangés. Aucun mode Mosaïque actif ou préconstruit.
