@@ -14,6 +14,8 @@ from .atelier import Masthead, Surface, PillButton, CatalogList, AutoScrollbar, 
 from .main_menu import MainMenuBar
 from .inspector import InspectorSummary, InspectorScrollbar
 from .navigation import NavigationTree, NavigationScrollbar, navigation_icons
+from .identity import resolve_identity
+from .identity_ui import ContextMasthead
 from . import ui_state, __version__
 
 
@@ -75,7 +77,7 @@ class App(DetailEditor):
         bar.add_cascade(label="Affichage", menu=view)
         help_menu = tk.Menu(bar, tearoff=False)
         help_menu.add_command(label="Gestes et raccourcis", command=self.help)
-        help_menu.add_command(label="À propos de Mon GPT<3", command=lambda: messagebox.showinfo("Mon GPT<3", f"Version {__version__} · Atelier chaleureux\nCatalogue local, aucune modification dans ChatGPT.\nDétaillée, Mosaïque et couvertures : prévues, non livrées.", parent=self.root))
+        help_menu.add_command(label="À propos de Mon GPT<3", command=lambda: messagebox.showinfo("Mon GPT<3", f"Version {__version__} · Atelier chaleureux\nCatalogue local, aucune modification dans ChatGPT.\nDétaillée et Mosaïque : prévues, non livrées.", parent=self.root))
         bar.add_cascade(label="Aide", menu=help_menu)
         self.main_menu = MainMenuBar(self.root, [("Fichier", file), ("Édition", edit), ("Affichage", view), ("Aide", help_menu)])
         self.main_menu.pack(fill="x")
@@ -96,7 +98,7 @@ class App(DetailEditor):
         self.panes.add(self.left,weight=0)
         self.panes.add(self.middle,weight=1)
         self.left.configure(width=252)
-        self.masthead=Masthead(self.middle)
+        self.masthead=ContextMasthead(self.middle,self.store.images)
         self.masthead.pack(fill="x",padx=4)
         self.search_area=search_area = ttk.Frame(self.middle, padding=(8, 4, 8, 6))
         search_area.pack(fill="x")
@@ -462,6 +464,8 @@ class App(DetailEditor):
             self.empty.pack(anchor="w",padx=6)
         self.refresh_chips()
 
+        self.update_identity()
+
     def sort_results(self, column):
         self.sort_reverse = not self.sort_reverse if self.sort_column == column else False
         self.sort_column = column
@@ -480,9 +484,13 @@ class App(DetailEditor):
         if not checked and not self.can_leave():
             return False
         self.current, self.dirty, self.editing = identity, False, False
+        self.update_identity()
         if self.inspector_visible:
             self.show_summary(identity, checked=True)
         return True
+
+    def update_identity(self):
+        self.masthead.set_identity(resolve_identity(self.cat,self.current,self.scope))
 
     def ensure_inspector(self):
         if not self.inspector_visible:
@@ -505,6 +513,7 @@ class App(DetailEditor):
         if not checked and not self.can_leave():
             return
         self.current,self.dirty,self.editing=identity,False,False
+        self.update_identity()
         for child in self.editor.winfo_children():
             child.destroy()
         self.summary=InspectorSummary(self.editor,self.cat.records.get(identity),self.project_label,
@@ -517,6 +526,7 @@ class App(DetailEditor):
         self.ensure_inspector()
         self.editing = True
         self.render_editor(identity)
+        self.update_identity()
 
     def edit_selected(self, identity=None):
         identity = identity or self.current
@@ -526,6 +536,7 @@ class App(DetailEditor):
     def save_record(self):
         if not self.editing or self.current not in self.cat.records:
             return False
+        if getattr(self,"visual_layer",None): self.visual_layer.accept()
         return super().save_record()
 
     def open_thread(self, identity=None):
@@ -732,6 +743,9 @@ class App(DetailEditor):
         self.inline.bind("<Escape>", lambda e: self.cancel_inline())
 
     def escape(self):
+        if getattr(self,"visual_layer",None):
+            self.visual_layer.cancel()
+            return
         if self.drag:
             self.clear_drop()
             self.drag = None

@@ -28,6 +28,7 @@ class Record:
     projects: list[str] = field(default_factory=list)
     created: str = field(default_factory=now)
     modified: str = field(default_factory=now)
+    visual: dict[str, str] = field(default_factory=dict)
 
 
 class Catalog:

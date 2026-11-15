@@ -1,8 +1,10 @@
-# Mon GPT<3 — 0.2.1
+# Mon GPT<3 — 0.3.0
 
 Application Windows locale pour organiser ses discussions ChatGPT. MG-002a donne corps à l’« Atelier chaleureux » : bandeau illustré, cartes papier, titres affirmés, icônes harmonisées, badges et menus dessinés. La **vue Liste** conserve l’ouverture directe. Aucun serveur, compte applicatif ou API OpenAI ; aucune modification dans ChatGPT.
 
-![La vraie application sur CODEX-VM](reports/MG-002b-03/01-liste-sans-apercu.png)
+![La vraie application sur CODEX-VM](reports/MG-003a/03-projet-ecriture.png)
+
+**MG-003a : l’univers de chaque projet.** Image, Icône et Couleur se choisissent dans sa fiche, avec six illustrations originales locales, huit icônes au trait et seize nuances. Le bandeau adopte ces repères ; les fils en héritent sans perdre leurs emplacements. Les images personnelles sont copiées dans les données et incluses dans la sauvegarde complète. [Rapport et cinq captures](reports/MG-003a/rapport.md) · [Illustrations et prompts de création](docs/illustrations-MG-003a.md).
 
 MG-002b-02 place les colonnes directement sous le menu validé : arbre et aperçu utilisent toute la hauteur, tandis que l’identité et la recherche compacte restent au centre. La recherche est plafonnée en largeur ; les pastilles n’occupent une ligne que si un périmètre ou un filtre est actif. [Rapport et trois captures](reports/MG-002b-02/rapport.md).
 
@@ -16,7 +18,7 @@ MG-002b-06 affine la navigation gauche : dossiers au trait, sélection sauge, ni
 
 ## Lancer
 
-Windows 11 x64, Python 3.13 avec Tcl/Tk et commande `python` accessible. Aucune dépendance pip ni police à installer. Recette sur CODEX-VM avec Python 3.13.17 / Tk 8.6. Depuis PowerShell :
+Windows 11 x64, Python 3.13 avec Tcl/Tk et commande `python` accessible. **Pillow 13.0.0** est le seul paquet requis pour décoder PNG, JPEG et WebP. Depuis le dépôt, installer une fois avec `python -m pip install -r requirements.txt`. Aucune police supplémentaire. Recette sur CODEX-VM avec Python 3.13.17 / Tk 8.6. Depuis PowerShell :
 
 ```powershell
 & 'C:\Users\codex\Documents\Projets\mon-gpt\lancer.cmd'
@@ -53,15 +55,25 @@ Le **clic droit / touche Menu** offre les actions selon l'objet : ouvrir/copier 
 
 Supprimer demande confirmation. Un projet supprimé remonte ses enfants au parent et retire ses rattachements **sans supprimer les fils**. Supprimer un fil retire seulement sa fiche locale. Retirer le dernier rattachement conserve le fil dans Tous les fils et À classer. Emplacements accepte aussi Ctrl+clic/Maj+flèche dans l'édition détaillée. Catégories, tags et emplacements restent trois notions distinctes.
 
+## Personnaliser un projet
+
+Dans **Modifier la fiche**, les propriétés Image, Icône et Couleur ont chacune un bouton Choisir. Le panneau temporaire permet de prévisualiser puis **Utiliser** le choix ; Annuler, la croix ou Échap reviennent au choix précédent. Par défaut rétablit le repère fourni par l’application. Les choix restent dans le même brouillon que les notes et suivent **Enregistrer / Ctrl+S**. Ctrl+S depuis un sélecteur applique sa prévisualisation puis enregistre la fiche. Revenir à l’aperçu ou quitter protège les modifications non enregistrées comme auparavant.
+
+Une couverture est fournie automatiquement à tout projet. Le pack de six illustrations 1200×675 est livré avec le code et fonctionne hors connexion. **Importer mon image…** accepte PNG, JPG/JPEG et WebP fixes, vérifiés selon leur contenu réel : 20 Mo (20 × 1024² octets), 8192 px par côté et 24 millions de pixels maximum ; minimum 16 px par côté. Format conseillé : paysage 1200×675. Les images sont orientées selon EXIF, converties en PNG sans métadonnées et réduites à 2400 px par côté au plus. L’original reste intact ; sa copie demeure utilisable après déplacement du fichier source. Un import refusé garde la couverture précédente.
+
+Le bandeau utilise les repères du projet sélectionné. Pour un fil, il préfère le projet actif **s’il est un rattachement direct de ce fil** ; en contexte global, il prend le premier rattachement dans l’ordre existant, sans le modifier. Un fil sans projet ou une absence de sélection conserve le paysage neutre. Les fils n’ont aucun champ de personnalisation supplémentaire. Icône et couleur accompagnent la petite couverture du bandeau, sans recolorer les zones validées de l’application.
+
 ## Menus et données
 
 **Fichier** : Sauvegarder le catalogue, Restaurer, Dossier de données, Quitter. **Ctrl+S reste l'enregistrement de fiche**, distinct de la sauvegarde globale. **Affichage** : inspecteur, recherche, filtres et taille de fenêtre. **Aide** rappelle les gestes et raccourcis.
 
 Les menus supérieurs et contextuels partagent un habillage papier ; leurs commandes sont réelles. Flèches/Entrée permettent de choisir, Échap ferme le menu. Illustration, icônes et contrôles sont dessinés localement avec Tk/Canvas : aucun téléchargement, actif de maquette, paquet graphique ou police supplémentaire.
 
-Catalogue : `%LOCALAPPDATA%\MonGPT\catalogue.json`, hors dépôt ; chemin affiché en bas, cliquable pour ouvrir le dossier. JSON UTF-8 **schéma 1 inchangé**, dates ISO 8601 zonées, validation stricte, fichier temporaire puis remplacement atomique, verrou d'instance. Une erreur de lecture arrête l'ouverture sans réinitialiser. Une mise à jour du code ne supprime pas les données.
+Catalogue : `%LOCALAPPDATA%\MonGPT\catalogue.json`, hors dépôt ; chemin affiché en bas, cliquable pour ouvrir le dossier. JSON UTF-8 **schéma 2**, dates ISO 8601 zonées, validation stricte, fichier temporaire puis remplacement atomique, verrou d’instance. Un catalogue v1 est vérifié puis copié à l’identique dans `avant-migration-v1-DATE.json` avant sa migration automatique. Ses identifiants, champs, relations, ordre et URL sont conservés. Versions futures et données invalides sont refusées sans réinitialisation. Les images personnelles résident dans le sous-dossier `images`, sous des noms dérivés de leur empreinte SHA-256.
 
-Sauvegarder exporte toutes les données métier vers un JSON choisi. Restaurer valide sans mutation, demande confirmation, crée `avant-restauration-DATE.json` dans le dossier des données, puis remplace le catalogue. Un fichier invalide laisse les données intactes. Conserver aussi une copie hors du disque du PC ; les données ne sont pas chiffrées.
+**Sauvegarder** produit désormais une archive ZIP complète : catalogue et images personnelles référencées. **Restaurer** accepte ZIP et anciens JSON v1 ; il valide contenu, empreintes, références et chemins avant confirmation. L’état courant est sauvegardé avant remplacement : ZIP lorsqu’il utilise des images personnelles, sinon JSON complet. Les ressources existantes ne sont pas écrasées arbitrairement. Un fichier invalide ou un échec laisse l’ancien catalogue utilisable. Conserver aussi une copie hors du disque du PC ; les données ne sont pas chiffrées. L’API d’export JSON reste disponible pour un catalogue sans image personnelle et refuse explicitement un export qui oublierait ces images.
+
+Limites vérifiées : catalogue de 10 Mo maximum, archive ZIP de 100 Mo, contenu décompressé de 200 Mo et 512 images personnelles au plus. Les ressources inutilisées après annulation ou remplacement sont conservées localement par précaution ; elles ne sont pas exportées. Aucun nettoyage automatique susceptible de supprimer une image partagée.
 
 `interface.json` conserve séparément taille de fenêtre, vue Liste et état de l'inspecteur à la fermeture. Ce fichier de confort est exclu des exports métier ; colonnes, filtres, tri d'affichage et sélection ne persistent pas entre lancements. Le vrai catalogue n'est pas utilisé pour les recettes.
 
@@ -85,7 +97,7 @@ Le générateur refuse de remplacer un catalogue existant. `--simulate-open` est
 
 ## Limites
 
-**Détaillée, Mosaïque, galerie de couvertures, import d'images et personnalisation visuelle sont prévus, non livrés dans MG-002.** Aucun faux sélecteur actif. Les icônes sont applicatives ; les trois PNG de référence sont inchangés et ne sont pas embarqués dans l'interface. Aucun travail MG-003 engagé.
+**Détaillée, Mosaïque et personnalisation propre aux fils restent à venir.** MG-003a livre uniquement l’identité des projets et son héritage dans le bandeau de la Liste. Les trois PNG de référence sont inchangés et ne sont pas embarqués dans l’interface.
 
 Les suggestions de tags/catégories portent sur **tout le catalogue**, pas seulement les résultats filtrés. Le cas suspect de doublon signalé en recette reste à reproduire dans un lot fonctionnel : MG-002a ne modifie pas la déduplication par UUID de l’adaptateur. L’accessibilité par lecteur d’écran des nouveaux contrôles Canvas n’est pas évaluée.
 

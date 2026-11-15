@@ -2,25 +2,35 @@
 import json
 import os
 import tempfile
+import shutil
+import zipfile
+import stat
 from pathlib import Path
 from datetime import datetime
 from uuid import UUID
 from .core import Catalog, Record
-from dataclasses import fields
+from dataclasses import fields, dataclass
 from .chatgpt import ChatGPT, Conversation, parse_url
+from .identity import validate_visual, image_references, ASSET
+from .images import ImageLibrary, check_asset, MAX_BYTES
+
+MAX_CATALOG=10*1024*1024
+MAX_ARCHIVE=100*1024*1024
+MAX_EXPANDED=200*1024*1024
 
 
 def encode(catalog, adapter):
-    return {"schema": 1, "records": catalog.to_list(), "chatgpt": adapter.to_list()}
+    return {"schema": 2, "records": catalog.to_list(), "chatgpt": adapter.to_list()}
 
 
 def decode(data):
     try:
-        if type(data) is not dict or set(data) != {"schema", "records", "chatgpt"} or type(data["schema"]) is not int or data["schema"] != 1:
+        if type(data) is not dict or set(data) != {"schema", "records", "chatgpt"} or type(data["schema"]) is not int or data["schema"] not in (1,2):
             raise ValueError("Version de sauvegarde non prise en charge.")
         if not isinstance(data["records"], list) or not isinstance(data["chatgpt"], list):
             raise ValueError("Listes attendues.")
-        if any(not isinstance(r, dict) or set(r) != {f.name for f in fields(Record)} for r in data["records"]):
+        expected={f.name for f in fields(Record)}-({"visual"} if data["schema"]==1 else set())
+        if any(not isinstance(r, dict) or set(r) != expected for r in data["records"]):
             raise ValueError("Champs de fiche manquants ou inconnus.")
         rows = [Record(**r) for r in data["records"]]
         cat = Catalog(rows)
@@ -28,6 +38,7 @@ def decode(data):
             raise ValueError("Identifiants dupliqués.")
         for r in rows:
             UUID(r.id)
+            validate_visual(r.visual,r.kind)
             if r.kind not in ("project", "item") or not isinstance(r.title, str) or not r.title.strip():
                 raise ValueError("Fiche invalide.")
             if not all(isinstance(v, str) for v in (r.description, r.notes, r.created, r.modified)):
@@ -87,6 +98,7 @@ class Store:
         self.directory = Path(directory).resolve()
         self.path = self.directory / "catalogue.json"
         self.lock = None
+        self.images = ImageLibrary(self.directory/"images")
 
     def acquire(self):
         # Verrou OS libéré aussi en cas d'arrêt brutal ; aucun verrou périmé.
@@ -107,29 +119,151 @@ class Store:
         if not self.path.exists():
             cat = Catalog()
             return cat, ChatGPT(cat)
-        return self.read(self.path)
+        data=read_json(self.path)
+        cat,adapter=decode(data)
+        self.validate_images(cat)
+        if data["schema"]==1:
+            # Copie exacte avant la première écriture du format 2.
+            self.save(cat,adapter)
+        return cat,adapter
 
     @staticmethod
     def read(path):
-        with open(path, encoding="utf-8") as stream:
-            return decode(json.load(stream))
+        if zipfile.is_zipfile(path): return decode(read_backup(path).data)
+        return decode(read_json(path))
+
+    @staticmethod
+    def prepare_restore(path):
+        return read_backup(path)
+
+    def validate_images(self,cat,images=None):
+        for reference in image_references(cat):
+            if images is not None:
+                if reference not in images: raise ValueError("Sauvegarde incomplète : une image personnelle manque.")
+                check_asset(reference,images[reference])
+            else: self.images.read(reference)
 
     def save(self, cat, adapter):
         data = encode(cat, adapter)
         decode(data)
+        catalog_bytes(data)
+        self.validate_images(cat)
+        if self.path.exists():
+            old=read_json(self.path)
+            if not isinstance(old,dict) or type(old.get("schema")) is not int or old["schema"] not in (1,2):
+                raise ValueError("Version du catalogue existant non prise en charge ; fichier conservé.")
+            if old["schema"]==1:
+                decode(old)
+                backup=self.directory/("avant-migration-v1-"+datetime.now().strftime("%Y%m%d-%H%M%S-%f")+".json")
+                shutil.copy2(self.path,backup)
         atomic_write(self.path, data)
 
     def export(self, destination, cat, adapter):
-        if Path(destination).resolve() == self.path:
+        destination=Path(destination).resolve()
+        if destination == self.path or destination.is_relative_to(self.images.directory.resolve()):
             raise ValueError("Choisissez un autre fichier que le catalogue actif.")
         data = encode(cat, adapter)
         decode(data)
-        atomic_write(destination, data)
+        catalog_bytes(data)
+        self.validate_images(cat)
+        references=image_references(cat)
+        if destination.suffix.lower()!=".zip":
+            if references: raise ValueError("Des images personnelles sont présentes : choisissez une sauvegarde complète ZIP.")
+            atomic_write(destination, data)
+            return
+        images={ref:self.images.read(ref) for ref in references}
+        write_backup(destination,data,images)
 
     def restore(self, candidate, cat, adapter):
         # Revalidation avant toute écriture, même si l'interface a déjà validé.
-        new_cat, new_adapter = decode(candidate)
-        backup = self.directory / ("avant-restauration-" + datetime.now().strftime("%Y%m%d-%H%M%S-%f") + ".json")
+        bundle=isinstance(candidate,Backup)
+        images=candidate.images if bundle else None
+        new_cat, new_adapter = decode(candidate.data if bundle else candidate)
+        self.validate_images(new_cat,images)
+        # Vérifier les collisions avant de toucher au catalogue ou à ses ressources.
+        for ref,data in (images or {}).items():
+            target=self.images.path(ref)
+            if target.exists() and target.read_bytes()!=data:
+                raise ValueError("Une ressource existante est incohérente ; restauration annulée.")
+        extension=".zip" if image_references(cat) else ".json"
+        backup = self.directory / ("avant-restauration-" + datetime.now().strftime("%Y%m%d-%H%M%S-%f") + extension)
         self.export(backup, cat, adapter)
+        # Ressources immuables d’abord, catalogue atomique en dernier. Aucun nettoyage
+        # destructif : un échec laisse les anciennes références utilisables.
+        for reference,data in (images or {}).items(): self.images.put(reference,data)
         self.save(new_cat, new_adapter)
         return new_cat, new_adapter, backup
+
+
+@dataclass
+class Backup:
+    data: dict
+    images: dict[str,bytes]
+
+
+def read_json(path):
+    with open(path,"rb") as f: data=f.read(MAX_CATALOG+1)
+    if len(data)>MAX_CATALOG: raise ValueError("Catalogue trop volumineux : 10 Mo maximum.")
+    try: return json.loads(data.decode("utf-8"))
+    except (UnicodeError,json.JSONDecodeError) as exc: raise ValueError("Catalogue JSON illisible.") from exc
+
+
+def read_backup(path):
+    if not zipfile.is_zipfile(path):
+        data=read_json(path)
+        cat,_=decode(data)
+        if image_references(cat): raise ValueError("Sauvegarde JSON incomplète pour les images : utilisez l’archive ZIP complète.")
+        return Backup(data,{})
+    if Path(path).stat().st_size>MAX_ARCHIVE: raise ValueError("Archive trop volumineuse : 100 Mo maximum.")
+    try:
+        with zipfile.ZipFile(path) as archive:
+            infos=archive.infolist()
+            names=[i.filename for i in infos]
+            if len(infos)>513 or len({name.casefold() for name in names})!=len(names):
+                raise ValueError("Archive : trop de fichiers ou noms dupliqués.")
+            if sum(i.file_size for i in infos)>MAX_EXPANDED: raise ValueError("Archive décompressée trop volumineuse : 200 Mo maximum.")
+            for info in infos:
+                name=info.filename
+                allowed=name=="catalogue.json" or (name.startswith("images/") and ASSET.fullmatch("asset:"+name[7:-4]) and name.endswith(".png"))
+                if not allowed or info.is_dir() or stat.S_ISLNK(info.external_attr>>16) or info.flag_bits&1:
+                    raise ValueError("Nom, chemin ou type de fichier non autorisé dans l’archive.")
+                if info.compress_type not in (zipfile.ZIP_STORED,zipfile.ZIP_DEFLATED): raise ValueError("Compression d’archive non prise en charge.")
+                limit=MAX_CATALOG if name=="catalogue.json" else MAX_BYTES
+                if info.file_size>limit: raise ValueError("Fichier de sauvegarde trop volumineux.")
+            if "catalogue.json" not in names: raise ValueError("Catalogue absent de l’archive.")
+            data=json.loads(archive.read("catalogue.json").decode("utf-8"))
+            cat,_=decode(data)
+            references=image_references(cat)
+            if set(names)!={"catalogue.json",*("images/"+r[6:]+".png" for r in references)}:
+                raise ValueError("Images manquantes ou fichiers supplémentaires dans la sauvegarde.")
+            images={ref:archive.read("images/"+ref[6:]+".png") for ref in references}
+            for ref,content in images.items(): check_asset(ref,content)
+            return Backup(data,images)
+    except (zipfile.BadZipFile,UnicodeError,RuntimeError,EOFError) as exc:
+        raise ValueError("Archive endommagée ou illisible.") from exc
+
+
+def write_backup(destination,data,images):
+    encoded=catalog_bytes(data)
+    if len(encoded)>MAX_CATALOG or len(images)>512 or len(encoded)+sum(map(len,images.values()))>MAX_EXPANDED:
+        raise ValueError("Sauvegarde trop volumineuse : 10 Mo de catalogue, 512 images et 200 Mo au total maximum.")
+    destination=Path(destination)
+    destination.parent.mkdir(parents=True,exist_ok=True)
+    name=None
+    try:
+        with tempfile.NamedTemporaryFile(dir=destination.parent,delete=False) as f:
+            name=f.name
+            with zipfile.ZipFile(f,"w",compression=zipfile.ZIP_DEFLATED) as archive:
+                archive.writestr("catalogue.json",encoded)
+                for ref,content in sorted(images.items()): archive.writestr("images/"+ref[6:]+".png",content)
+            f.flush();os.fsync(f.fileno())
+        if Path(name).stat().st_size>MAX_ARCHIVE: raise ValueError("Archive trop volumineuse : 100 Mo maximum.")
+        os.replace(name,destination)
+    finally:
+        if name and os.path.exists(name): os.unlink(name)
+
+
+def catalog_bytes(data):
+    encoded=json.dumps(data,ensure_ascii=False,indent=2).encode("utf-8")
+    if len(encoded)>MAX_CATALOG: raise ValueError("Catalogue trop volumineux : 10 Mo maximum, aucune écriture effectuée.")
+    return encoded

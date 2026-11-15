@@ -9,6 +9,7 @@ from .widgets import ChipPicker, EditorDelete, editor_styles
 from .inspector import InspectorAction
 from .theme import COLORS
 from .chatgpt import parse_url
+from .identity_ui import ProjectVisualFields
 
 
 def confirm_delete(parent,message):
@@ -71,6 +72,7 @@ class DetailEditor:
             raise
 
     def can_leave(self):
+        if getattr(self,"visual_layer",None): self.visual_layer.cancel()
         if not self.dirty:
             return True
         answer = messagebox.askyesnocancel("Modifications en cours", "Enregistrer les modifications de la fiche ?\nNon : abandonner ces modifications.", parent=self.root)
@@ -90,6 +92,8 @@ class DetailEditor:
         return " / ".join(reversed(parts))
 
     def render_editor(self, identity):
+        if getattr(self,"visual_layer",None): self.visual_layer.cancel()
+        self.project_visual=None
         self.current, self.dirty = identity, False
         for widget in self.editor.winfo_children():
             widget.destroy()
@@ -157,6 +161,9 @@ class DetailEditor:
             wrapped.append(error)
         self.pickers = {}
         field("title", "Titre", r.title)
+        if r.kind=="project":
+            self.project_visual=ProjectVisualFields(form,self,r.visual)
+            self.project_visual.pack(fill="x")
         if r.kind == "item":
             field("url", "Lien", self.adapter.conversations[r.id].url)
         field("description", "Description" if r.kind == "project" else "Résumé", r.description, 2)
@@ -255,6 +262,7 @@ class DetailEditor:
                     parent = self.parent_ids[self.parent_box.current()]
                     if parent != r.parent:
                         self.cat.move(r.id, parent)
+                    r.visual=self.project_visual.get()
                 for key in ("title", "description", "notes"):
                     setattr(r, key, values[key])
                 for key in ("tags", "categories"):
@@ -293,7 +301,7 @@ class DetailEditor:
     def export(self):
         if not self.can_leave():
             return
-        path = filedialog.asksaveasfilename(parent=self.root, title="Sauvegarder tout le catalogue", defaultextension=".json", initialdir=self.store.directory, initialfile="mon-gpt-sauvegarde.json", filetypes=[("Sauvegarde JSON", "*.json")])
+        path = filedialog.asksaveasfilename(parent=self.root, title="Sauvegarder le catalogue et ses images", defaultextension=".zip", initialdir=self.store.directory, initialfile="mon-gpt-sauvegarde.zip", filetypes=[("Sauvegarde complète ZIP", "*.zip")])
         if path:
             def action():
                 self.store.export(path, self.cat, self.adapter)
@@ -303,12 +311,12 @@ class DetailEditor:
     def restore(self):
         if not self.can_leave():
             return
-        path = filedialog.askopenfilename(parent=self.root, title="Choisir une sauvegarde à vérifier", initialdir=self.store.directory, filetypes=[("Sauvegarde JSON", "*.json")])
+        path = filedialog.askopenfilename(parent=self.root, title="Choisir une sauvegarde à vérifier", initialdir=self.store.directory, filetypes=[("Sauvegardes ZIP ou JSON historique", "*.zip *.json")])
         if not path:
             return
         def action():
-            candidate_cat, candidate_adapter = self.store.read(path)
-            candidate = encode(candidate_cat, candidate_adapter)
+            candidate=self.store.prepare_restore(path)
+            candidate_cat,candidate_adapter=decode(candidate.data)
             if not messagebox.askyesno("Remplacer le catalogue ?", f"Sauvegarde vérifiée : {len(candidate_cat.records)} fiches.\nLe catalogue actuel sera remplacé, après sauvegarde automatique dans le dossier des données.\nContinuer ?", parent=self.root):
                 return
             self.cat, self.adapter, backup = self.store.restore(candidate, self.cat, self.adapter)

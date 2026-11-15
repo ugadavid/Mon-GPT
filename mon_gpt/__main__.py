@@ -3,8 +3,6 @@ import os
 import tkinter as tk
 from tkinter import messagebox
 from pathlib import Path
-from .storage import Store
-from .ui import App
 
 
 def main():
@@ -16,6 +14,14 @@ def main():
         parser.error("--simulate-open exige un --data-dir isolé du catalogue utilisateur.")
     root = tk.Tk()
     root.withdraw()
+    try:
+        from .storage import Store
+        from .ui import App
+    except ModuleNotFoundError as exc:
+        if exc.name!="PIL": raise
+        messagebox.showerror("Prérequis manquant", "Pillow est nécessaire pour les images.\nDepuis le dossier de Mon GPT<3, exécutez :\npython -m pip install -r requirements.txt",parent=root)
+        root.destroy()
+        return 1
     store = Store(args.data_dir)
     try:
         store.acquire()

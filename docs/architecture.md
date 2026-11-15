@@ -1,10 +1,10 @@
-# Architecture — MG-001
+# Architecture — Mon GPT<3
 
-Version 0.1.0, 14 novembre 2026.
+État actuel : 0.3.0, 15 novembre 2026. Les sections MG-002/MG-002a décrivent leur état historique avant MG-003a.
 
 ## Choix techniques
 
-Python 3.13 et Tkinter/ttk : application de bureau Windows sans serveur HTTP ni dépendance tierce, lancement avec Python déjà présent sur la VM. Coût : rendu sobre, Python/Tk requis sur le poste cible, absence d'installateur autonome. [Tkinter](https://docs.python.org/3.13/library/tkinter.html) fournit les contrôles et dialogues de bureau utilisés.
+Python 3.13 et Tkinter/ttk : application de bureau Windows sans serveur HTTP. Pillow 13.0.0, ajouté par MG-003a, décode et vérifie les images. Python/Tk et Pillow sont requis sur le poste cible ; aucun installateur autonome. [Tkinter](https://docs.python.org/3.13/library/tkinter.html) fournit les contrôles et dialogues de bureau utilisés.
 
 JSON UTF-8 plutôt que SQLite pour cette première version : catalogue personnel facile à inspecter, exporter et restaurer. Chaque mutation est validée et écrite dans un temporaire du même dossier, avec flush/fsync puis [os.replace](https://docs.python.org/3.13/library/os.html#os.replace). Une erreur laisse l'ancien fichier intact ; l'interface revient aussi à son état métier précédent et conserve la saisie. Le verrou Windows `msvcrt.locking` garde une seule instance écrivaine et se libère à la fin du processus, même brutalement. La durabilité face à une panne matérielle complète dépend du système de fichiers et de son cache ; cela ne remplace pas une sauvegarde hors machine.
 
@@ -26,7 +26,7 @@ La recherche du socle ne connaît que les champs communs et métadonnées. Norma
 
 ## Schéma et cohérence
 
-Racine : `schema: 1`, `records: […]`, `chatgpt: […]`. Le décodeur vérifie champs obligatoires, types, UUID, unicité, dates zonées, parents présents, absence de cycles, rattachements et identités ChatGPT cohérentes. Toute fiche applicative a exactement une entrée ChatGPT, chaque projet aucune. Versions inconnues et fichiers illisibles sont refusés sans recréer de catalogue. Une migration future devra être explicite et sauvegarder le format précédent.
+Racine actuelle : `schema: 2`, `records: […]`, `chatgpt: […]`. Le décodeur vérifie champs obligatoires, types, UUID, unicité, dates zonées, parents présents, absence de cycles, rattachements et identités ChatGPT cohérentes. Toute fiche applicative a exactement une entrée ChatGPT, chaque projet aucune. Versions inconnues et fichiers illisibles sont refusés sans recréer de catalogue. Le format 1 strict reste décodable ; sa migration ajoute seulement `visual: {}` aux fiches après copie exacte du catalogue ancien. Le détail des ressources et sauvegardes MG-003a figure ci-dessous.
 
 La restauration valide avant confirmation puis revalide l'objet en mémoire, exporte l'état courant vers une sauvegarde horodatée unique et écrit le nouvel état atomiquement. Une erreur de validation ne produit aucune écriture. La copie préalable demeure si le remplacement échoue. Les exports conservent champs communs, identités, relations, ordre et entrées de l'adaptateur. Le verrou n'est pas une donnée métier.
 
@@ -57,3 +57,17 @@ Le navigateur est une fonction injectable à la frontière UI. Le mode de recett
 Les ajustements fonctionnels restent dans `ui.py` : retrait du projet courant après `Catalog.search`, molette limitée aux descendants de l’inspecteur, inférence d’un rattachement source seulement s’il est unique. Le moteur, l’adaptateur, le stockage, le schéma et les 35 tests précédents sont inchangés. Les suggestions restent globales. La déduplication n’est pas réécrite.
 
 Au lancement, les séparateurs sont positionnés après réalisation de la fenêtre, y compris lorsque l’inspecteur est restauré depuis les préférences. Le format compact adapte la hauteur du bandeau et des lignes ; le défilement horizontal préserve la largeur des colonnes. Les tests ciblent les corrections et régressions constatées ; les captures proviennent séparément de la recette native Windows.
+
+## MG-003a — Identité visuelle des projets (0.3.0)
+
+`Record.visual` est un dictionnaire générique, vide pour les fils, portant les identifiants facultatifs `image`, `icon`, `color` des projets. Aucun champ ChatGPT supplémentaire. `identity.py` définit les repères et **l’unique résolveur pur** `resolve_identity(catalog, identity, scope)` : projet choisi ; pour un fil, contexte direct s’il existe dans ses liens, sinon premier lien conservé ; sans projet, état neutre. Il ne connaît ni UI, ni fichiers, ni ChatGPT. Détaillée et Mosaïque pourront réutiliser ce résultat sans nouvelle règle d’héritage.
+
+`identity_ui.py` ajoute les trois contrôles à la seule fiche projet. Les layers occupent le Canvas de l’inspecteur et possèdent leur défilement ; leur choix temporaire est distinct du brouillon de la fiche. Utiliser alimente ce brouillon, Annuler/Échap le laisse intact. Ctrl+S applique aussi le choix du layer ouvert puis utilise la transaction existante. L’avertissement `dirty` protège les départs. `ContextMasthead` dérive du bandeau existant et remplace seulement les objets marqués `landscape`, sans changer les dimensions, les marges, la marque ni le moteur de Liste. Vignettes recadrées sans déformation, icône et discret trait coloré ; le cliché du bandeau est réutilisé tant que ses repères et dimensions ne changent pas.
+
+`images.py` vérifie taille, contenu PNG/JPEG/WebP, dimensions et absence d’animation avant décodage complet. Il corrige l’orientation, retire les métadonnées, réduit au plus à 2400 px et copie le PNG normalisé dans `<data-dir>/images/<sha256>.png`. La référence persistée `asset:<sha256>` n’est jamais un chemin fourni par l’utilisateur. Les couvertures `pack:<id>` proviennent de `mon_gpt/assets/covers`, hors données personnelles. Les copies sont immuables : pas de suppression automatique après remplacement ou suppression d’un projet. Une annulation peut donc laisser une copie non référencée ; elle n’entre pas dans l’export.
+
+`storage.py` assure la validation explicite des versions 1 et 2 et la copie `avant-migration-v1-…json` avant écriture du format 2. Le lecteur v1 n’ajoute aucune règle ChatGPT. `Backup(data, images)` est un contenu vérifié avant confirmation de restauration ; les anciens JSON v1 restent acceptés. L’export UI est ZIP, avec `catalogue.json` et exactement les images référencées. L’export JSON programmatique refuse les images personnelles pour éviter une sauvegarde silencieusement incomplète.
+
+Les archives refusent doublons de noms (y compris casse), liens symboliques, chiffrement, chemins inattendus, fichiers supplémentaires, empreintes incorrectes et ressources manquantes. Aucun `extractall` : les noms d’images sont reconstruits depuis les empreintes validées. Bornes : 10 Mo pour le catalogue, 20 Mo par image, 100 Mo pour le ZIP, 200 Mo décompressés et 512 images. Ces limites sont vérifiées aussi à l’écriture afin de ne pas produire une sauvegarde que le lecteur refuserait.
+
+La restauration revalide, vérifie les collisions et sauvegarde d’abord l’existant complètement. Les nouvelles images sont installées avant le remplacement atomique du catalogue. Un échec peut laisser des images supplémentaires, jamais des anciennes références détruites. Les fichiers existants d’un même hash doivent être identiques ; une collision incohérente bloque la restauration au lieu d’écraser une ressource partagée. Le schéma et l’adaptateur ChatGPT restent séparés. Les composants validés de menu, navigation, Liste, tags/catégories, aperçu et dialogues ciblés n’ont pas été redessinés.
