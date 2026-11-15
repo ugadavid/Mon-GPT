@@ -1,0 +1,445 @@
+{
+  "historical_sha256": {
+    "creation": "3e607cd6493f6478c9c416b20ef1da2c1c093f25152e507cde973fc85ecb2598",
+    "ecriture": "121c8b75e435b74a68283b235d4ec028160bc4a1d4aa5eaba011a9f5b8297516",
+    "laboratoire": "16f1ec600d30d79629ef1ec5560c061aac465b151b309fc4d012ce9ac2ee9251",
+    "montagne": "b96a75d8313039d597fadb1c60f9fb9a3ac994d068e74fa54696d5279179bedd",
+    "soleil": "beda856914bb1951408a9b6bb8403d8733a2d39f1b0758d53f7b3813f732fac0",
+    "technique": "3d22ba7192a7c689f5aafd6af0af14f56be765671330d666e62bdaa952c9ea2c",
+    "voyage": "d8ef6843d0d5e11870e80a77340c836425af5ed902af09795ac5e219d65ff1de"
+  },
+  "covers": [
+    {
+      "source": "Image ChatGPT 15 nov. 2026, 11_11_24-1.png",
+      "theme": "Écriture · carnet",
+      "observation": "Carnet manuscrit et stylo sur un bureau",
+      "key": "pack:ecriture_carnet",
+      "jpeg": "ecriture_carnet.jpg",
+      "source_size": [
+        1672,
+        941
+      ],
+      "source_bytes": 2430024,
+      "source_sha256": "a645bf62251d5fb24c0284a048f630017fc9cf287ca5fb43733b2a872a1a03b0",
+      "jpeg_size": [
+        1200,
+        675
+      ],
+      "jpeg_bytes": 252938
+    },
+    {
+      "source": "Image ChatGPT 15 nov. 2026, 11_11_26-2.png",
+      "theme": "Gaming",
+      "observation": "Écran de jeu, manette et casque",
+      "key": "pack:gaming",
+      "jpeg": "gaming.jpg",
+      "source_size": [
+        1672,
+        941
+      ],
+      "source_bytes": 2336639,
+      "source_sha256": "18f27a58b471768e6e60524bcf8203c76e09f5a0a94382727fc5a693d48799ed",
+      "jpeg_size": [
+        1200,
+        675
+      ],
+      "jpeg_bytes": 277784
+    },
+    {
+      "source": "Image ChatGPT 15 nov. 2026, 11_11_28-3.png",
+      "theme": "Études",
+      "observation": "Livres, cours sur ordinateur et cahier de révision",
+      "key": "pack:etudes",
+      "jpeg": "etudes.jpg",
+      "source_size": [
+        1672,
+        941
+      ],
+      "source_bytes": 2248351,
+      "source_sha256": "ab049af42724e4ebfc1086515d9414c58870fb5cfbddce23c6602e856368fa13",
+      "jpeg_size": [
+        1200,
+        675
+      ],
+      "jpeg_bytes": 247667
+    },
+    {
+      "source": "Image ChatGPT 15 nov. 2026, 11_11_30-4.png",
+      "theme": "Administratif",
+      "observation": "Dossiers, formulaires, calendrier et tampon",
+      "key": "pack:administratif",
+      "jpeg": "administratif.jpg",
+      "source_size": [
+        1672,
+        941
+      ],
+      "source_bytes": 2297206,
+      "source_sha256": "62009363813b639cf9431094b0e147315d79cca67953df630ac1036be1007e7a",
+      "jpeg_size": [
+        1200,
+        675
+      ],
+      "jpeg_bytes": 251746
+    },
+    {
+      "source": "Image ChatGPT 15 nov. 2026, 11_11_33-5.png",
+      "theme": "Langues",
+      "observation": "Livre de langues, casque, globe et symboles de conversation",
+      "key": "pack:langues",
+      "jpeg": "langues.jpg",
+      "source_size": [
+        1672,
+        941
+      ],
+      "source_bytes": 2378500,
+      "source_sha256": "48b15f7bc5e5556f4246b700e6a22dd0bdf4698e3369a32c3e7b834bc50cd0d7",
+      "jpeg_size": [
+        1200,
+        675
+      ],
+      "jpeg_bytes": 275443
+    },
+    {
+      "source": "Image ChatGPT 15 nov. 2026, 11_11_35-6.png",
+      "theme": "Développement",
+      "observation": "Éditeur de code et schémas informatiques",
+      "key": "pack:developpement",
+      "jpeg": "developpement.jpg",
+      "source_size": [
+        1672,
+        941
+      ],
+      "source_bytes": 2282447,
+      "source_sha256": "87e2e54754063f17aaa1ca926d2fce2233a07c9276bacf038e45d2be85910c17",
+      "jpeg_size": [
+        1200,
+        675
+      ],
+      "jpeg_bytes": 245601
+    },
+    {
+      "source": "Image ChatGPT 15 nov. 2026, 11_17_23-1.png",
+      "theme": "Travaux",
+      "observation": "Plans, casque de chantier et outils",
+      "key": "pack:travaux",
+      "jpeg": "travaux.jpg",
+      "source_size": [
+        1672,
+        941
+      ],
+      "source_bytes": 2552412,
+      "source_sha256": "806a5f72636cc28a4b2c0d7c707dc426dd91778cd590a43116e89e51f078cf84",
+      "jpeg_size": [
+        1200,
+        675
+      ],
+      "jpeg_bytes": 306112
+    },
+    {
+      "source": "Image ChatGPT 15 nov. 2026, 11_17_25-2.png",
+      "theme": "Musique",
+      "observation": "Piano, guitare, violon et partitions",
+      "key": "pack:musique",
+      "jpeg": "musique.jpg",
+      "source_size": [
+        1672,
+        941
+      ],
+      "source_bytes": 2585803,
+      "source_sha256": "79c8d1c79233ba66b1b1d6e4944f5f10707b4f690ec3cab7632b299231a4de34",
+      "jpeg_size": [
+        1200,
+        675
+      ],
+      "jpeg_bytes": 317785
+    },
+    {
+      "source": "Image ChatGPT 15 nov. 2026, 11_17_26-3.png",
+      "theme": "Graphisme",
+      "observation": "Tablette graphique, croquis et nuancier",
+      "key": "pack:graphisme",
+      "jpeg": "graphisme.jpg",
+      "source_size": [
+        1672,
+        941
+      ],
+      "source_bytes": 2478246,
+      "source_sha256": "8addf0e8d26b8b66be05cb46af4842075527be0418ccfe518d91b706303638f2",
+      "jpeg_size": [
+        1200,
+        675
+      ],
+      "jpeg_bytes": 292145
+    },
+    {
+      "source": "Image ChatGPT 15 nov. 2026, 11_17_28-4.png",
+      "theme": "Réflexion",
+      "observation": "Carnet, penseur, sablier et ampoule",
+      "key": "pack:reflexion",
+      "jpeg": "reflexion.jpg",
+      "source_size": [
+        1672,
+        941
+      ],
+      "source_bytes": 2523261,
+      "source_sha256": "3ba2a16ab4d42b7746c4a2263319a9dc77a8b91bc95e807ffc2994e7d553fb69",
+      "jpeg_size": [
+        1200,
+        675
+      ],
+      "jpeg_bytes": 299331
+    },
+    {
+      "source": "Image ChatGPT 15 nov. 2026, 11_17_30-5.png",
+      "theme": "Institutions",
+      "observation": "Bureau officiel, sceau et bâtiment institutionnel",
+      "key": "pack:institutions",
+      "jpeg": "institutions.jpg",
+      "source_size": [
+        1672,
+        941
+      ],
+      "source_bytes": 2530674,
+      "source_sha256": "2469cc0003393ee6f6bb5288ddad45a77995bc815fb60993cd21855ab2eb01e5",
+      "jpeg_size": [
+        1200,
+        675
+      ],
+      "jpeg_bytes": 314227
+    },
+    {
+      "source": "Image ChatGPT 15 nov. 2026, 11_17_32-6.png",
+      "theme": "Santé",
+      "observation": "Stéthoscope, carnet de santé et cadre apaisant",
+      "key": "pack:sante",
+      "jpeg": "sante.jpg",
+      "source_size": [
+        1672,
+        941
+      ],
+      "source_bytes": 2532357,
+      "source_sha256": "24dffe86c8bb99beb688599a43a482f2350dd7d981a5d05b798f285562c381fc",
+      "jpeg_size": [
+        1200,
+        675
+      ],
+      "jpeg_bytes": 304948
+    },
+    {
+      "source": "Image ChatGPT 15 nov. 2026, 11_38_34-1.png",
+      "theme": "Cuisine",
+      "observation": "Cuisine, recettes, légumes et ustensiles",
+      "key": "pack:cuisine",
+      "jpeg": "cuisine.jpg",
+      "source_size": [
+        1672,
+        941
+      ],
+      "source_bytes": 2845006,
+      "source_sha256": "74bc2321dda2edf8202eedf8b83ada6e9efd8e2992b598089108307b209adad4",
+      "jpeg_size": [
+        1200,
+        675
+      ],
+      "jpeg_bytes": 371444
+    },
+    {
+      "source": "Image ChatGPT 15 nov. 2026, 11_38_36-2.png",
+      "theme": "Finances",
+      "observation": "Calculatrice, tirelire, pièces et carnet de budget",
+      "key": "pack:finances",
+      "jpeg": "finances.jpg",
+      "source_size": [
+        1672,
+        941
+      ],
+      "source_bytes": 2630159,
+      "source_sha256": "b5a4c811423df4c623b9472bfc1d117523db50c98ebea23e4cb72f6c43aeedba",
+      "jpeg_size": [
+        1200,
+        675
+      ],
+      "jpeg_bytes": 335199
+    },
+    {
+      "source": "Image ChatGPT 15 nov. 2026, 11_38_37-3.png",
+      "theme": "Maison",
+      "observation": "Fauteuil, décoration et échantillons de couleurs",
+      "key": "pack:maison",
+      "jpeg": "maison.jpg",
+      "source_size": [
+        1672,
+        941
+      ],
+      "source_bytes": 2846465,
+      "source_sha256": "e438bc9a6c69d62ace02da28c272afdfc124b781f2ad01bf7a539352b4fe2f85",
+      "jpeg_size": [
+        1200,
+        675
+      ],
+      "jpeg_bytes": 342467
+    },
+    {
+      "source": "Image ChatGPT 15 nov. 2026, 11_38_39-4.png",
+      "theme": "Jardinage",
+      "observation": "Serre, semis et outils de jardin",
+      "key": "pack:jardinage",
+      "jpeg": "jardinage.jpg",
+      "source_size": [
+        1672,
+        941
+      ],
+      "source_bytes": 2987902,
+      "source_sha256": "f998b84f3b05b730f9d775550211ce5861ee91a72564ae5c7c58b0c9297604e7",
+      "jpeg_size": [
+        1200,
+        675
+      ],
+      "jpeg_bytes": 396868
+    },
+    {
+      "source": "Image ChatGPT 15 nov. 2026, 11_38_42-5.png",
+      "theme": "Photo & vidéo",
+      "observation": "Appareil photo, caméra, éclairage et montage vidéo",
+      "key": "pack:photo_video",
+      "jpeg": "photo_video.jpg",
+      "source_size": [
+        1672,
+        941
+      ],
+      "source_bytes": 2724333,
+      "source_sha256": "0c7023de3a74ef10256633935ba66710367612d48334a4b5e54ea28b18aa4918",
+      "jpeg_size": [
+        1200,
+        675
+      ],
+      "jpeg_bytes": 341751
+    },
+    {
+      "source": "Image ChatGPT 15 nov. 2026, 11_38_44-6.png",
+      "theme": "Cinéma",
+      "observation": "Projection de film, bobines et salon de cinéma",
+      "key": "pack:cinema",
+      "jpeg": "cinema.jpg",
+      "source_size": [
+        1672,
+        941
+      ],
+      "source_bytes": 2549123,
+      "source_sha256": "cf4916bd49e782f9e02536fef2d01ec23f33754db83e04e27c95240d186a0571",
+      "jpeg_size": [
+        1200,
+        675
+      ],
+      "jpeg_bytes": 317053
+    },
+    {
+      "source": "Image ChatGPT 15 nov. 2026, 11_38_46-7.png",
+      "theme": "Sport",
+      "observation": "Course en nature, vélo et tapis de sport",
+      "key": "pack:sport",
+      "jpeg": "sport.jpg",
+      "source_size": [
+        1672,
+        941
+      ],
+      "source_bytes": 3017381,
+      "source_sha256": "2156f51757926e869cef5006d28ee2a3e8a3dd435628060d75fc9c3fa13b3507",
+      "jpeg_size": [
+        1200,
+        675
+      ],
+      "jpeg_bytes": 397423
+    },
+    {
+      "source": "Image ChatGPT 15 nov. 2026, 11_38_47-8.png",
+      "theme": "Famille",
+      "observation": "Album familial, jouets et souvenirs",
+      "key": "pack:famille",
+      "jpeg": "famille.jpg",
+      "source_size": [
+        1672,
+        941
+      ],
+      "source_bytes": 2752966,
+      "source_sha256": "be663ba8f1bf48eaf3407674d370699d56dd5be87214c55286ae248f9f4d7f6f",
+      "jpeg_size": [
+        1200,
+        675
+      ],
+      "jpeg_bytes": 349174
+    },
+    {
+      "source": "Image ChatGPT 15 nov. 2026, 11_38_49-9.png",
+      "theme": "Sciences",
+      "observation": "Microscope, télescope, verrerie et modèles scientifiques",
+      "key": "pack:sciences",
+      "jpeg": "sciences.jpg",
+      "source_size": [
+        1672,
+        941
+      ],
+      "source_bytes": 2757345,
+      "source_sha256": "9a3632e9f84d02ad8e1bec85de62d2fb35000138b4a4eb638e7b17e87d0b7678",
+      "jpeg_size": [
+        1200,
+        675
+      ],
+      "jpeg_bytes": 377050
+    },
+    {
+      "source": "Image ChatGPT 15 nov. 2026, 11_38_50-10.png",
+      "theme": "Fêtes",
+      "observation": "Gâteau, cadeaux et table de fête",
+      "key": "pack:fetes",
+      "jpeg": "fetes.jpg",
+      "source_size": [
+        1672,
+        941
+      ],
+      "source_bytes": 2634660,
+      "source_sha256": "b29cab4e693311834015872369daa1deb46d0b1fe950cc2d6e073f39fade5782",
+      "jpeg_size": [
+        1200,
+        675
+      ],
+      "jpeg_bytes": 348058
+    },
+    {
+      "source": "Image ChatGPT 15 nov. 2026, 11_47_45-1.png",
+      "theme": "Entrepreneuriat",
+      "observation": "Projet professionnel, ordinateur, planning et colis",
+      "key": "pack:entrepreneuriat",
+      "jpeg": "entrepreneuriat.jpg",
+      "source_size": [
+        1672,
+        941
+      ],
+      "source_bytes": 2583504,
+      "source_sha256": "dc2240b5db5c2660e78ba9a71d5048e4cabb72418adff26f445741183ae3cfbc",
+      "jpeg_size": [
+        1200,
+        675
+      ],
+      "jpeg_bytes": 331854
+    },
+    {
+      "source": "Image ChatGPT 15 nov. 2026, 11_47_47-2.png",
+      "theme": "Animaux",
+      "observation": "Chien, chat, lapin et animaux du jardin",
+      "key": "pack:animaux",
+      "jpeg": "animaux.jpg",
+      "source_size": [
+        1672,
+        941
+      ],
+      "source_bytes": 3082761,
+      "source_sha256": "3ed28b453b38bde6d1b541495047c23bfde23f80791a5b706a3b4e43e343e332",
+      "jpeg_size": [
+        1200,
+        675
+      ],
+      "jpeg_bytes": 390825
+    }
+  ]
+}
