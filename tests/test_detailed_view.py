@@ -3,7 +3,6 @@ import json
 from pathlib import Path
 import tempfile
 import tkinter as tk
-from types import SimpleNamespace
 import unittest
 from unittest.mock import Mock,patch
 from PIL import Image,ImageDraw
@@ -149,4 +148,3 @@ class DetailedViewTests(unittest.TestCase):
 
 
 if __name__=='__main__': unittest.main()
-
