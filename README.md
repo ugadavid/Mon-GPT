@@ -1,4 +1,6 @@
-# Mon GPT<3 — 0.8.0
+# Mon GPT<3 — 0.9.0
+
+**MG-009 — Import intelligent.** Depuis **Fichier → Importer depuis Mon GPT Collector (JSON)…**, prévisualiser projets et discussions d’un export v2, choisir création séparée, association, fusion explicite ou omission, puis confirmer. Les homonymes restent distincts par défaut ; GUID sources et correspondances locales sont sauvegardés ensemble. Réimporter conserve toutes les personnalisations et ne crée aucun doublon. [Guide d’import](docs/MG-009-import.md) · [Rapport, recette réelle et six captures fictives](reports/MG-009/rapport.md). Collector Chrome **0.8.2 inchangé**.
 
 Application Windows locale pour organiser ses discussions ChatGPT. MG-002a donne corps à l’« Atelier chaleureux » : bandeau illustré, cartes papier, titres affirmés, icônes harmonisées, badges et menus dessinés. La **vue Liste** conserve l’ouverture directe. Aucun serveur, compte applicatif ou API OpenAI ; aucune modification dans ChatGPT.
 

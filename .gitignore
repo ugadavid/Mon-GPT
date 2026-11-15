@@ -8,3 +8,6 @@ data/
 catalogue.json
 *sauvegarde*.json
 avant-restauration-*.json
+.recette/
+.recette-*.txt
+avant-import-*.zip

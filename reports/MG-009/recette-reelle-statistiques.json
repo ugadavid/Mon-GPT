@@ -1,0 +1,61 @@
+{
+  "sourcePersonalValuesPublished": false,
+  "homonymGroups": 2,
+  "homonymSourceKeys": 4,
+  "homonymDistinctDestinations": 4,
+  "runs": [
+    {
+      "phase": "first",
+      "windowsTkExecuted": true,
+      "restart": false,
+      "previewNoMutation": true,
+      "counts": {
+        "created_projects": 58,
+        "reused_projects": 0,
+        "associated_projects": 0,
+        "ignored_projects": 0,
+        "created_threads": 115,
+        "existing_threads": 0,
+        "unfiled_threads": 59
+      },
+      "cancelNoMutation": true,
+      "projects": 58,
+      "distinctLocalProjects": 58,
+      "threads": 115,
+      "attached": 56,
+      "unfiled": 59,
+      "importBackupCount": 1,
+      "beforeBackupReadable": true,
+      "noAutomaticOpen": true,
+      "sourceIntact": true,
+      "success": true
+    },
+    {
+      "phase": "second",
+      "windowsTkExecuted": true,
+      "restart": true,
+      "previewNoMutation": true,
+      "counts": {
+        "created_projects": 0,
+        "reused_projects": 58,
+        "associated_projects": 0,
+        "ignored_projects": 0,
+        "created_threads": 0,
+        "existing_threads": 115,
+        "unfiled_threads": 0
+      },
+      "cancelNoMutation": true,
+      "projects": 58,
+      "distinctLocalProjects": 58,
+      "threads": 115,
+      "attached": 56,
+      "unfiled": 59,
+      "importBackupCount": 1,
+      "beforeBackupReadable": true,
+      "backupRestoreThenReimportUnchanged": true,
+      "noAutomaticOpen": true,
+      "sourceIntact": true,
+      "success": true
+    }
+  ]
+}

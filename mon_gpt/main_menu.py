@@ -15,6 +15,10 @@ def menu_icon(canvas, label, x, y, color):
         line(x+1,y+15,x+1,y+1,x+12,y+1,x+15,y+4,x+15,y+15,x+1,y+15)
         box(x+4,y+1,x+11,y+6)
         box(x+4,y+10,x+12,y+15)
+    elif "Importer" in label:
+        line(x+8,y,x+8,y+10,x+4,y+6)
+        line(x+8,y+10,x+12,y+6)
+        line(x+1,y+11,x+1,y+15,x+15,y+15,x+15,y+11)
     elif "Restaurer" in label:
         canvas.create_arc(x+1,y+1,x+15,y+15,start=35,extent=295,style="arc",outline=color,width=1.3)
         line(x,y+1,x,y+6,x+5,y+6)

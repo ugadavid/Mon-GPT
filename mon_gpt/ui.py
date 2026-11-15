@@ -88,6 +88,7 @@ class App(DetailEditor):
         file = tk.Menu(bar, tearoff=False)
         file.add_command(label="Sauvegarder le catalogue…", command=self.export)
         file.add_command(label="Restaurer le catalogue…", command=self.restore)
+        file.add_command(label="Importer depuis Mon GPT Collector (JSON)…", command=self.import_collector)
         file.add_separator()
         file.add_command(label="Dossier de données", command=self.open_data)
         file.add_command(label="Quitter", command=self.close)
@@ -122,6 +123,10 @@ class App(DetailEditor):
         self.plus = skin_menu(tk.Menu(self.root, tearoff=False))
         self.plus.add_command(label="Nouveau fil", accelerator="Ctrl+N", command=lambda: self.new("item"))
         self.plus.add_command(label="Nouveau projet", accelerator="Ctrl+Maj+P", command=lambda: self.new("project"))
+
+    def import_collector(self):
+        from .import_ui import open_import
+        open_import(self)
 
     def update_view_menu(self):
         for index,(key,label) in enumerate((("list","Liste"),("detail","Détaillée"),("mosaic","Mosaïque"))):

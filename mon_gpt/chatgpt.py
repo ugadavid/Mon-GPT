@@ -4,6 +4,8 @@ from urllib.parse import urlsplit, urlunsplit
 from uuid import UUID
 import re
 
+PROJECT_KEY = re.compile(r"g-p-[A-Za-z0-9_-]{1,124}\Z")
+
 
 @dataclass
 class Conversation:
@@ -27,9 +29,11 @@ def parse_url(url):
 
 
 class ChatGPT:
-    def __init__(self, catalog, conversations=()):
+    def __init__(self, catalog, conversations=(), project_links=None):
         self.catalog = catalog
         self.conversations = {c.record_id: c for c in conversations}
+        # Identités de source, jamais des attributs du socle générique.
+        self.project_links = dict(project_links or {})
 
     def ingest(self, title, url):
         identity, source = parse_url(url)

@@ -1,6 +1,6 @@
 # Contrat d’export v2 — projets et conversations
 
-Contrat introduit par MG-008a, conservé par MG-008b / Mon GPT Collector **0.8.2**. Même schéma v2 et même stockage `monGptCollectorStateV2` lors de la correction. **Aucun lecteur v1, migration ou compatibilité historique.** Aucune importation dans le catalogue Python n’est livrée.
+Contrat introduit par MG-008a, conservé par MG-008b / Mon GPT Collector **0.8.2**. Même schéma v2 et même stockage `monGptCollectorStateV2` lors de la correction. **Aucun lecteur v1, migration ou compatibilité historique.** L’import Python v2 est désormais livré par [MG-009](MG-009-import.md), sans changement de ce contrat ni du Collector.
 
 ## Exemple fictif
 
@@ -103,6 +103,6 @@ Pas de messages, prompts, réponses, formulaires, tokens, cookies, compte, React
 
 Le cœur manipule des `records` génériques et des `entities` nommées `{source, identity, name, evidence, confidence}`. Il ne connaît ni les clés `g-p-…`, ni ChatGPT, DOM ou Chrome. L’adaptateur valide ces clés et projette les champs `projects` / `conversations` à l’export. Une autre source peut réutiliser la fusion, le dépôt et les composants de présentation sans fusionner ses conteneurs par nom.
 
-MG-009 devra importer **exclusivement v2**, valider avant écriture et prévoir une transaction/sauvegarde. Chaque clé source devra être mémorisée vers un ID interne local stable. Des dossiers locaux pourront être proposés à partir des noms ; deux clés homonymes ne devront jamais être fusionnées automatiquement : proposer fusion/séparation, y compris face à des dossiers locaux existants. Plusieurs clés pourront converger vers un même dossier uniquement après décision explicite.
+MG-009 importe **exclusivement v2**, valide avant écriture et applique une transaction avec sauvegarde complète. Chaque clé source est mémorisée vers un ID interne local stable dans l’adaptateur ChatGPT, au même catalogue atomique (schéma 4). Deux clés homonymes restent séparées par défaut ; plusieurs clés convergent uniquement après association ou fusion explicite.
 
-Les fils devront rester dédoublonnés par UUID et rattachés selon ces correspondances de clés, pas selon la similarité de noms. Titres locaux, notes, tags, catégories, couvertures et rattachements personnalisés ne devront pas être écrasés silencieusement ; les noms inconnus demanderont un traitement explicite. Aucun dossier local, décision de fusion ou import Python développé dans MG-008a.
+Les fils restent dédoublonnés par UUID et les nouveaux sont rattachés selon ces correspondances de clés, pas selon les noms. Les fiches existantes sont conservées intégralement ; les noms inconnus demandent un traitement explicite. Aucun dossier local, décision de fusion ou import Python n’était développé dans MG-008a ; voir le [guide MG-009](MG-009-import.md) pour le parcours livré.

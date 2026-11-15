@@ -10,7 +10,7 @@ from datetime import datetime
 from uuid import UUID
 from .core import Catalog, Record
 from dataclasses import fields, dataclass
-from .chatgpt import ChatGPT, Conversation, parse_url
+from .chatgpt import ChatGPT, Conversation, parse_url, PROJECT_KEY
 from .identity import validate_visual, image_references, ASSET
 from .images import ImageLibrary, check_asset, MAX_BYTES
 
@@ -20,13 +20,19 @@ MAX_EXPANDED=200*1024*1024
 
 
 def encode(catalog, adapter):
-    return {"schema": 3, "records": catalog.to_list(), "chatgpt": adapter.to_list()}
+    data = {"schema": 3, "records": catalog.to_list(), "chatgpt": adapter.to_list()}
+    if adapter.project_links:
+        data.update(schema=4, chatgpt_projects=dict(adapter.project_links))
+    return data
 
 
 def decode(data):
     try:
-        if type(data) is not dict or set(data) != {"schema", "records", "chatgpt"} or type(data["schema"]) is not int or data["schema"] not in (1,2,3):
+        if type(data) is not dict or type(data.get("schema")) is not int or data["schema"] not in (1,2,3,4):
             raise ValueError("Version de sauvegarde non prise en charge.")
+        expected_keys={"schema", "records", "chatgpt"} | ({"chatgpt_projects"} if data["schema"]==4 else set())
+        if set(data)!=expected_keys:
+            raise ValueError("Champs de catalogue manquants ou inconnus.")
         if not isinstance(data["records"], list) or not isinstance(data["chatgpt"], list):
             raise ValueError("Listes attendues.")
         expected={f.name for f in fields(Record)}-({"visual"} if data["schema"]==1 else set())
@@ -74,7 +80,17 @@ def decode(data):
         for c in conversations:
             if parse_url(c.url)[0] != c.conversation_id:
                 raise ValueError("Identité de conversation incohérente.")
-        return cat, ChatGPT(cat, conversations)
+        links=data.get("chatgpt_projects",{})
+        if type(links) is not dict or len(links)>10000:
+            raise ValueError("Correspondances ChatGPT invalides (10 000 maximum).")
+        for key,target in links.items():
+            if not isinstance(key,str) or not PROJECT_KEY.fullmatch(key) or not isinstance(target,str) or str(UUID(target))!=target:
+                raise ValueError("Identité de correspondance ChatGPT invalide.")
+            if target in cat.records and cat.records[target].kind!="project":
+                raise ValueError("Une correspondance ChatGPT doit viser un projet.")
+            # Un projet supprimé garde sa clé comme témoin : l'assistant exigera
+            # une résolution explicite au prochain import, sans recréation cachée.
+        return cat, ChatGPT(cat, conversations, links)
     except (TypeError, KeyError, AttributeError, ValueError) as exc:
         raise ValueError(f"Catalogue invalide : {exc}") from exc
 
@@ -152,13 +168,29 @@ class Store:
         self.validate_images(cat)
         if self.path.exists():
             old=read_json(self.path)
-            if not isinstance(old,dict) or type(old.get("schema")) is not int or old["schema"] not in (1,2,3):
+            if not isinstance(old,dict) or type(old.get("schema")) is not int or old["schema"] not in (1,2,3,4):
                 raise ValueError("Version du catalogue existant non prise en charge ; fichier conservé.")
-            if old["schema"]<3:
+            if old["schema"]<data["schema"]:
                 decode(old)
                 backup=self.directory/(f"avant-migration-v{old['schema']}-"+datetime.now().strftime("%Y%m%d-%H%M%S-%f")+".json")
                 shutil.copy2(self.path,backup)
         atomic_write(self.path, data)
+
+    def commit_import(self, plan, cat, adapter):
+        """Sauvegarde complète puis un seul remplacement ; objets actifs intacts."""
+        if encode(cat,adapter)!=plan.before:
+            raise ValueError("Le catalogue a changé : analysez à nouveau l’import.")
+        new_cat,new_adapter=decode(plan.data)
+        catalog_bytes(plan.data)
+        self.validate_images(new_cat)
+        if plan.data==plan.before:
+            return cat,adapter,None
+        backup=self.directory/("avant-import-"+datetime.now().strftime("%Y%m%d-%H%M%S-%f")+".zip")
+        self.export(backup,cat,adapter)
+        # La sauvegarde ZIP contient déjà l'état antérieur et les ressources.
+        # save() conserve aussi la copie exacte d'un ancien schéma si nécessaire.
+        self.save(new_cat,new_adapter)
+        return new_cat,new_adapter,backup
 
     def export(self, destination, cat, adapter):
         destination=Path(destination).resolve()
