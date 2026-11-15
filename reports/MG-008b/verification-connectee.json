@@ -1,0 +1,32 @@
+{
+  "version": "0.8.2",
+  "checkedAt": "2026-11-15T19:37:39.000Z",
+  "readOnly": true,
+  "exportOnDisk": false,
+  "originVerified": true,
+  "exportSchemaVersion": 2,
+  "nativeControls": 9,
+  "baselineNamedProjects": 0,
+  "correctedNamedProjects": 9,
+  "checkedProjectCount": 2,
+  "checks": [
+    {
+      "alias": "Projet A",
+      "keyExact": true,
+      "nameExactAgainstRendered": true,
+      "evidenceDirect": true,
+      "linkedConversationCount": 5,
+      "allLinkedConversationsCorrect": true
+    },
+    {
+      "alias": "Projet B",
+      "keyExact": true,
+      "nameExactAgainstRendered": true,
+      "evidenceDirect": true,
+      "linkedConversationCount": 3,
+      "allLinkedConversationsCorrect": true
+    }
+  ],
+  "allProjectKeysDistinct": true,
+  "GO": true
+}

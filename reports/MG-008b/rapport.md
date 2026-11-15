@@ -2,13 +2,13 @@
 
 15 novembre 2026 · Collector **0.8.2** · Chrome **157.0.8103.52** · CODEX-VM.
 
-**Statut : PARTIEL.** La session Chrome authentifiée préparée par David a réellement été inspectée ; la cause de l’échec est prouvée sur deux contrôles de projets réels distincts. Le scanner est corrigé, les tests et la recette Chrome sur reproduction fidèle passent. **La comparaison finale DOM réel → scanner corrigé → export v2 sur deux projets n’a pas encore pu être exécutée dans cette session**, car Chrome bloque le collage de diagnostic dans DevTools (protection self-XSS). Une prise en main utilisateur a été demandée ; aucune barrière contournée. **Aucun GO revendiqué.**
+**Statut : GO technique, soumis à validation David/GPT.** La session Chrome authentifiée préparée par David a réellement été inspectée, puis le scanner et l’exporteur de production corrigés y ont été exécutés en mémoire. Sur le même DOM, le scanner 0.8.1 trouve **0 nom**, contre **9 noms** avec 0.8.2. Pour **deux projets réels distincts**, les noms exacts, les clés et les rattachements de leurs **5 et 3 discussions observées** concordent avec l’export v2. [Résultat connecté anonymisé](verification-connectee.json), obtenu le 15 novembre 2026 à 19:37:39 UTC. Tests et recette Chrome sur reproduction fidèle également réussis.
 
 ## Ce qui a été réellement observé
 
 L’[audit réel anonymisé](audit-dom-reel-anonymise.md) détaille les attributs et relations avant code. Deux projets réels, A développé et B d’abord replié puis développé manuellement, ont été examinés dans la navigation de la session existante. Pour chacun : clé source valide, libellé sémantique sur le même contrôle, titre affiché concordant, propriétaire portant cette même clé. Les clés A/B sont distinctes. Les copies réduites des contrôles ont été analysées **en mémoire seulement** ; leurs vrais noms/GUID ne sont pas dans le dépôt.
 
-Ces deux paires vérifiées dans le DOM **ne sont pas présentées comme deux paires vérifiées dans l’export corrigé**. La seconde étape attend encore l’exécution connectée de production.
+Ces deux paires ont ensuite été vérifiées dans le **véritable export corrigé**, sérialisé et relu uniquement en mémoire dans cette même session connectée. Aucun export personnel sur disque ni valeur privée dans les preuves publiées.
 
 L’accueil d’un projet a été ouvert par l’action native **Page d’accueil du projet** ; son URL concorde avec la clé du contrôle. Cet écran contient aussi des aperçus de messages : retour à l’accueil général, puis DevTools détaché pour éviter leur capture pendant la suite. Aucun écran personnel n’est enregistré dans les preuves publiées. Les autres projets, messages, formulaires, cookies, tokens, API internes et profils n’ont pas servi à la collecte de preuves.
 
@@ -45,7 +45,7 @@ Le H1 d’accueil reste un fallback seulement **en l’absence de contrôle nati
 | Vérification | Résultat / preuve |
 | --- | --- |
 | Audit du Chrome authentifié déjà ouvert | **Réalisé**, deux contrôles réels distincts examinés, titre/clé/propriétaire concordants, repli/dépli manuel et accueil projet observés |
-| Scanner + export v2 corrigés sur deux vrais projets | **En attente**, pas encore exécuté dans la session connectée ; protection de collage Chrome nécessitant une action utilisateur |
+| Scanner + export v2 corrigés sur deux vrais projets | **Réussi dans la session connectée**, deux noms/clés exacts, 5 et 3 discussions correctement rattachées ; [preuve anonymisée](verification-connectee.json) |
 | Tests JavaScript | **43 réussis**, dont les 35 tests précédents et 8 tests ciblés du contrat natif : [journal](tests-javascript.txt) |
 | Tests Python existants | **121 réussis**, application inchangée : [journal](tests-python.txt) |
 | Recette du vrai Chrome sur reproduction anonymisée | **Réussie**, extension MV3 0.8.2 réellement chargée depuis la distribution propre : [journal](recette-chrome.txt). Ce profil de test ne remplace pas la session connectée |
@@ -55,19 +55,21 @@ Le H1 d’accueil reste un fallback seulement **en l’absence de contrôle nati
 | Export et rattachements fictifs | v2 inchangé, UUID dédoublonnés, deux projets distincts et conversations rattachées à leurs bonnes clés |
 | Non-contamination et sécurité | Propriétaire/texte contradictoires, IDs ambigus, clé absente, groupe mixte et titre manquant testés ; aucun lien de message ou contenu exclu collecté |
 | Fonctions MG-008a | Manuel sans auto, scan répété nouveaux/connus, trois modes, SPA, mutations, quotas/erreurs sans perte, copie réelle, JSON/TXT téléchargés et relus, confirmation, désactivation/réactivation, redémarrage et stockage conservés |
-| Diagnostic de production anonymisant | Généré sans données privées, syntaxe vérifiée et exécuté sur fixture ; ce résultat n’est **pas** publié comme résultat connecté |
+| Diagnostic de production anonymisant | Vérifié sur fixture sans mutation DOM/stockage, puis exécuté sur le vrai compte connecté : 0 → 9 noms, deux paires exactes, `GO: true` |
 
 Le banc de recette a été adapté à la fermeture native d’une popup lors de l’activation de son parent : il rouvre un contexte vivant après capture. Cette adaptation concerne uniquement le test, pas les interactions du produit.
 
-## Dernière vérification connectée préparée
+## Vérification connectée réalisée et reproductible
 
 `tests/build-connected-probe.cjs` génère `.recette/connected-probe-readonly.js`. Il embarque les sources de production actuelles du cœur et de l’adaptateur, plus l’adaptateur 0.8.1 du commit de référence pour le diagnostic comparatif. Ce dernier reste un outil de test, **aucun lecteur d’ancien format n’est ajouté à l’extension**.
 
 Le script généré est une expression autonome à variables locales : aucune écriture DOM, stockage, réseau ou fichier personnel. Il relève les titres propres des contrôles de navigation, scanne le vrai DOM, fusionne en mémoire, sérialise/relit le **véritable exporteur v2**, puis compare deux clés/noms aux contrôles et à leurs liens enfants. La sortie ne contient que `Projet A` / `Projet B`, compteurs et booléens (`keyExact`, `nameExactAgainstRendered`, `allLinkedConversationsCorrect`, etc.), jamais les valeurs privées. Les deux projets doivent être développés manuellement pour vérifier leurs rattachements.
 
-Après lecture du script et prise en main utilisateur de l’avertissement Chrome, l’exécuter dans la console de l’onglet connecté. **Il reste à constater** `checkedProjectCount: 2`, les comparaisons vraies, `exportSchemaVersion: 2` et `GO: true`, puis à joindre cette seule sortie anonymisée. Si ce contrôle échoue, garder PARTIEL et diagnostiquer le seul contrôle concerné ; ne pas présenter les tests de fixture comme une réussite connectée.
+David a lui-même saisi l’autorisation de collage dans DevTools. Le diagnostic a ensuite été exécuté dans la console de l’onglet ChatGPT réellement connecté : `checkedProjectCount: 2`, toutes les comparaisons vraies, `exportSchemaVersion: 2`, clés distinctes et `GO: true`. Seule cette sortie anonymisée a été conservée. Pour reproduire : générer et lire le script, développer manuellement deux projets comportant des liens de discussions visibles, l’exécuter dans la console autorisée par l’utilisateur, puis vérifier ces mêmes assertions.
 
-Blocage concret : le Chrome existant n’expose pas de port de débogage externe et le connecteur navigateur ne fournit pas son onglet DOM. Le contrôle natif a permis l’audit via Elements ; la console refuse le collage avec l’avertissement self-XSS. Aucune authentification, profil ou protection n’a été manipulé pour éviter ce blocage. La console DevTools détachée a été laissée accessible pour la prise en main demandée.
+Le blocage initial self-XSS a donc été résolu par l’utilisateur, sans contournement. Aucun changement d’authentification, de profil ou de stockage personnel. **Périmètre précis :** les sources de production du scanner, du cœur et de l’exporteur ont été exécutées dans la console connectée ; l’extension n’a pas été installée ou reconfigurée dans ce profil personnel. Son transport MV3, son stockage et sa popup ont été testés séparément dans le vrai Chrome sur données fictives. Cette distinction évite d’attribuer au compte connecté les tests d’interface et de persistance effectués dans le profil de recette.
+
+Après vérification : DevTools fermé, accueil général conservé, projet B replié et taille initiale de la fenêtre Chrome rétablie. Aucun projet ni fil modifié.
 
 ## Distribution et mise à jour
 
@@ -91,4 +93,4 @@ Captures natives de l’application réellement exécutée, dans le profil ficti
 
 La reconnaissance dépend de ces attributs rendus et de leur concordance. Un projet hors DOM, un contrôle caché ou une preuve contradictoire peut rester sans nom ; aucun déroulement/scroll automatique. Les bornes et protections MG-008a restent applicables. Une copie du collecteur lancée depuis un nouveau chemin n’a pas le même stockage Chrome : utiliser la procédure de mise à jour.
 
-**Correction livrable, recette connectée finale non validée : PARTIEL.** La prochaine étape est exclusivement la vérification réelle préparée ci-dessus, puis le contrôle David/GPT. Aucun MG-009 commencé.
+**GO technique : correction et recette connectée terminées.** Arrêt pour validation David/GPT. Aucun MG-009 commencé.
