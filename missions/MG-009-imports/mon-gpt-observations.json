@@ -1,0 +1,2312 @@
+{
+  "source": "mon-gpt-collector",
+  "schemaVersion": 2,
+  "exportedAt": "2026-11-15T19:53:43.350Z",
+  "projects": [
+    {
+      "projectKey": "g-p-675de76cdb808191935640945c041e03",
+      "observedName": "Preply",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-675de82676b881919599c36d6f3bbc4e",
+      "observedName": "suricate38000",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-675ef653d4608191a88f71b582c30d69",
+      "observedName": "Graphisme",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-675ff938536081919f50c51eb3b78823",
+      "observedName": "Stage",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-676329eef15481918e5225930420cc37",
+      "observedName": "JsTools",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-6763cf93a18881918b2b774af77cb6b1",
+      "observedName": "Projet TMR",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-67665b07122881919cf340460249d1ff",
+      "observedName": "Zampa",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-67687ea4065c8191938051e750f15a2d",
+      "observedName": "Divers",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-677ec63a29cc8191b0b7d5537a02ab54",
+      "observedName": "Elearning",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-678bcaf8349c8191a86170350f39d37a",
+      "observedName": "Space Invader",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-6794a21f810881918a3d9544dd945932",
+      "observedName": "Textes à trous",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-679669ce0a788191935f25c759d6a6ad",
+      "observedName": "Ingénierie pédagogique numérique en langues",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-679740b3faf48191b0419ca26100bde8",
+      "observedName": "Drag and Drop",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-67bed14f783481919ff9357490d49e9e",
+      "observedName": "qR",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-67da7bd705508191b4349794a8fbd05f",
+      "observedName": "INP",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-681cd6b4c3588191a756892099836db8",
+      "observedName": "Mem",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-684d0eea1638819199cb56934dd61acc",
+      "observedName": "soutenance",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-687260306f148191a67ecd1a8564d908",
+      "observedName": "BEScripts",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-687603cb66dc8191b0906353a8d618ab",
+      "observedName": "BHE",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-6876043348048191aaacc4e62a57edfa",
+      "observedName": "JustChat",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-6876049c9cc08191bdb33229887ee667",
+      "observedName": "BEGraph",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-687604e015648191a974ca9fdbf42da9",
+      "observedName": "BE_BaB",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-6876056eb2f481918a4a1c6c8dae858a",
+      "observedName": "WSL",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-687605cf9f4081919aa57c3b2ebf736f",
+      "observedName": "M2",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-68b470fe5fa08191945c5fd79d9edad5",
+      "observedName": "TechnoDivers",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-68b4714461bc819192b9666f23cf7f2b",
+      "observedName": "2026",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-68b4719ff88c8191b2371896026581cd",
+      "observedName": "Game",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-68b4725acea08191a07c3b508254d33f",
+      "observedName": "Santé",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-68b4732b704081919d6c6d5a96160cae",
+      "observedName": "Ian",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-68cd73acf4b48191af35e2cf276db4c9",
+      "observedName": "UGA-Music",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-68cebb14a0848191a97bbcdef0a7e32b",
+      "observedName": "Cours M2",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-68cebb25e4848191956ccc7658b65b7a",
+      "observedName": "Cours M2",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-68f1ef98a8648191b6bd5e3fd5aa413b",
+      "observedName": "FAD",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-68f35e76dcb88191b50cefd83c649b04",
+      "observedName": "Cas projet",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-68f8f234bd3881919ffbc1f1d7a5c56b",
+      "observedName": "Vocabulaire",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-69aee9324e508191a52821f0c0c4244a",
+      "observedName": "M2",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-69b81ab1494c819185b41f0c28e1e5df",
+      "observedName": "Diprolang",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-69df4491aef48191bdc7884fe958d1b7",
+      "observedName": "Zenith Ice",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-6a017b7748148191ac03b03c4638790d",
+      "observedName": "BHE - réalisation",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-6a365439454c8191896d568ec838409c",
+      "observedName": "M2 - Dico-IC",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-6a3f8095945c8191bf4921268873aee9",
+      "observedName": "Skykits",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-6a4cb47fc5c88191b062dfe92eaf1917",
+      "observedName": "En cours... importants",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-6a4cb59825b08191b1879440019b1182",
+      "observedName": "Iconotheque",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-6a4d42546a188191bce479d3e6d8e07e",
+      "observedName": "Etudiants",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-6a4f6d4eaef881919a2307b11be6092f",
+      "observedName": "Devs - Super importants !",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-6a50ddb2f0248191a15859ca3c039e3d",
+      "observedName": "Méthodologie_2027",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-6a57ff6e2b0081919335b54acbed788d",
+      "observedName": "GestionProjetsAgents_2027",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-6a9d122b90048191b49bf89a10d57812",
+      "observedName": "Let's Play",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-6a9e74694a408191bb73287c14f7d8c1",
+      "observedName": "dev-lab",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-6aaa37f84cec819184c338daeb84eff5",
+      "observedName": "Vacances",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-6aafeb311f148191b069f6b433b379bc",
+      "observedName": "BD",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-6ab12a21b77081919b4ce96cf83e45bd",
+      "observedName": "Administratif",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-6ab1467fc9608191bfcc3062d3b854c4",
+      "observedName": "Sonia",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-6ab1477ec9fc8191863e4270d9990a83",
+      "observedName": "Mariela",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-6ab2324212588191845f7317130c17ff",
+      "observedName": "Ecriture",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-6af8254b1f7c8191b4aa6c8e0cbac287",
+      "observedName": "Mon GPT",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-6af89c000b6881918bd11142dc2fef0f",
+      "observedName": "Offiong",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    },
+    {
+      "projectKey": "g-p-7ad4623ec06c8191a62a218558a4d295",
+      "observedName": "Arabe",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 22,
+      "nameObservedAt": "2026-11-15T19:53:37.967Z",
+      "evidence": {
+        "kind": "direct-control",
+        "url": null
+      }
+    }
+  ],
+  "conversations": [
+    {
+      "conversationId": "681f8418-1d50-8006-8cea-d37e22399e4a",
+      "url": "https://chatgpt.com/g/g-p-675de76cdb808191935640945c041e03/c/681f8418-1d50-8006-8cea-d37e22399e4a",
+      "observedTitle": "Leçon Harry Potter Alisson",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-675de76cdb808191935640945c041e03/c/681f8418-1d50-8006-8cea-d37e22399e4a"
+      ],
+      "observedProjectKeys": [
+        "g-p-675de76cdb808191935640945c041e03"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6858339d-3f4c-8006-9558-f689aefde897",
+      "url": "https://chatgpt.com/g/g-p-675de76cdb808191935640945c041e03/c/6858339d-3f4c-8006-9558-f689aefde897",
+      "observedTitle": "Leçon HP échecs",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-675de76cdb808191935640945c041e03/c/6858339d-3f4c-8006-9558-f689aefde897"
+      ],
+      "observedProjectKeys": [
+        "g-p-675de76cdb808191935640945c041e03"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6865801b-2578-8006-af92-29d0e0bdf275",
+      "url": "https://chatgpt.com/g/g-p-675de76cdb808191935640945c041e03/c/6865801b-2578-8006-af92-29d0e0bdf275",
+      "observedTitle": "Jean-Peu",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-675de76cdb808191935640945c041e03/c/6865801b-2578-8006-af92-29d0e0bdf275"
+      ],
+      "observedProjectKeys": [
+        "g-p-675de76cdb808191935640945c041e03"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "68792e9e-684c-8325-b983-f2aadede1e18",
+      "url": "https://chatgpt.com/g/g-p-675de76cdb808191935640945c041e03/c/68792e9e-684c-8325-b983-f2aadede1e18",
+      "observedTitle": "Aide Marseillaise FLE",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-675de76cdb808191935640945c041e03/c/68792e9e-684c-8325-b983-f2aadede1e18"
+      ],
+      "observedProjectKeys": [
+        "g-p-675de76cdb808191935640945c041e03"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "68865a32-a94c-8332-9a02-6d8006b41cf3",
+      "url": "https://chatgpt.com/g/g-p-68b4719ff88c8191b2371896026581cd/c/68865a32-a94c-8332-9a02-6d8006b41cf3",
+      "observedTitle": "Règles tarot 4 joueurs",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-68b4719ff88c8191b2371896026581cd/c/68865a32-a94c-8332-9a02-6d8006b41cf3"
+      ],
+      "observedProjectKeys": [
+        "g-p-68b4719ff88c8191b2371896026581cd"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "688fc646-684c-832e-81fe-2b49961eb3e9",
+      "url": "https://chatgpt.com/g/g-p-68b4719ff88c8191b2371896026581cd/c/688fc646-684c-832e-81fe-2b49961eb3e9",
+      "observedTitle": "Commandes FS2024",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-68b4719ff88c8191b2371896026581cd/c/688fc646-684c-832e-81fe-2b49961eb3e9"
+      ],
+      "observedProjectKeys": [
+        "g-p-68b4719ff88c8191b2371896026581cd"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6899a668-8a00-832a-b78c-b00039fde33a",
+      "url": "https://chatgpt.com/g/g-p-68b4719ff88c8191b2371896026581cd/c/6899a668-8a00-832a-b78c-b00039fde33a",
+      "observedTitle": "Trouver bastions Nether",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-68b4719ff88c8191b2371896026581cd/c/6899a668-8a00-832a-b78c-b00039fde33a"
+      ],
+      "observedProjectKeys": [
+        "g-p-68b4719ff88c8191b2371896026581cd"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "68a9a8d3-a400-8322-804a-8cbd96f042b6",
+      "url": "https://chatgpt.com/g/g-p-675de76cdb808191935640945c041e03/c/68a9a8d3-a400-8322-804a-8cbd96f042b6",
+      "observedTitle": "Idées cours Harry Potter",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-675de76cdb808191935640945c041e03/c/68a9a8d3-a400-8322-804a-8cbd96f042b6"
+      ],
+      "observedProjectKeys": [
+        "g-p-675de76cdb808191935640945c041e03"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "68adffe9-86e4-8326-9fe3-4cb9123104aa",
+      "url": "https://chatgpt.com/g/g-p-68b4719ff88c8191b2371896026581cd/c/68adffe9-86e4-8326-9fe3-4cb9123104aa",
+      "observedTitle": "Compter plan au sol",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-68b4719ff88c8191b2371896026581cd/c/68adffe9-86e4-8326-9fe3-4cb9123104aa"
+      ],
+      "observedProjectKeys": [
+        "g-p-68b4719ff88c8191b2371896026581cd"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "68b2262b-10bc-8321-8d18-b1d5aa636955",
+      "url": "https://chatgpt.com/g/g-p-68b4719ff88c8191b2371896026581cd/c/68b2262b-10bc-8321-8d18-b1d5aa636955",
+      "observedTitle": "Vérification des dimensions Excel",
+      "firstSeenAt": "2026-11-15T19:52:56.470Z",
+      "lastSeenAt": "2026-11-15T19:52:56.470Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-68b4719ff88c8191b2371896026581cd/c/68b2262b-10bc-8321-8d18-b1d5aa636955"
+      ],
+      "observedProjectKeys": [
+        "g-p-68b4719ff88c8191b2371896026581cd"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "69aee93c-e1f0-8386-9084-01b891139907",
+      "url": "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/69aee93c-e1f0-8386-9084-01b891139907",
+      "observedTitle": "00. IA - IC",
+      "firstSeenAt": "2026-11-15T19:52:52.105Z",
+      "lastSeenAt": "2026-11-15T19:52:52.105Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/69aee93c-e1f0-8386-9084-01b891139907"
+      ],
+      "observedProjectKeys": [
+        "g-p-69aee9324e508191a52821f0c0c4244a"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "69b2fc5d-cc40-838f-a154-2efcfa78a3aa",
+      "url": "https://chatgpt.com/g/g-p-69b81ab1494c819185b41f0c28e1e5df/c/69b2fc5d-cc40-838f-a154-2efcfa78a3aa",
+      "observedTitle": "Installation Drupal serveur",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-69b81ab1494c819185b41f0c28e1e5df/c/69b2fc5d-cc40-838f-a154-2efcfa78a3aa"
+      ],
+      "observedProjectKeys": [
+        "g-p-69b81ab1494c819185b41f0c28e1e5df"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "69b81b8c-2308-8386-a268-df6963fa8568",
+      "url": "https://chatgpt.com/g/g-p-69b81ab1494c819185b41f0c28e1e5df/c/69b81b8c-2308-8386-a268-df6963fa8568",
+      "observedTitle": "Structure site Diprolang",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-69b81ab1494c819185b41f0c28e1e5df/c/69b81b8c-2308-8386-a268-df6963fa8568"
+      ],
+      "observedProjectKeys": [
+        "g-p-69b81ab1494c819185b41f0c28e1e5df"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "69ddf508-261c-838f-a218-064f16d9f822",
+      "url": "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/69ddf508-261c-838f-a218-064f16d9f822",
+      "observedTitle": "00. Juliana M1",
+      "firstSeenAt": "2026-11-15T19:52:52.105Z",
+      "lastSeenAt": "2026-11-15T19:52:52.105Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/69ddf508-261c-838f-a218-064f16d9f822"
+      ],
+      "observedProjectKeys": [
+        "g-p-69aee9324e508191a52821f0c0c4244a"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "69df468f-8a88-8394-9f8d-babbe5ff16d7",
+      "url": "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/69df468f-8a88-8394-9f8d-babbe5ff16d7",
+      "observedTitle": "00. Enquête",
+      "firstSeenAt": "2026-11-15T19:52:52.105Z",
+      "lastSeenAt": "2026-11-15T19:52:52.105Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/69df468f-8a88-8394-9f8d-babbe5ff16d7"
+      ],
+      "observedProjectKeys": [
+        "g-p-69aee9324e508191a52821f0c0c4244a"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "69e72eab-d394-8385-bea7-41eb1408f565",
+      "url": "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/69e72eab-d394-8385-bea7-41eb1408f565",
+      "observedTitle": "00. Suivi des envois mails",
+      "firstSeenAt": "2026-11-15T19:52:49.238Z",
+      "lastSeenAt": "2026-11-15T19:52:49.238Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/69e72eab-d394-8385-bea7-41eb1408f565"
+      ],
+      "observedProjectKeys": [
+        "g-p-69aee9324e508191a52821f0c0c4244a"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "69faeade-7920-838b-8d97-c07f4754f855",
+      "url": "https://chatgpt.com/g/g-p-6a017b7748148191ac03b03c4638790d/c/69faeade-7920-838b-8d97-c07f4754f855",
+      "observedTitle": "BHE - Semaine 6.n",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-6a017b7748148191ac03b03c4638790d/c/69faeade-7920-838b-8d97-c07f4754f855"
+      ],
+      "observedProjectKeys": [
+        "g-p-6a017b7748148191ac03b03c4638790d"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a017c09-a700-83eb-8fa1-2c3ab288ad02",
+      "url": "https://chatgpt.com/g/g-p-6a017b7748148191ac03b03c4638790d/c/6a017c09-a700-83eb-8fa1-2c3ab288ad02",
+      "observedTitle": "BHE - Semaine 2",
+      "firstSeenAt": "2026-11-15T19:52:37.851Z",
+      "lastSeenAt": "2026-11-15T19:52:37.851Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-6a017b7748148191ac03b03c4638790d/c/6a017c09-a700-83eb-8fa1-2c3ab288ad02"
+      ],
+      "observedProjectKeys": [
+        "g-p-6a017b7748148191ac03b03c4638790d"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a0abc7f-9e34-838c-ba60-d4075f752572",
+      "url": "https://chatgpt.com/g/g-p-6a017b7748148191ac03b03c4638790d/c/6a0abc7f-9e34-838c-ba60-d4075f752572",
+      "observedTitle": "BHE - Semaine 3",
+      "firstSeenAt": "2026-11-15T19:52:37.851Z",
+      "lastSeenAt": "2026-11-15T19:52:37.851Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-6a017b7748148191ac03b03c4638790d/c/6a0abc7f-9e34-838c-ba60-d4075f752572"
+      ],
+      "observedProjectKeys": [
+        "g-p-6a017b7748148191ac03b03c4638790d"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a158bf2-2cd0-83eb-9105-8f6ccd17a7a5",
+      "url": "https://chatgpt.com/g/g-p-69b81ab1494c819185b41f0c28e1e5df/c/6a158bf2-2cd0-83eb-9105-8f6ccd17a7a5",
+      "observedTitle": "Réponse alerte sécurité Drupal",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-69b81ab1494c819185b41f0c28e1e5df/c/6a158bf2-2cd0-83eb-9105-8f6ccd17a7a5"
+      ],
+      "observedProjectKeys": [
+        "g-p-69b81ab1494c819185b41f0c28e1e5df"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a169e06-1a90-83eb-bce1-89412bd35454",
+      "url": "https://chatgpt.com/g/g-p-6a017b7748148191ac03b03c4638790d/c/6a169e06-1a90-83eb-bce1-89412bd35454",
+      "observedTitle": "BHE - Semaine 4",
+      "firstSeenAt": "2026-11-15T19:52:37.851Z",
+      "lastSeenAt": "2026-11-15T19:52:37.851Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-6a017b7748148191ac03b03c4638790d/c/6a169e06-1a90-83eb-bce1-89412bd35454"
+      ],
+      "observedProjectKeys": [
+        "g-p-6a017b7748148191ac03b03c4638790d"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a1afe4b-d33c-83eb-9f06-87fa339a1fe7",
+      "url": "https://chatgpt.com/g/g-p-68b4719ff88c8191b2371896026581cd/c/6a1afe4b-d33c-83eb-9f06-87fa339a1fe7",
+      "observedTitle": "Escape Game Pédagogique",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-68b4719ff88c8191b2371896026581cd/c/6a1afe4b-d33c-83eb-9f06-87fa339a1fe7"
+      ],
+      "observedProjectKeys": [
+        "g-p-68b4719ff88c8191b2371896026581cd"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a1d32a6-57f0-83eb-ac92-19f6458e56cc",
+      "url": "https://chatgpt.com/g/g-p-6a017b7748148191ac03b03c4638790d/c/6a1d32a6-57f0-83eb-ac92-19f6458e56cc",
+      "observedTitle": "BHE - Semaine 5",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-6a017b7748148191ac03b03c4638790d/c/6a1d32a6-57f0-83eb-ac92-19f6458e56cc"
+      ],
+      "observedProjectKeys": [
+        "g-p-6a017b7748148191ac03b03c4638790d"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a1fcbec-0ca4-83eb-a476-a901eb9fb0ba",
+      "url": "https://chatgpt.com/g/g-p-6a4cb47fc5c88191b062dfe92eaf1917/c/6a1fcbec-0ca4-83eb-a476-a901eb9fb0ba",
+      "observedTitle": "Reprise dossier WC méthodique",
+      "firstSeenAt": "2026-11-15T19:53:28.003Z",
+      "lastSeenAt": "2026-11-15T19:53:28.003Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-6a4cb47fc5c88191b062dfe92eaf1917/c/6a1fcbec-0ca4-83eb-a476-a901eb9fb0ba"
+      ],
+      "observedProjectKeys": [
+        "g-p-6a4cb47fc5c88191b062dfe92eaf1917"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a325516-3458-83eb-8230-b4c4991727c2",
+      "url": "https://chatgpt.com/g/g-p-6a017b7748148191ac03b03c4638790d/c/6a325516-3458-83eb-8230-b4c4991727c2",
+      "observedTitle": "BHE - Semaine 6.1",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-6a017b7748148191ac03b03c4638790d/c/6a325516-3458-83eb-8230-b4c4991727c2"
+      ],
+      "observedProjectKeys": [
+        "g-p-6a017b7748148191ac03b03c4638790d"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a34096c-0034-83eb-b9e5-bc61f55be5ec",
+      "url": "https://chatgpt.com/g/g-p-6a017b7748148191ac03b03c4638790d/c/6a34096c-0034-83eb-b9e5-bc61f55be5ec",
+      "observedTitle": "BHE - Semaine 6.2",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-6a017b7748148191ac03b03c4638790d/c/6a34096c-0034-83eb-b9e5-bc61f55be5ec"
+      ],
+      "observedProjectKeys": [
+        "g-p-6a017b7748148191ac03b03c4638790d"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a393699-2664-83ed-95c8-fbff288f72d5",
+      "url": "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a393699-2664-83ed-95c8-fbff288f72d5",
+      "observedTitle": "01. Mémoire et formulation sujet",
+      "firstSeenAt": "2026-11-15T19:52:49.238Z",
+      "lastSeenAt": "2026-11-15T19:52:49.238Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a393699-2664-83ed-95c8-fbff288f72d5"
+      ],
+      "observedProjectKeys": [
+        "g-p-69aee9324e508191a52821f0c0c4244a"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a397798-3900-83ed-811a-7dfdfda8a994",
+      "url": "https://chatgpt.com/g/g-p-6a017b7748148191ac03b03c4638790d/c/6a397798-3900-83ed-811a-7dfdfda8a994",
+      "observedTitle": "BHE - Semaine 7.1",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-6a017b7748148191ac03b03c4638790d/c/6a397798-3900-83ed-811a-7dfdfda8a994"
+      ],
+      "observedProjectKeys": [
+        "g-p-6a017b7748148191ac03b03c4638790d"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a3b8c9a-5104-83ed-b6a0-cdfd0d4b6539",
+      "url": "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a3b8c9a-5104-83ed-b6a0-cdfd0d4b6539",
+      "observedTitle": "Branche · 01. Mémoire et formulation sujet",
+      "firstSeenAt": "2026-11-15T19:52:49.238Z",
+      "lastSeenAt": "2026-11-15T19:52:49.238Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a3b8c9a-5104-83ed-b6a0-cdfd0d4b6539"
+      ],
+      "observedProjectKeys": [
+        "g-p-69aee9324e508191a52821f0c0c4244a"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a3ccb3b-bf74-83eb-8aef-cfa9af4d047d",
+      "url": "https://chatgpt.com/g/g-p-6ab12a21b77081919b4ce96cf83e45bd/c/6a3ccb3b-bf74-83eb-8aef-cfa9af4d047d",
+      "observedTitle": "Problème de prélèvement TVA",
+      "firstSeenAt": "2026-11-15T19:53:18.305Z",
+      "lastSeenAt": "2026-11-15T19:53:18.305Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-6ab12a21b77081919b4ce96cf83e45bd/c/6a3ccb3b-bf74-83eb-8aef-cfa9af4d047d"
+      ],
+      "observedProjectKeys": [
+        "g-p-6ab12a21b77081919b4ce96cf83e45bd"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a492a21-27d0-83eb-b726-a7a62fafa284",
+      "url": "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a492a21-27d0-83eb-b726-a7a62fafa284",
+      "observedTitle": "Insertion des citations interviewées",
+      "firstSeenAt": "2026-11-15T19:52:49.238Z",
+      "lastSeenAt": "2026-11-15T19:52:49.238Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a492a21-27d0-83eb-b726-a7a62fafa284"
+      ],
+      "observedProjectKeys": [
+        "g-p-69aee9324e508191a52821f0c0c4244a"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a493dcd-1f70-83eb-b496-53f40d55f732",
+      "url": "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a493dcd-1f70-83eb-b496-53f40d55f732",
+      "observedTitle": "Inventaire bibliographique DILIPEM",
+      "firstSeenAt": "2026-11-15T19:52:49.238Z",
+      "lastSeenAt": "2026-11-15T19:52:49.238Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a493dcd-1f70-83eb-b496-53f40d55f732"
+      ],
+      "observedProjectKeys": [
+        "g-p-69aee9324e508191a52821f0c0c4244a"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a4d2a3a-0e0c-83eb-b34a-9937a514636a",
+      "url": "https://chatgpt.com/g/g-p-6af89c000b6881918bd11142dc2fef0f/c/6a4d2a3a-0e0c-83eb-b34a-9937a514636a",
+      "observedTitle": "Offiong",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-6af89c000b6881918bd11142dc2fef0f/c/6a4d2a3a-0e0c-83eb-b34a-9937a514636a"
+      ],
+      "observedProjectKeys": [
+        "g-p-6af89c000b6881918bd11142dc2fef0f"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a5dca71-e274-83eb-a699-9d06d0dffb6b",
+      "url": "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a5dca71-e274-83eb-a699-9d06d0dffb6b",
+      "observedTitle": "Avancement mémoire et GPT",
+      "firstSeenAt": "2026-11-15T19:52:45.703Z",
+      "lastSeenAt": "2026-11-15T19:52:45.703Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a5dca71-e274-83eb-a699-9d06d0dffb6b"
+      ],
+      "observedProjectKeys": [
+        "g-p-69aee9324e508191a52821f0c0c4244a"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a65b620-117c-83ed-ba5e-8ca5706b4a9f",
+      "url": "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a65b620-117c-83ed-ba5e-8ca5706b4a9f",
+      "observedTitle": "Préparation soutenance mémoire",
+      "firstSeenAt": "2026-11-15T19:52:45.703Z",
+      "lastSeenAt": "2026-11-15T19:52:45.703Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a65b620-117c-83ed-ba5e-8ca5706b4a9f"
+      ],
+      "observedProjectKeys": [
+        "g-p-69aee9324e508191a52821f0c0c4244a"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a708370-4bb8-83ed-9df8-1688503ddae6",
+      "url": "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a708370-4bb8-83ed-9df8-1688503ddae6",
+      "observedTitle": "Soutenance projet site web",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a708370-4bb8-83ed-9df8-1688503ddae6"
+      ],
+      "observedProjectKeys": [
+        "g-p-69aee9324e508191a52821f0c0c4244a"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a74b48d-db98-83eb-ac0c-90d5e916e1a5",
+      "url": "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a74b48d-db98-83eb-ac0c-90d5e916e1a5",
+      "observedTitle": "Références mémoire complétées",
+      "firstSeenAt": "2026-11-15T19:52:45.703Z",
+      "lastSeenAt": "2026-11-15T19:52:45.703Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a74b48d-db98-83eb-ac0c-90d5e916e1a5"
+      ],
+      "observedProjectKeys": [
+        "g-p-69aee9324e508191a52821f0c0c4244a"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a79748a-35e8-83eb-ba10-6d08473a5dba",
+      "url": "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a79748a-35e8-83eb-ba10-6d08473a5dba",
+      "observedTitle": "Mémoire réécriture et finalisation",
+      "firstSeenAt": "2026-11-15T19:52:45.703Z",
+      "lastSeenAt": "2026-11-15T19:52:45.703Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a79748a-35e8-83eb-ba10-6d08473a5dba"
+      ],
+      "observedProjectKeys": [
+        "g-p-69aee9324e508191a52821f0c0c4244a"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a7f2b1d-5ce8-83eb-9e44-4bc0ce447617",
+      "url": "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a7f2b1d-5ce8-83eb-9e44-4bc0ce447617",
+      "observedTitle": "Contradiction Massou Wiley",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a7f2b1d-5ce8-83eb-9e44-4bc0ce447617"
+      ],
+      "observedProjectKeys": [
+        "g-p-69aee9324e508191a52821f0c0c4244a"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a8021af-334c-83eb-9b7e-134da2ffdca1",
+      "url": "https://chatgpt.com/c/6a8021af-334c-83eb-9b7e-134da2ffdca1",
+      "observedTitle": "Veille emplois UGA",
+      "firstSeenAt": "2026-11-15T19:53:26.475Z",
+      "lastSeenAt": "2026-11-15T19:53:26.475Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6a8021af-334c-83eb-9b7e-134da2ffdca1"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a82b5f8-6618-83eb-b115-fa6583391cc0",
+      "url": "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a82b5f8-6618-83eb-b115-fa6583391cc0",
+      "observedTitle": "Mémorisation soutenance active",
+      "firstSeenAt": "2026-11-15T19:52:45.703Z",
+      "lastSeenAt": "2026-11-15T19:52:45.703Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a82b5f8-6618-83eb-b115-fa6583391cc0"
+      ],
+      "observedProjectKeys": [
+        "g-p-69aee9324e508191a52821f0c0c4244a"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a8555fd-b794-83eb-9ab1-ab15632b0d2e",
+      "url": "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a8555fd-b794-83eb-9ab1-ab15632b0d2e",
+      "observedTitle": "Vérifier la dernière version",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a8555fd-b794-83eb-9ab1-ab15632b0d2e"
+      ],
+      "observedProjectKeys": [
+        "g-p-69aee9324e508191a52821f0c0c4244a"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a8fdec1-f470-83eb-be8b-918091ccd676",
+      "url": "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a8fdec1-f470-83eb-be8b-918091ccd676",
+      "observedTitle": "Conseil pour répéter la soutenance",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6a8fdec1-f470-83eb-be8b-918091ccd676"
+      ],
+      "observedProjectKeys": [
+        "g-p-69aee9324e508191a52821f0c0c4244a"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6a9c8994-a4b8-83eb-8f0e-1fb642bb7473",
+      "url": "https://chatgpt.com/g/g-p-6ab1477ec9fc8191863e4270d9990a83/c/6a9c8994-a4b8-83eb-8f0e-1fb642bb7473",
+      "observedTitle": "Donner accès aux fichiers",
+      "firstSeenAt": "2026-11-15T19:53:15.449Z",
+      "lastSeenAt": "2026-11-15T19:53:15.449Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-6ab1477ec9fc8191863e4270d9990a83/c/6a9c8994-a4b8-83eb-8f0e-1fb642bb7473"
+      ],
+      "observedProjectKeys": [
+        "g-p-6ab1477ec9fc8191863e4270d9990a83"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6aa56e94-83e4-83eb-9ec0-321123b25c3e",
+      "url": "https://chatgpt.com/g/g-p-6aafeb311f148191b069f6b433b379bc/c/6aa56e94-83e4-83eb-9ec0-321123b25c3e",
+      "observedTitle": "Outils IA locaux simples",
+      "firstSeenAt": "2026-11-15T19:53:19.942Z",
+      "lastSeenAt": "2026-11-15T19:53:19.942Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-6aafeb311f148191b069f6b433b379bc/c/6aa56e94-83e4-83eb-9ec0-321123b25c3e"
+      ],
+      "observedProjectKeys": [
+        "g-p-6aafeb311f148191b069f6b433b379bc"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6aabfd0c-6a48-83eb-a505-5d0555328fc1",
+      "url": "https://chatgpt.com/g/g-p-6aafeb311f148191b069f6b433b379bc/c/6aabfd0c-6a48-83eb-a505-5d0555328fc1",
+      "observedTitle": "Reprendre entraînement Kiki",
+      "firstSeenAt": "2026-11-15T19:53:19.942Z",
+      "lastSeenAt": "2026-11-15T19:53:19.942Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-6aafeb311f148191b069f6b433b379bc/c/6aabfd0c-6a48-83eb-a505-5d0555328fc1"
+      ],
+      "observedProjectKeys": [
+        "g-p-6aafeb311f148191b069f6b433b379bc"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6aad2bc3-bf6c-83ed-ad6a-acf40c17c030",
+      "url": "https://chatgpt.com/g/g-p-6aafeb311f148191b069f6b433b379bc/c/6aad2bc3-bf6c-83ed-ad6a-acf40c17c030",
+      "observedTitle": "Extraire et portrait",
+      "firstSeenAt": "2026-11-15T19:53:19.942Z",
+      "lastSeenAt": "2026-11-15T19:53:19.942Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-6aafeb311f148191b069f6b433b379bc/c/6aad2bc3-bf6c-83ed-ad6a-acf40c17c030"
+      ],
+      "observedProjectKeys": [
+        "g-p-6aafeb311f148191b069f6b433b379bc"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6aad6b04-f2e0-83ed-9b94-86abbe36754b",
+      "url": "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6aad6b04-f2e0-83ed-9b94-86abbe36754b",
+      "observedTitle": "Archiver mails universitaires",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-69aee9324e508191a52821f0c0c4244a/c/6aad6b04-f2e0-83ed-9b94-86abbe36754b"
+      ],
+      "observedProjectKeys": [
+        "g-p-69aee9324e508191a52821f0c0c4244a"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6ab0e2ce-4dc4-83eb-839e-3e9df0ae6cb3",
+      "url": "https://chatgpt.com/g/g-p-6ab12a21b77081919b4ce96cf83e45bd/c/6ab0e2ce-4dc4-83eb-839e-3e9df0ae6cb3",
+      "observedTitle": "Relance gratification stage",
+      "firstSeenAt": "2026-11-15T19:53:18.305Z",
+      "lastSeenAt": "2026-11-15T19:53:18.305Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-6ab12a21b77081919b4ce96cf83e45bd/c/6ab0e2ce-4dc4-83eb-839e-3e9df0ae6cb3"
+      ],
+      "observedProjectKeys": [
+        "g-p-6ab12a21b77081919b4ce96cf83e45bd"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6ab18303-d60c-83eb-ac95-e7f8af46ea48",
+      "url": "https://chatgpt.com/g/g-p-6ab2324212588191845f7317130c17ff/c/6ab18303-d60c-83eb-ac95-e7f8af46ea48",
+      "observedTitle": "Concevoir un logiciel d’écriture",
+      "firstSeenAt": "2026-11-15T19:53:12.070Z",
+      "lastSeenAt": "2026-11-15T19:53:12.070Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-6ab2324212588191845f7317130c17ff/c/6ab18303-d60c-83eb-ac95-e7f8af46ea48"
+      ],
+      "observedProjectKeys": [
+        "g-p-6ab2324212588191845f7317130c17ff"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6ab57487-d524-83eb-a1a1-0904910094b3",
+      "url": "https://chatgpt.com/g/g-p-6ab2324212588191845f7317130c17ff/c/6ab57487-d524-83eb-a1a1-0904910094b3",
+      "observedTitle": "Créer un schéma visuel",
+      "firstSeenAt": "2026-11-15T19:53:09.045Z",
+      "lastSeenAt": "2026-11-15T19:53:09.045Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-6ab2324212588191845f7317130c17ff/c/6ab57487-d524-83eb-a1a1-0904910094b3"
+      ],
+      "observedProjectKeys": [
+        "g-p-6ab2324212588191845f7317130c17ff"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6ab62bc2-afd8-83eb-9373-43ffd2eff2de",
+      "url": "https://chatgpt.com/g/g-p-6ab2324212588191845f7317130c17ff/c/6ab62bc2-afd8-83eb-9373-43ffd2eff2de",
+      "observedTitle": "Étude économique du marché",
+      "firstSeenAt": "2026-11-15T19:53:09.045Z",
+      "lastSeenAt": "2026-11-15T19:53:09.045Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-6ab2324212588191845f7317130c17ff/c/6ab62bc2-afd8-83eb-9373-43ffd2eff2de"
+      ],
+      "observedProjectKeys": [
+        "g-p-6ab2324212588191845f7317130c17ff"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6ab8c5f1-c7e8-83eb-8708-c4a7b381dba6",
+      "url": "https://chatgpt.com/g/g-p-6ab2324212588191845f7317130c17ff/c/6ab8c5f1-c7e8-83eb-8708-c4a7b381dba6",
+      "observedTitle": "Explorer les réseaux sociaux",
+      "firstSeenAt": "2026-11-15T19:53:09.045Z",
+      "lastSeenAt": "2026-11-15T19:53:09.045Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-6ab2324212588191845f7317130c17ff/c/6ab8c5f1-c7e8-83eb-8708-c4a7b381dba6"
+      ],
+      "observedProjectKeys": [
+        "g-p-6ab2324212588191845f7317130c17ff"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6ab955fd-6cac-83eb-8ad0-e4eea9feddd2",
+      "url": "https://chatgpt.com/c/6ab955fd-6cac-83eb-8ad0-e4eea9feddd2",
+      "observedTitle": "Optimiser statut Preply",
+      "firstSeenAt": "2026-11-15T19:53:37.967Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6ab955fd-6cac-83eb-8ad0-e4eea9feddd2"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6abbef9e-dff0-83ed-88de-61f8cdbcf5ec",
+      "url": "https://chatgpt.com/c/6abbef9e-dff0-83ed-88de-61f8cdbcf5ec",
+      "observedTitle": "Idée site programmes 2027",
+      "firstSeenAt": "2026-11-15T19:53:37.967Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6abbef9e-dff0-83ed-88de-61f8cdbcf5ec"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6ac00d8a-e8dc-83ed-8201-83439b0e8293",
+      "url": "https://chatgpt.com/c/6ac00d8a-e8dc-83ed-8201-83439b0e8293",
+      "observedTitle": "Configurer la page",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6ac00d8a-e8dc-83ed-8201-83439b0e8293"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6ac00da6-ef24-83eb-a4ba-48b4abd335bb",
+      "url": "https://chatgpt.com/c/6ac00da6-ef24-83eb-a4ba-48b4abd335bb",
+      "observedTitle": "Actualiser la page TRAME",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6ac00da6-ef24-83eb-a4ba-48b4abd335bb"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6ac20a62-d2ac-83ed-bca1-85058c374e0b",
+      "url": "https://chatgpt.com/c/6ac20a62-d2ac-83ed-bca1-85058c374e0b",
+      "observedTitle": "Comprendre email Sandrine",
+      "firstSeenAt": "2026-11-15T19:53:37.967Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6ac20a62-d2ac-83ed-bca1-85058c374e0b"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6ac35983-c34c-83eb-ae90-d25ddcc8ad28",
+      "url": "https://chatgpt.com/c/6ac35983-c34c-83eb-ae90-d25ddcc8ad28",
+      "observedTitle": "Windows 11 26H2 mûre",
+      "firstSeenAt": "2026-11-15T19:53:28.003Z",
+      "lastSeenAt": "2026-11-15T19:53:28.003Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6ac35983-c34c-83eb-ae90-d25ddcc8ad28"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6ac35c6d-bd5c-83eb-8424-287681604025",
+      "url": "https://chatgpt.com/c/6ac35c6d-bd5c-83eb-8424-287681604025",
+      "observedTitle": "Assurance villégiature location",
+      "firstSeenAt": "2026-11-15T19:53:37.967Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6ac35c6d-bd5c-83eb-8424-287681604025"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6ac3988c-1798-83eb-a158-b4dddd7e4c00",
+      "url": "https://chatgpt.com/c/6ac3988c-1798-83eb-a158-b4dddd7e4c00",
+      "observedTitle": "Réponse à Beci",
+      "firstSeenAt": "2026-11-15T19:53:37.967Z",
+      "lastSeenAt": "2026-11-15T19:53:37.967Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6ac3988c-1798-83eb-a158-b4dddd7e4c00"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6ac654e7-e2ec-83ed-a815-1daccf56b892",
+      "url": "https://chatgpt.com/c/6ac654e7-e2ec-83ed-a815-1daccf56b892",
+      "observedTitle": "Message LinkedIn alternance",
+      "firstSeenAt": "2026-11-15T19:53:36.948Z",
+      "lastSeenAt": "2026-11-15T19:53:36.948Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6ac654e7-e2ec-83ed-a815-1daccf56b892"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6ac9e3c8-4a38-83ed-9695-e153fe9128df",
+      "url": "https://chatgpt.com/c/6ac9e3c8-4a38-83ed-9695-e153fe9128df",
+      "observedTitle": "Réponse chaleureuse en anglais",
+      "firstSeenAt": "2026-11-15T19:53:36.948Z",
+      "lastSeenAt": "2026-11-15T19:53:36.948Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6ac9e3c8-4a38-83ed-9695-e153fe9128df"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6ac9f2c3-0b00-83eb-a1d1-9f81e8e44452",
+      "url": "https://chatgpt.com/c/6ac9f2c3-0b00-83eb-a1d1-9f81e8e44452",
+      "observedTitle": "Branchement audio ZI",
+      "firstSeenAt": "2026-11-15T19:53:36.948Z",
+      "lastSeenAt": "2026-11-15T19:53:36.948Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6ac9f2c3-0b00-83eb-a1d1-9f81e8e44452"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6acb5b4c-de18-83eb-b810-1309b7440a3f",
+      "url": "https://chatgpt.com/c/6acb5b4c-de18-83eb-b810-1309b7440a3f",
+      "observedTitle": "Application préparation vacances",
+      "firstSeenAt": "2026-11-15T19:53:36.948Z",
+      "lastSeenAt": "2026-11-15T19:53:36.948Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6acb5b4c-de18-83eb-b810-1309b7440a3f"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6accd9e4-7be4-83ed-b555-b0399ff7bcbd",
+      "url": "https://chatgpt.com/c/6accd9e4-7be4-83ed-b555-b0399ff7bcbd",
+      "observedTitle": "Projets communs TAL enseignement",
+      "firstSeenAt": "2026-11-15T19:53:36.438Z",
+      "lastSeenAt": "2026-11-15T19:53:36.438Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6accd9e4-7be4-83ed-b555-b0399ff7bcbd"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6acd1140-aa8c-83ed-ae6d-7be2b1890c6f",
+      "url": "https://chatgpt.com/c/6acd1140-aa8c-83ed-ae6d-7be2b1890c6f",
+      "observedTitle": "Conseils techniques DILIPEM",
+      "firstSeenAt": "2026-11-15T19:53:36.438Z",
+      "lastSeenAt": "2026-11-15T19:53:36.438Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6acd1140-aa8c-83ed-ae6d-7be2b1890c6f"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6acd160e-2990-83eb-8db1-b35f94eb5ce4",
+      "url": "https://chatgpt.com/c/6acd160e-2990-83eb-8db1-b35f94eb5ce4",
+      "observedTitle": "Description dimage ComfyUI",
+      "firstSeenAt": "2026-11-15T19:53:36.438Z",
+      "lastSeenAt": "2026-11-15T19:53:36.438Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6acd160e-2990-83eb-8db1-b35f94eb5ce4"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6acf2d96-e3f8-83eb-b9be-883aed9b3438",
+      "url": "https://chatgpt.com/c/6acf2d96-e3f8-83eb-b9be-883aed9b3438",
+      "observedTitle": "Explorer un projet universitaire",
+      "firstSeenAt": "2026-11-15T19:53:36.438Z",
+      "lastSeenAt": "2026-11-15T19:53:36.438Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6acf2d96-e3f8-83eb-b9be-883aed9b3438"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6acf33b2-8910-83eb-8e41-38456c817fb3",
+      "url": "https://chatgpt.com/c/6acf33b2-8910-83eb-8e41-38456c817fb3",
+      "observedTitle": "Échanger fichiers Hyper V",
+      "firstSeenAt": "2026-11-15T19:53:36.438Z",
+      "lastSeenAt": "2026-11-15T19:53:36.438Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6acf33b2-8910-83eb-8e41-38456c817fb3"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6acf4a20-d81c-83ed-9533-742a2d0aab33",
+      "url": "https://chatgpt.com/c/6acf4a20-d81c-83ed-9533-742a2d0aab33",
+      "observedTitle": "Recherche service enlèvement lave linge",
+      "firstSeenAt": "2026-11-15T19:53:29.604Z",
+      "lastSeenAt": "2026-11-15T19:53:29.604Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6acf4a20-d81c-83ed-9533-742a2d0aab33"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6ad0889d-d2d4-83ed-92c8-9e028e24f6ab",
+      "url": "https://chatgpt.com/c/6ad0889d-d2d4-83ed-92c8-9e028e24f6ab",
+      "observedTitle": "Douleurs cervicales persistantes",
+      "firstSeenAt": "2026-11-15T19:53:29.604Z",
+      "lastSeenAt": "2026-11-15T19:53:29.604Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6ad0889d-d2d4-83ed-92c8-9e028e24f6ab"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6ad1e49a-5248-83ed-9a5e-f63ea9d1ec82",
+      "url": "https://chatgpt.com/c/6ad1e49a-5248-83ed-9a5e-f63ea9d1ec82",
+      "observedTitle": "École Aivancity connue",
+      "firstSeenAt": "2026-11-15T19:53:29.604Z",
+      "lastSeenAt": "2026-11-15T19:53:29.604Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6ad1e49a-5248-83ed-9a5e-f63ea9d1ec82"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6ad265d2-bfa8-83eb-b27d-729948955b68",
+      "url": "https://chatgpt.com/c/6ad265d2-bfa8-83eb-b27d-729948955b68",
+      "observedTitle": "Signer un PDF gratuitement",
+      "firstSeenAt": "2026-11-15T19:53:29.604Z",
+      "lastSeenAt": "2026-11-15T19:53:29.604Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6ad265d2-bfa8-83eb-b27d-729948955b68"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6ad2a3ea-3c48-83ed-8b2a-64b081c09d58",
+      "url": "https://chatgpt.com/c/6ad2a3ea-3c48-83ed-8b2a-64b081c09d58",
+      "observedTitle": "Disponibilité de Dot en France",
+      "firstSeenAt": "2026-11-15T19:53:29.604Z",
+      "lastSeenAt": "2026-11-15T19:53:29.604Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6ad2a3ea-3c48-83ed-8b2a-64b081c09d58"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6ad89248-da64-83ed-917c-379b109305a2",
+      "url": "https://chatgpt.com/c/6ad89248-da64-83ed-917c-379b109305a2",
+      "observedTitle": "Expliquer une histoire poétique",
+      "firstSeenAt": "2026-11-15T19:53:29.604Z",
+      "lastSeenAt": "2026-11-15T19:53:29.604Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6ad89248-da64-83ed-917c-379b109305a2"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6ad9107a-1be8-83ed-b006-4c1c1fec9351",
+      "url": "https://chatgpt.com/c/6ad9107a-1be8-83ed-b006-4c1c1fec9351",
+      "observedTitle": "Faille PHP majeure",
+      "firstSeenAt": "2026-11-15T19:53:29.604Z",
+      "lastSeenAt": "2026-11-15T19:53:29.604Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6ad9107a-1be8-83ed-b006-4c1c1fec9351"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6adb2591-c8b4-83ed-907d-91ff9eadc47e",
+      "url": "https://chatgpt.com/c/6adb2591-c8b4-83ed-907d-91ff9eadc47e",
+      "observedTitle": "Rédiger mail médical",
+      "firstSeenAt": "2026-11-15T19:53:29.604Z",
+      "lastSeenAt": "2026-11-15T19:53:29.604Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6adb2591-c8b4-83ed-907d-91ff9eadc47e"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6adb386f-b388-83eb-94e4-09e0290cc776",
+      "url": "https://chatgpt.com/c/6adb386f-b388-83eb-94e4-09e0290cc776",
+      "observedTitle": "Plateformes d’autoédition rémunérée",
+      "firstSeenAt": "2026-11-15T19:53:29.604Z",
+      "lastSeenAt": "2026-11-15T19:53:29.604Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6adb386f-b388-83eb-94e4-09e0290cc776"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6adba8f8-07b8-83eb-aad8-3013095d0592",
+      "url": "https://chatgpt.com/c/6adba8f8-07b8-83eb-aad8-3013095d0592",
+      "observedTitle": "Suivi de l’enquête de Trappes",
+      "firstSeenAt": "2026-11-15T19:53:28.870Z",
+      "lastSeenAt": "2026-11-15T19:53:28.870Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6adba8f8-07b8-83eb-aad8-3013095d0592"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6adce5d6-bb10-83ed-a0d7-851fc6e322ab",
+      "url": "https://chatgpt.com/c/6adce5d6-bb10-83ed-a0d7-851fc6e322ab",
+      "observedTitle": "YouTube Subscriptions Tab",
+      "firstSeenAt": "2026-11-15T19:53:29.604Z",
+      "lastSeenAt": "2026-11-15T19:53:29.604Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6adce5d6-bb10-83ed-a0d7-851fc6e322ab"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6adce818-9b08-83ed-b708-6afeb1c2aa96",
+      "url": "https://chatgpt.com/c/6adce818-9b08-83ed-b708-6afeb1c2aa96",
+      "observedTitle": "Accès au Drive Google",
+      "firstSeenAt": "2026-11-15T19:53:28.870Z",
+      "lastSeenAt": "2026-11-15T19:53:28.870Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6adce818-9b08-83ed-b708-6afeb1c2aa96"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6add2ccc-d190-83eb-836b-62e30c70eb96",
+      "url": "https://chatgpt.com/c/6add2ccc-d190-83eb-836b-62e30c70eb96",
+      "observedTitle": "Affaire Thélyson Orélien",
+      "firstSeenAt": "2026-11-15T19:53:28.003Z",
+      "lastSeenAt": "2026-11-15T19:53:28.003Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6add2ccc-d190-83eb-836b-62e30c70eb96"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6adeeaf4-07d8-83eb-8ac6-15c37bd8f2c8",
+      "url": "https://chatgpt.com/c/6adeeaf4-07d8-83eb-8ac6-15c37bd8f2c8",
+      "observedTitle": "Analyse d’écriture et projets IA",
+      "firstSeenAt": "2026-11-15T19:53:28.870Z",
+      "lastSeenAt": "2026-11-15T19:53:28.870Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6adeeaf4-07d8-83eb-8ac6-15c37bd8f2c8"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6ae064f6-4098-83eb-9a4f-1a6f97bc24d2",
+      "url": "https://chatgpt.com/c/6ae064f6-4098-83eb-9a4f-1a6f97bc24d2",
+      "observedTitle": "Remplir un PDF gratuitement",
+      "firstSeenAt": "2026-11-15T19:53:28.870Z",
+      "lastSeenAt": "2026-11-15T19:53:28.870Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6ae064f6-4098-83eb-9a4f-1a6f97bc24d2"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6ae0ae6b-345c-83ed-becd-ba178d42d9a0",
+      "url": "https://chatgpt.com/c/6ae0ae6b-345c-83ed-becd-ba178d42d9a0",
+      "observedTitle": "Vérifier la facturation Alibaba Cloud",
+      "firstSeenAt": "2026-11-15T19:53:28.870Z",
+      "lastSeenAt": "2026-11-15T19:53:28.870Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6ae0ae6b-345c-83ed-becd-ba178d42d9a0"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6ae75f27-7eb8-83ed-98b6-273d1b27a3dd",
+      "url": "https://chatgpt.com/g/g-p-6ab2324212588191845f7317130c17ff/c/6ae75f27-7eb8-83ed-98b6-273d1b27a3dd",
+      "observedTitle": "Intégration Super partagée",
+      "firstSeenAt": "2026-11-15T19:53:09.045Z",
+      "lastSeenAt": "2026-11-15T19:53:09.045Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-6ab2324212588191845f7317130c17ff/c/6ae75f27-7eb8-83ed-98b6-273d1b27a3dd"
+      ],
+      "observedProjectKeys": [
+        "g-p-6ab2324212588191845f7317130c17ff"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6aed9b38-a868-83ed-9219-ffe5ef87e567",
+      "url": "https://chatgpt.com/g/g-p-7ad4623ec06c8191a62a218558a4d295/c/6aed9b38-a868-83ed-9219-ffe5ef87e567",
+      "observedTitle": "Audit documentaire technique",
+      "firstSeenAt": "2026-11-15T19:53:14.550Z",
+      "lastSeenAt": "2026-11-15T19:53:14.550Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-7ad4623ec06c8191a62a218558a4d295/c/6aed9b38-a868-83ed-9219-ffe5ef87e567"
+      ],
+      "observedProjectKeys": [
+        "g-p-7ad4623ec06c8191a62a218558a4d295"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af021cd-e808-83eb-af7d-175b54eb3a22",
+      "url": "https://chatgpt.com/g/g-p-6ab2324212588191845f7317130c17ff/c/6af021cd-e808-83eb-af7d-175b54eb3a22",
+      "observedTitle": "Branche · Intégration Super partagée",
+      "firstSeenAt": "2026-11-15T19:53:09.045Z",
+      "lastSeenAt": "2026-11-15T19:53:09.045Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-6ab2324212588191845f7317130c17ff/c/6af021cd-e808-83eb-af7d-175b54eb3a22"
+      ],
+      "observedProjectKeys": [
+        "g-p-6ab2324212588191845f7317130c17ff"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af060eb-348c-83eb-9e88-0d8d93573893",
+      "url": "https://chatgpt.com/c/6af060eb-348c-83eb-9e88-0d8d93573893",
+      "observedTitle": "Vérifier notification OneDrive",
+      "firstSeenAt": "2026-11-15T19:53:28.003Z",
+      "lastSeenAt": "2026-11-15T19:53:28.003Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6af060eb-348c-83eb-9e88-0d8d93573893"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af0ae3b-3398-83eb-8166-7d4a2da877ad",
+      "url": "https://chatgpt.com/c/6af0ae3b-3398-83eb-8166-7d4a2da877ad",
+      "observedTitle": "Bug de publication GitHub",
+      "firstSeenAt": "2026-11-15T19:53:24.666Z",
+      "lastSeenAt": "2026-11-15T19:53:24.666Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6af0ae3b-3398-83eb-8166-7d4a2da877ad"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af0c88f-d434-83eb-b0dc-52d169552dae",
+      "url": "https://chatgpt.com/c/6af0c88f-d434-83eb-b0dc-52d169552dae",
+      "observedTitle": "Concevoir une bibliothèque virtuelle",
+      "firstSeenAt": "2026-11-15T19:53:27.538Z",
+      "lastSeenAt": "2026-11-15T19:53:27.538Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6af0c88f-d434-83eb-b0dc-52d169552dae"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af18d44-4490-83eb-85fd-50312e7893ce",
+      "url": "https://chatgpt.com/c/6af18d44-4490-83eb-85fd-50312e7893ce",
+      "observedTitle": "Transfert de fichiers Hyper V",
+      "firstSeenAt": "2026-11-15T19:53:27.538Z",
+      "lastSeenAt": "2026-11-15T19:53:27.538Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6af18d44-4490-83eb-85fd-50312e7893ce"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af222bd-c364-83eb-a34a-51887e8204e6",
+      "url": "https://chatgpt.com/c/6af222bd-c364-83eb-a34a-51887e8204e6",
+      "observedTitle": "Envoyer les images validées",
+      "firstSeenAt": "2026-11-15T19:53:27.538Z",
+      "lastSeenAt": "2026-11-15T19:53:27.538Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6af222bd-c364-83eb-a34a-51887e8204e6"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af22461-fe24-83ed-97f1-15062b4d61be",
+      "url": "https://chatgpt.com/c/6af22461-fe24-83ed-97f1-15062b4d61be",
+      "observedTitle": "Envoyer images mission",
+      "firstSeenAt": "2026-11-15T19:53:27.538Z",
+      "lastSeenAt": "2026-11-15T19:53:27.538Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6af22461-fe24-83ed-97f1-15062b4d61be"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af22545-a8f4-83ed-b87e-a78c8588d0dc",
+      "url": "https://chatgpt.com/c/6af22545-a8f4-83ed-b87e-a78c8588d0dc",
+      "observedTitle": "Problème des interruptions",
+      "firstSeenAt": "2026-11-15T19:53:24.666Z",
+      "lastSeenAt": "2026-11-15T19:53:24.666Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6af22545-a8f4-83ed-b87e-a78c8588d0dc"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af2d2db-3454-83ed-9801-169674bfce69",
+      "url": "https://chatgpt.com/c/6af2d2db-3454-83ed-9801-169674bfce69",
+      "observedTitle": "Vocabulaire interface graphique",
+      "firstSeenAt": "2026-11-15T19:53:26.475Z",
+      "lastSeenAt": "2026-11-15T19:53:26.475Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6af2d2db-3454-83ed-9801-169674bfce69"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af2e278-002c-83ed-a28c-c34f79919c9a",
+      "url": "https://chatgpt.com/c/6af2e278-002c-83ed-a28c-c34f79919c9a",
+      "observedTitle": "Résoudre affichage NVIDIA Capture écran",
+      "firstSeenAt": "2026-11-15T19:53:26.475Z",
+      "lastSeenAt": "2026-11-15T19:53:26.475Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6af2e278-002c-83ed-a28c-c34f79919c9a"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af2ff6a-7150-83eb-a34b-401d3f3bc6f6",
+      "url": "https://chatgpt.com/c/6af2ff6a-7150-83eb-a34b-401d3f3bc6f6",
+      "observedTitle": "Fusionner les branches Git",
+      "firstSeenAt": "2026-11-15T19:53:26.475Z",
+      "lastSeenAt": "2026-11-15T19:53:26.475Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6af2ff6a-7150-83eb-a34b-401d3f3bc6f6"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af32bdd-0320-83eb-95b7-de926cb21bf2",
+      "url": "https://chatgpt.com/c/6af32bdd-0320-83eb-95b7-de926cb21bf2",
+      "observedTitle": "Posologies de prégabaline",
+      "firstSeenAt": "2026-11-15T19:53:26.475Z",
+      "lastSeenAt": "2026-11-15T19:53:26.475Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6af32bdd-0320-83eb-95b7-de926cb21bf2"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af3f63a-f568-83eb-90fa-8bca63ee54de",
+      "url": "https://chatgpt.com/c/6af3f63a-f568-83eb-90fa-8bca63ee54de",
+      "observedTitle": "Retrouver clé Windows",
+      "firstSeenAt": "2026-11-15T19:53:25.318Z",
+      "lastSeenAt": "2026-11-15T19:53:25.318Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6af3f63a-f568-83eb-90fa-8bca63ee54de"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af4ac0f-4d60-83ed-8ff0-e88855b58a2d",
+      "url": "https://chatgpt.com/c/6af4ac0f-4d60-83ed-8ff0-e88855b58a2d",
+      "observedTitle": "Maquette mon-aise",
+      "firstSeenAt": "2026-11-15T19:53:25.318Z",
+      "lastSeenAt": "2026-11-15T19:53:25.318Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6af4ac0f-4d60-83ed-8ff0-e88855b58a2d"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af4b2eb-9b7c-83eb-9fc2-a24a59817581",
+      "url": "https://chatgpt.com/c/6af4b2eb-9b7c-83eb-9fc2-a24a59817581",
+      "observedTitle": "Problème upload GitHub",
+      "firstSeenAt": "2026-11-15T19:53:25.318Z",
+      "lastSeenAt": "2026-11-15T19:53:25.318Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6af4b2eb-9b7c-83eb-9fc2-a24a59817581"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af4b62f-6430-83ed-b2d8-3c41bb2c8736",
+      "url": "https://chatgpt.com/c/6af4b62f-6430-83ed-b2d8-3c41bb2c8736",
+      "observedTitle": "Autorisation GitHub plantage",
+      "firstSeenAt": "2026-11-15T19:53:25.318Z",
+      "lastSeenAt": "2026-11-15T19:53:25.318Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6af4b62f-6430-83ed-b2d8-3c41bb2c8736"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af4b7df-70b8-83eb-a16a-a2a16fef9fd4",
+      "url": "https://chatgpt.com/c/6af4b7df-70b8-83eb-a16a-a2a16fef9fd4",
+      "observedTitle": "Poursuite du transfert GitHub",
+      "firstSeenAt": "2026-11-15T19:53:25.318Z",
+      "lastSeenAt": "2026-11-15T19:53:25.318Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6af4b7df-70b8-83eb-a16a-a2a16fef9fd4"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af5c9fe-c304-83eb-b51a-8d6adc68beee",
+      "url": "https://chatgpt.com/c/6af5c9fe-c304-83eb-b51a-8d6adc68beee",
+      "observedTitle": "Vérifier script Chrome",
+      "firstSeenAt": "2026-11-15T19:52:22.065Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 2,
+      "observedUrls": [
+        "https://chatgpt.com/c/6af5c9fe-c304-83eb-b51a-8d6adc68beee"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": true
+    },
+    {
+      "conversationId": "6af644c8-0af0-83eb-ae56-a6694acbff34",
+      "url": "https://chatgpt.com/c/6af644c8-0af0-83eb-ae56-a6694acbff34",
+      "observedTitle": "Compléter Mes Bulles",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6af644c8-0af0-83eb-ae56-a6694acbff34"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af6c9ff-3010-83eb-b3a4-7bf846511052",
+      "url": "https://chatgpt.com/c/6af6c9ff-3010-83eb-b3a4-7bf846511052",
+      "observedTitle": "Radiographier les données locales",
+      "firstSeenAt": "2026-11-15T19:53:24.666Z",
+      "lastSeenAt": "2026-11-15T19:53:24.666Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6af6c9ff-3010-83eb-b3a4-7bf846511052"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af6d0dd-2e1c-83eb-8bf0-c276d4630cef",
+      "url": "https://chatgpt.com/c/6af6d0dd-2e1c-83eb-8bf0-c276d4630cef",
+      "observedTitle": "Analyser un mail étrange",
+      "firstSeenAt": "2026-11-15T19:53:24.666Z",
+      "lastSeenAt": "2026-11-15T19:53:24.666Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6af6d0dd-2e1c-83eb-8bf0-c276d4630cef"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af7320a-2ca8-83ed-bf8b-a32f1a6dd914",
+      "url": "https://chatgpt.com/c/6af7320a-2ca8-83ed-bf8b-a32f1a6dd914",
+      "observedTitle": "Salutation affectueuse",
+      "firstSeenAt": "2026-11-15T19:53:24.666Z",
+      "lastSeenAt": "2026-11-15T19:53:24.666Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6af7320a-2ca8-83ed-bf8b-a32f1a6dd914"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af77685-dc54-83ed-bc08-375d83f7b54c",
+      "url": "https://chatgpt.com/c/6af77685-dc54-83ed-bc08-375d83f7b54c",
+      "observedTitle": "Retrouver inscription Microsoft Store",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6af77685-dc54-83ed-bc08-375d83f7b54c"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af8117e-8f84-83ed-9b67-f49ebb94abd2",
+      "url": "https://chatgpt.com/c/6af8117e-8f84-83ed-9b67-f49ebb94abd2",
+      "observedTitle": "Accès au modèle 6.1",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6af8117e-8f84-83ed-9b67-f49ebb94abd2"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af81b19-bb14-83ed-b9a1-a6f8e683f5fe",
+      "url": "https://chatgpt.com/g/g-p-6af8254b1f7c8191b4aa6c8e0cbac287/c/6af81b19-bb14-83ed-b9a1-a6f8e683f5fe",
+      "observedTitle": "Classer les chats alphabétiquement",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/g/g-p-6af8254b1f7c8191b4aa6c8e0cbac287/c/6af81b19-bb14-83ed-b9a1-a6f8e683f5fe"
+      ],
+      "observedProjectKeys": [
+        "g-p-6af8254b1f7c8191b4aa6c8e0cbac287"
+      ],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af82df4-cbc8-83eb-904d-ae2e84eb6556",
+      "url": "https://chatgpt.com/c/6af82df4-cbc8-83eb-904d-ae2e84eb6556",
+      "observedTitle": "Loi travaux copropriété",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6af82df4-cbc8-83eb-904d-ae2e84eb6556"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    },
+    {
+      "conversationId": "6af89c70-edf0-83ed-8095-d17e66fe448a",
+      "url": "https://chatgpt.com/c/6af89c70-edf0-83ed-8095-d17e66fe448a",
+      "observedTitle": "Créer appli capture annotée",
+      "firstSeenAt": "2026-11-15T19:52:23.787Z",
+      "lastSeenAt": "2026-11-15T19:52:23.787Z",
+      "seenCount": 1,
+      "observedUrls": [
+        "https://chatgpt.com/c/6af89c70-edf0-83ed-8095-d17e66fe448a"
+      ],
+      "observedProjectKeys": [],
+      "lastObservedActive": false
+    }
+  ]
+}
