@@ -1,6 +1,6 @@
 # Architecture — Mon GPT<3
 
-État actuel : 0.4.0, 15 novembre 2026. Les sections MG-002/MG-002a décrivent leur état historique avant MG-003a ; MG-003b précise les corrections de présentation actuelles.
+État actuel : 0.4.1, 15 novembre 2026. Les sections MG-002/MG-002a décrivent leur état historique avant MG-003a ; MG-003b précise les corrections de présentation actuelles.
 
 ## Choix techniques
 
@@ -89,3 +89,13 @@ La restauration revalide, vérifie les collisions et sauvegarde d’abord l’ex
 Les couvertures visibles sont chargées par `ImageLibrary` puis `contained_picture`, sans recadrage. Cache PhotoImage LRU de 192 entrées par référence/taille, limité aux tailles de vignettes effectives ; photos retenues pendant le rendu. Les icônes réutilisent `ProjectIconCache`. Pas de décodage d’image à chaque survol. La sélection est rendue visible au changement de mode ; la Liste retrouve ses colonnes et sa géométrie historiques.
 
 `interface.json` reste en version 1 : `view` accepte `list` ou `detail`, ancien `list` compatible, valeur inconnue rejetée avec repli sûr et avertissement. La sauvegarde à la fermeture utilise le mode courant, jamais le catalogue. Les quatre tris existent dans les deux vues ; Détaillée les expose par un petit menu central. Les nouvelles commandes Affichage utilisent le menu habillé existant sans le redessiner. Le cœur, le résolveur, le schéma 2, ChatGPT, les importations et ZIP sont inchangés. Aucun mode Mosaïque actif ou préconstruit.
+
+## MG-004a — Reprise de l’espace de travail (0.4.1)
+
+`ui_state.py` étend le fichier `interface.json` version 1 avec `query`, `tag`, `category`, `scope`, `selected` et `expanded_projects`. Les anciens fichiers à quatre propriétés gardent leurs défauts sans avertissement. Validation avant application : clés autorisées, types stricts, UUID locaux canoniques, limites de texte (4096 caractères de recherche, 1024 par filtre), liste de branches unique limitée à 4096, géométrie bornée et lecture limitée à 256 Kio. Les modes admis sont explicitement `VIEWS = ("list", "detail")` ; aucun mode Mosaïque actif. L’écriture utilise toujours `atomic_write` et la même validation.
+
+`App.restore_workspace` applique recherche/filtres, périmètre et branches, remplit les résultats puis restaure seulement une sélection visible. Le contrôle des références au catalogue reste dans l’UI : projet de périmètre absent ou de mauvais type, fiche supprimée → espace complet par défaut ; sélection exclue par les critères → sélection/aperçu vides, critères conservés. Les anciennes références de branches absentes sont ignorées. Aucun UUID fantôme ajouté à l’arbre. `expanded_projects: []` signifie explicitement toutes les branches fermées ; absence du champ conserve le comportement historique. `refresh_tree` distingue désormais premier peuplement et ensemble de branches toutes fermées.
+
+Une garde de démarrage neutralise les handlers de sélection pendant le peuplement et les événements initiaux. Après mise en page, projet et résultat sont rendus visibles. Les ancêtres nécessaires pour atteindre un projet sélectionné peuvent s’ouvrir ; les autres branches gardent leur état. L’inspecteur utilise `show_summary` en lecture seule, sans appeler `open_thread`, l’adaptateur ou le navigateur. Même mécanisme pour les deux vues et la future Mosaïque.
+
+À la fermeture, `can_leave()` reste le premier contrôle : annuler ne touche pas aux préférences ; accepter traite le brouillon puis capture les critères, le périmètre, la sélection centrale effective et les branches. Pas de brouillon sérialisé. Fichier invalide/illisible → défauts complets et statut discret. Échec d’écriture → avertissement existant, catalogue préservé. Les champs métier, images, ZIP, schéma 2, moteur, rendus et interactions ne changent pas. Les tris, positions de scroll exactes et séparateurs ne sont pas de nouvelles préférences ; la sélection restaurée est rendue visible.

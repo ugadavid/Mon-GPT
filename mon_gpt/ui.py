@@ -33,6 +33,11 @@ class App(DetailEditor):
         self.search_timer = None
         self.preferences_path = store.directory / "interface.json"
         preferences, warning = ui_state.load(self.preferences_path)
+        scope=preferences.get("scope","all")
+        selected=preferences.get("selected")
+        if (scope not in ("all","unfiled") and (scope not in cat.records or cat.records[scope].kind!="project")) or (selected is not None and selected not in cat.records):
+            preferences,warning={},ui_state.WARNING
+        self.restoring_workspace=True
         self.view=tk.StringVar(value=preferences.get("view","list"))
         apply_theme(root)
         self.icons = make_icons(root)
@@ -47,11 +52,34 @@ class App(DetailEditor):
         self.build_menus()
         self.build_shell()
         self.bind_keys()
-        self.refresh_tree()
-        self.refresh_results()
-        if preferences.get("inspector"):
-            self.toggle_inspector()
+        self.restore_workspace(preferences)
         root.protocol("WM_DELETE_WINDOW", self.close)
+
+    def restore_workspace(self,preferences):
+        self.scope=preferences.get("scope","all")
+        for key in ("query","tag","category"):
+            getattr(self,key).set(preferences.get(key,""))
+        self.refresh_tree(expanded=preferences.get("expanded_projects"))
+        self.refresh_results()
+        selected=preferences.get("selected")
+        if selected and self.results.exists(selected):
+            self.current=selected
+            self.results.selection_set(selected)
+            self.results.focus(selected)
+        else:
+            self.current=None
+        self.update_identity()
+        if preferences.get("inspector"):
+            self.ensure_inspector()
+            self.show_summary(self.current,checked=True)
+        self.root.after_idle(self.finish_workspace_restore)
+
+    def finish_workspace_restore(self):
+        # Vider les événements initiaux pendant la garde, avant la reprise normale.
+        self.root.update_idletasks()
+        self.tree.see(self.scope)
+        if self.current and self.results.exists(self.current): self.results.see(self.current)
+        self.restoring_workspace=False
 
     def build_menus(self):
         bar = tk.Menu(self.root, tearoff=False)
@@ -460,21 +488,24 @@ class App(DetailEditor):
         self.hide_suggestions()
         self.refresh_results()
 
-    def refresh_tree(self):
-        opened = {p for p in self.cat.records if self.tree.exists(p) and self.tree.item(p, "open")}
+    def refresh_tree(self,expanded=None):
+        had_projects=any(r.kind=="project" and self.tree.exists(r.id) for r in self.cat.records.values())
+        opened = set(expanded) if expanded is not None else {p for p in self.cat.records if self.tree.exists(p) and self.tree.item(p, "open")}
+        initial_open=expanded is None and not had_projects
         self.tree.delete(*self.tree.get_children())
         self.tree.insert("", "end", iid="all", text="Tous les fils", image=self.nav_icons["all"])
         self.tree.insert("", "end", iid="unfiled", text="À classer", image=self.nav_icons["unfiled"])
         pending = [(r, "") for r in reversed(self.cat.children(None, self.sort.get() != "Manuel"))]
         while pending:
             r, parent = pending.pop()
-            self.tree.insert(parent, "end", iid=r.id, text=r.title, image=self.project_icons.for_project(r), open=(r.id in opened or not opened))
+            self.tree.insert(parent, "end", iid=r.id, text=r.title, image=self.project_icons.for_project(r), open=(r.id in opened or initial_open))
             pending.extend((c, r.id) for c in reversed(self.cat.children(r.id, self.sort.get() != "Manuel")))
         if not self.tree.exists(self.scope):
             self.scope = "all"
         self.tree.selection_set(self.scope)
 
     def select_scope(self, event=None):
+        if self.restoring_workspace: return
         selection = self.tree.selection()
         if not selection or selection[0].startswith("__") or selection[0] == self.scope:
             return
@@ -526,6 +557,7 @@ class App(DetailEditor):
         self.refresh_results()
 
     def select_record(self, event=None):
+        if self.restoring_workspace: return
         selection = self.results.selection()
         if selection and selection[0] != self.current:
             if not self.select_identity(selection[0]):
@@ -1051,8 +1083,12 @@ class App(DetailEditor):
         if not self.can_leave():
             return
         try:
-            ui_state.save(self.preferences_path, self.inspector_visible, f"{max(1000,self.root.winfo_width())}x{max(680,self.root.winfo_height())}", self.view.get())
-        except OSError as exc:
+            selection=self.results.selection()
+            ui_state.save(self.preferences_path, self.inspector_visible, f"{max(1000,self.root.winfo_width())}x{max(680,self.root.winfo_height())}", self.view.get(),
+                query=self.query.get(),tag=self.tag.get(),category=self.category.get(),scope=self.scope,
+                selected=selection[0] if selection else None,
+                expanded_projects=[r.id for r in self.cat.records.values() if r.kind=="project" and self.tree.exists(r.id) and self.tree.item(r.id,"open")])
+        except (OSError,ValueError) as exc:
             messagebox.showwarning("Préférences non enregistrées", f"Le catalogue reste intact.\n{exc}", parent=self.root)
         if self.search_timer:
             self.root.after_cancel(self.search_timer)

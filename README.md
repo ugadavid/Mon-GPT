@@ -1,8 +1,10 @@
-# Mon GPT<3 — 0.4.0
+# Mon GPT<3 — 0.4.1
 
 Application Windows locale pour organiser ses discussions ChatGPT. MG-002a donne corps à l’« Atelier chaleureux » : bandeau illustré, cartes papier, titres affirmés, icônes harmonisées, badges et menus dessinés. La **vue Liste** conserve l’ouverture directe. Aucun serveur, compte applicatif ou API OpenAI ; aucune modification dans ChatGPT.
 
 ![La vraie application sur CODEX-VM](reports/MG-004/02-detaillee.png)
+
+**MG-004a : reprendre son espace de travail.** À la fermeture normale, Mon GPT<3 mémorise aussi recherche, filtres, périmètre, branches ouvertes et fiche sélectionnée. La relance retrouve le même aperçu en lecture seule, sans ouvrir de discussion. Tout reste dans `interface.json`, hors catalogue et sauvegarde métier. Un fichier ancien reste compatible ; un état invalide revient discrètement à l’affichage par défaut. [Rapport et captures avant/après](reports/MG-004a/rapport.md).
 
 **MG-004 : la vue Détaillée.** De petites couvertures entières, les icônes colorées des projets, titres, extraits de résumés, emplacements et pastilles composent des cartes légères. **Liste | Détaillée**, près de Discussions ou dans Affichage, change la présentation en gardant sélection, recherche, filtres, tri et fiche ouverte. La vue choisie est mémorisée à la fermeture dans les préférences, hors catalogue. [Rapport et cinq captures comparatives réelles](reports/MG-004/rapport.md). Mosaïque reste réservée à une prochaine mission.
 
@@ -42,7 +44,7 @@ Cliquer **Détaillée** sous Discussions, ou choisir **Affichage → Détaillée
 
 Le titre ou **↗** ouvre directement une discussion ; l’image, les pastilles et le reste de la carte sélectionnent seulement. Double-clic et Entrée sur le résultat focalisé gardent le comportement de la Liste. Un projet utilise sa propre couverture et ne s’ouvre jamais dans ChatGPT : Entrée/double-clic navigue vers son périmètre. Flèches haut/bas parcourent les cartes, droite focalise l’action d’ouverture. Un titre coupé, le résumé et les repères complets sont accessibles au survol. En petite largeur, quelques pastilles se replient en `+N`.
 
-Le bouton **Tri** de Détaillée reprend les quatre tris des en-têtes de Liste ; choisir le tri actif inverse son sens. Clic droit, F2, glisser gauche vers un projet et les raccourcis existants restent disponibles. Aucun nouveau raccourci de vue. Le choix Liste/Détaillée est le seul nouvel état mémorisé ; recherche et filtres restent ceux de la session.
+Le bouton **Tri** de Détaillée reprend les quatre tris des en-têtes de Liste ; choisir le tri actif inverse son sens. Clic droit, F2, glisser gauche vers un projet et les raccourcis existants restent disponibles. Aucun nouveau raccourci de vue. À la fermeture, le choix Liste/Détaillée est mémorisé avec recherche, filtres, périmètre, branches et sélection centrale. La relance restaure un aperçu en lecture seule si la fiche figure encore dans les résultats ; aucune discussion ne s’ouvre automatiquement. Les anciens fichiers de préférences restent lisibles. Une sélection supprimée ou un périmètre disparu revient à l’espace par défaut ; une fiche simplement exclue par les filtres n’est pas réintroduite dans les résultats.
 
 ## Créer et modifier
 
