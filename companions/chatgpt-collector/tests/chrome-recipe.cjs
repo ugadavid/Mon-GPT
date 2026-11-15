@@ -8,7 +8,7 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 const ROOT = path.resolve(__dirname, '..');
-const REPORT = path.resolve(ROOT, '../../reports/MG-008a');
+const REPORT = path.resolve(ROOT, '../../reports/MG-008b');
 const WORK = path.join(ROOT, '.recette');
 const PROFILE = path.join(WORK, 'chrome-' + Date.now());
 const ID = '00000000-0000-4000-8000-000000000801';
@@ -44,12 +44,15 @@ async function checkpoint(stage) {
   const size = await popup.evaluate(() => ({ body: document.body.scrollHeight, viewport: document.documentElement.clientHeight }));
   console.log('POPUP_HEIGHT', stage, size); assert.ok(size.body <= 600, 'Popup entièrement utilisable sous le plafond Chrome');
   await popup.screenshot({ path: path.join(WORK, stage + '-renderer.png') });
-  if (!checkpoints || !stage.includes('projets-')) return;
+  if (!checkpoints || !stage.startsWith('native-')) return;
   if (process.env.COLLECTOR_CAPTURE_STAGE && process.env.COLLECTOR_CAPTURE_STAGE !== stage) return;
   const continuation = 'continue-' + path.basename(PROFILE) + '-' + stage;
-  await fs.writeFile(path.join(WORK, 'stage.json'), JSON.stringify({ stage, continuation, extensionId, fixtureTitle: 'Recette fictive MG-008a' }));
+  await fs.writeFile(path.join(WORK, 'stage.json'), JSON.stringify({ stage, continuation, extensionId, fixtureTitle: 'Recette fictive MG-008b' }));
   console.log('CAPTURE_NATIVE · ' + stage);
   await until(async () => { try { await fs.access(path.join(WORK, continuation)); return true; } catch { return false; } }, 'capture native ' + stage, 20 * 60 * 1000);
+  // Une activation native de la fenêtre peut fermer sa popup : repartir d’un
+  // contexte vivant après la capture, sans changer les observations.
+  await openPopup();
 }
 async function launch(install = false) {
   browser = await puppeteer.launch({ executablePath: process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: false,
@@ -228,14 +231,40 @@ async function fixture(url = 'https://chatgpt.com/', filename = 'sidebar.html') 
   pass('Accueil projet : nom depuis H1 sur URL projet ; Auto cible conserve seulement ce projet, export JSON actif même sans conversation');
   await chooseMode('manual'); await popup.close();
   assert.ok(projectsFixture.requests.every(url => url === 'https://chatgpt.com/' || url === 'https://chatgpt.com/favicon.ico'));
-  // Diagnostic du site réel dans ce profil neuf, sans connexion et sans aucun geste de compte.
-  const live = await browser.newPage(); let liveStatus = 'PARTIEL : diagnostic ChatGPT réel indisponible';
-  try {
-    await live.goto('https://chatgpt.com/', { waitUntil: 'domcontentloaded', timeout: 20000 });
-    const count = await live.$$eval('nav a[href*="/c/"], aside a[href*="/c/"]', list => list.length);
-    liveStatus = 'PARTIEL : site ChatGPT réel chargé dans le profil neuf, ' + count + ' lien(s) de discussion observables ; aucun compte personnel utilisé.';
-  } catch { liveStatus = 'PARTIEL : page ChatGPT réelle non exploitable dans le profil neuf ; aucune authentification ni barrière contournée.'; }
-  log.push(liveStatus); console.log(liveStatus); await live.close();
+  await worker.evaluate(() => repository.clear());
+  const nativeFixture = await fixture('https://chatgpt.com/', 'native-projects.html'); await page.close(); page = nativeFixture.page;
+  const nativeBefore = await page.content(); await openPopup(); await popup.click('#scanButton');
+  await until(async () => Object.keys((await state()).entities).length === 3, 'projets natifs de la fixture');
+  current = await state(); assert.equal(current.entities[A].name, 'Développement'); assert.equal(current.entities[B].name, 'Développement');
+  assert.equal(current.entities[C].name, null); assert.equal(Object.keys(current.records).length, 2);
+  assert.equal(current.entities[A].evidence.kind, 'direct-control'); assert.equal(current.entities[B].evidence.kind, 'direct-control');
+  assert.equal(await page.content(), nativeBefore); assert.ok(!JSON.stringify(current).includes('INTERDIT'));
+  await popup.waitForFunction(() => document.querySelectorAll('.project-row').length === 3);
+  await checkpoint('native-01-homonymes');
+  await chooseMode('broad'); await popup.close(); await page.click('#toggleB');
+  await until(async () => Object.keys((await state()).records).length === 3, 'dépli natif fictif');
+  await page.click('#renameA'); await until(async () => (await state()).entities[A].name === 'Options — Été & recherches', 'mutation attribut et titre natifs');
+  assert.equal((await state()).entities[B].name, 'Développement'); assert.equal(Object.keys((await state()).entities).length, 3);
+  const nativeExport = await worker.evaluate(async () => ChatGPTAdapter.exportJson((await repository.get()).state, new Date().toISOString()));
+  assert.equal(nativeExport.schemaVersion, 2); for (const key of [A, B]) assert.ok(nativeExport.conversations.some(c => c.observedProjectKeys.includes(key)));
+  pass('Contrat DOM natif reproduit après audit réel : div role button, homonymes distincts, projet replié nommé et fils ajoutés au dépli ; mutation du nom sans changement de fil, export v2 rattaché');
+  execFileSync(process.execPath, [path.join(__dirname, 'build-connected-probe.cjs')], { cwd: ROOT });
+  const probe = await fs.readFile(path.join(WORK, 'connected-probe-readonly.js'), 'utf8');
+  const domBeforeProbe = await page.content(), storageBeforeProbe = await state();
+  const fixtureProof = JSON.parse(await page.evaluate(probe));
+  assert.equal(fixtureProof.GO, true); assert.equal(fixtureProof.checkedProjectCount, 2);
+  assert.ok(fixtureProof.checks.every(c => c.nameExactAgainstRendered && c.keyExact && c.allLinkedConversationsCorrect));
+  assert.equal(await page.content(), domBeforeProbe); assert.deepEqual(await state(), storageBeforeProbe);
+  pass('Diagnostic anonymisant de production vérifié sur fixture : sortie sans noms/clé personnels, sans export sur disque ; ce test ne remplace pas la recette connectée');
+  await page.click('#routeA'); await openPopup(); await chooseMode('manual'); await popup.close(); await worker.evaluate(() => repository.clear());
+  await openPopup(); await chooseMode('targeted');
+  await until(async () => Object.keys((await state()).entities).length === 1, 'cible native sur accueil projet');
+  assert.equal((await state()).entities[A].name, 'Options — Été & recherches'); assert.equal(Object.keys((await state()).records).length, 0);
+  await checkpoint('native-02-cible');
+  pass('Accueil SPA natif en cible : un projet, titre exact même préfixé Options ; H1 générique non utilisé, aucun autre projet collecté');
+  await chooseMode('manual'); await popup.close();
+  assert.ok(nativeFixture.requests.every(url => url === 'https://chatgpt.com/' || url === 'https://chatgpt.com/favicon.ico'));
+  log.push('FIXTURES UNIQUEMENT · Recette de la session authentifiée existante réalisée séparément ; ne pas présenter ce profil jetable comme preuve du compte connecté.');
   await fs.writeFile(path.join(REPORT, 'recette-chrome.txt'), log.join('\n') + '\n');
   await browser.close(); browser = null;
 })().catch(async error => {

@@ -1,4 +1,4 @@
-# Mon GPT Collector — 0.8.1
+# Mon GPT Collector — 0.8.2
 
 Extension Chrome MV3 locale : conserver les discussions observées, identifier les projets **par clé**, observer leurs noms quand une preuve DOM le permet, exporter le tout. Deux projets « Développement » restent distincts si leurs clés diffèrent. Aucun import dans Mon GPT : MG-009 sera une mission séparée.
 
@@ -17,15 +17,17 @@ Ce script Python standard, sans paquet à installer, produit **16 fichiers exéc
 2. Pour une nouvelle installation, choisir **Charger l’extension non empaquetée** et sélectionner :
 
    ```text
-   C:\Users\codex\Documents\Projets\mon-gpt\dist\Mon-GPT-Collector-0.8.1
+   C:\Users\codex\Documents\Projets\mon-gpt\dist\Mon-GPT-Collector-0.8.2
    ```
 
-3. Si l’ancienne extension est encore installée depuis un autre dossier, la retirer pour éviter deux collecteurs en parallèle, puis charger le dossier ci-dessus. Pour recharger **ce même dossier** après une correction, utiliser **Actualiser** sur sa carte Chrome.
+3. **Mise à jour d’une 0.8.1 déjà chargée : conserver son dossier et son identifiant Chrome.** Décompresser le ZIP 0.8.2 dans **ce même dossier**, en remplaçant les 16 fichiers exécutables, puis utiliser **Actualiser** sur sa carte Chrome. Le nom du dossier peut rester `Mon-GPT-Collector-0.8.1` ; la carte doit afficher **0.8.2**. Ne pas désinstaller pour cette correction : le stockage v2 existant doit rester en place. Ne pas charger en parallèle une seconde copie depuis un autre chemin.
 4. Actualiser les onglets ChatGPT déjà ouverts, puis ouvrir **Mon GPT Collector** depuis le menu Extensions. L’épingler est facultatif.
 
-Le ZIP `dist/Mon-GPT-Collector-0.8.1.zip` contient la même distribution à décompresser avant chargement. Le script refuse un dossier de sortie pollué par des fichiers inattendus et ne supprime aucun dossier existant.
+Le ZIP `dist/Mon-GPT-Collector-0.8.2.zip` contient la même distribution à décompresser avant chargement. Le script refuse un dossier de sortie pollué par des fichiers inattendus et ne supprime aucun dossier existant.
 
 **Départ vierge décidé pour MG-008a.** Stockage neuf `monGptCollectorStateV2`, export **schemaVersion 2 exclusivement**. Aucun lecteur v1, migration, récupération ou sauvegarde d’anciens caches. Une ancienne clé éventuellement présente n’est ni lue ni convertie. L’application Windows demeure en 0.8.0 et n’est pas modifiée par cette mission.
+
+**MG-008b conserve ce stockage v2.** La correction réobserve les clés existantes et enrichit leurs noms à partir du DOM natif ; aucun nouveau schéma ni vidage automatique.
 
 ## Modes et gestes
 
@@ -43,23 +45,26 @@ Le compteur principal mesure les discussions conservées dans **l’extension**,
 
 ## Ce qui prouve un nom
 
+- **Contrôle natif réellement observé en session connectée :** `div[role="button"][data-app-action-sidebar-project-row]`, clé dans `data-app-action-sidebar-project-id`, nom dans `data-app-action-sidebar-project-label`. Le propriétaire `data-sidebar-project-kind="local"` / `data-sidebar-project-container-id="project:CLÉ"` doit concorder, ainsi que le titre propre visible référencé par `aria-labelledby` (ou son emplacement sémantique de titre). Aucune classe générée. Les enfants visibles, s’ils existent, ne doivent pas contredire la clé. Le même contrôle replié peut donc fournir son nom sans ouvrir ses fils.
 - Lien d’accueil `/g/g-p-…[/project]` avec son propre nom, ou contrôle portant explicitement `data-project-id` / `data-project-key`.
-- Accueil projet réellement ouvert : URL stricte portant la clé, un seul `h1` visible dans le contenu principal. Jamais le H1 d’une conversation.
+- Accueil projet réellement ouvert : URL stricte portant la clé, un seul `h1` visible dans le contenu principal, **uniquement en absence de contrôle natif identifié pour cette clé**. Un H1 générique ne tranche jamais un nom natif absent ou contradictoire. Jamais le H1 d’une conversation.
 - Groupe développé : treeitem propriétaire, liens contenus dans le bouton du projet ou relation réciproque `aria-controls` / `aria-labelledby`. Les enfants utilisables doivent tous porter la même clé ; aucune section/sous-projet concurrente. Cette preuve est de niveau inférieur aux preuves directes.
 
 Pas d’association par ordre, voisinage, titre de discussion, nom identique ou clé ressemblante. Les titres de boutons d’action ne deviennent pas des noms de projet ; aucun préfixe d’action n’est supprimé approximativement. En cas de conflit de même niveau, aucun nom nouveau n’est choisi. Un relevé plus faible ou sans nom n’efface pas une preuve plus fiable. Un renommage fiable de même niveau actualise la même clé. Si seul le groupe change après une ancienne preuve directe, ouvrir manuellement l’accueil projet permet de relever à nouveau une preuve directe.
 
-**Nom non observé** et **Titre non observé** sont des libellés UI ; le JSON contient `null`. L’[audit préalable](../../reports/MG-008a/audit-dom.md) précise les hypothèses et le niveau de confiance. **PARTIEL sur l’association nom/GUID du vrai compte** : les fixtures fonctionnent dans Chrome réel, mais le profil de recette n’est pas connecté. David doit confirmer le raccord avec son DOM actuel.
+**Nom non observé** et **Titre non observé** sont des libellés UI ; le JSON contient `null`. L’[audit du vrai DOM connecté](../../reports/MG-008b/audit-dom-reel-anonymise.md) explique la cause prouvée de l’échec 0.8.1. Le [rapport MG-008b](../../reports/MG-008b/rapport.md) distingue cet audit réel, les tests sur sa reproduction anonymisée et la vérification de l’export corrigé dans la session connectée.
 
 ## Recette courte sur le Chrome connecté de David
 
-1. Charger/actualiser la version **0.8.1**, actualiser ChatGPT, choisir **Manuel**. Le stockage v2 part vide. Garder les anciens collecteurs désactivés.
+1. Mettre à jour **dans le même dossier** vers **0.8.2**, actualiser ChatGPT, choisir **Manuel**. **Ne pas vider** le stockage v2 pour une mise à jour ; les clés déjà collectées vont s’enrichir. Garder toute autre copie du collecteur désactivée.
 2. Repérer 2–3 projets. Si possible, choisir deux homonymes existants ; relever leur **clé dans les liens**, pas seulement leur nom. Ouvrir et replier leurs sections soi-même, puis **Scanner cette page**. Vérifier noms, nombres et clés complètes au survol.
 3. Si un nom reste inconnu, ouvrir soi-même **l’accueil de ce projet**, sans ouvrir une conversation ; scanner. Vérifier que le nom obtenu correspond exactement à cette clé. Un nom non prouvé doit rester inconnu, plutôt que celui d’un fil voisin.
 4. Exporter JSON. Vérifier `schemaVersion: 2`, deux entrées `projects` distinctes pour les deux homonymes, noms exacts et `evidence`. Vérifier les `observedProjectKeys` de quelques conversations ; une conversation reste unique même sous plusieurs URL.
 5. Si un projet de recette est renommé manuellement, revoir son accueil et scanner : même clé, nouveau nom, pas de doublon. Tester ensuite Auto cible puis Auto large, uniquement sur les sections rendues. Ne rien modifier dans un projet réel juste pour la recette.
 
 **Preuve attendue :** la même clé constatée dans l’URL/attribut et dans l’export, le vrai libellé du contrôle/titre, le type de preuve, des clés distinctes malgré un nom identique. Pour un échec, noter le type de page, le mode et le seul contrôle/groupe concerné (attributs sémantiques), sans messages, tokens ou dump global de la page. Aucun export personnel ne doit être commité dans ce dépôt.
+
+Un diagnostic de développement strictement en mémoire est généré par `node tests/build-connected-probe.cjs`. Il produit `.recette/connected-probe-readonly.js` sans données personnelles intégrées. Après lecture du code et uniquement si la console Chrome accepte son collage, l’exécuter dans l’onglet connecté : il compare deux titres natifs, les observations de production et le JSON v2 sérialisé/relu en mémoire, et retourne seulement des alias et booléens. Il compare aussi le scanner 0.8.1 issu du commit de référence ; ce n’est ni un lecteur d’ancien export ni un chemin de compatibilité. Aucun DOM, stockage ou réseau écrit, aucun export personnel sur disque. **Ne pas contourner une protection Chrome de collage ; elle doit être traitée par l’utilisateur.** Un résultat sur fixture ne prouve pas la recette connectée.
 
 ## Données et permissions
 
@@ -82,4 +87,4 @@ npm test
 
 Tests purs avec `node:test`, sans installation de paquet. Pour la recette Chrome automatisée, uniquement côté développement : `npm ci`, puis `npm run test:chrome`. `puppeteer-core` est une dépendance de développement figée, sans téléchargement de navigateur. Chrome installé à `C:/Program Files/Google/Chrome/Application/chrome.exe` par défaut (`CHROME_PATH` permet un autre chemin). Le banc charge **le dossier distribué**, un profil jetable `.recette/` et des fixtures fictives avec le manifest inchangé. Aucun profil personnel utilisé. Le chargement CDP est réappliqué explicitement après redémarrage pour vérifier le stockage ; ce n’est pas une recette de l’installation permanente manuelle.
 
-`node tests/chrome-recipe.cjs --hold` prépare les quatre arrêts pour captures Windows natives. Ne pas lancer la recette Chrome en parallèle des tests Tk utilisant le focus. [Rapport, journaux et quatre captures](../../reports/MG-008a/rapport.md).
+`node tests/chrome-recipe.cjs --hold` prépare les deux arrêts pour captures Windows natives sur la fixture réduite du DOM observé. Ne pas lancer la recette Chrome en parallèle des tests Tk utilisant le focus. [Rapport, journaux et captures non personnelles](../../reports/MG-008b/rapport.md).

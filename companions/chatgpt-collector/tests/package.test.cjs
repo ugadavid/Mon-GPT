@@ -13,5 +13,5 @@ test('Distribution propre et reproductible : uniquement actifs exécutables, auc
   const files = fs.readdirSync(first.folder, { recursive: true, withFileTypes: true }).filter(e => e.isFile());
   assert.equal(files.length, first.files); assert.equal(first.files, 16); assert.ok(first.zipBytes < 100000);
   assert.ok(files.every(f => !/node_modules|\.recette|tests|package-lock|exports|README/.test(path.join(f.parentPath, f.name).slice(first.folder.length))));
-  assert.equal(JSON.parse(fs.readFileSync(path.join(first.folder, 'manifest.json'))).version, '0.8.1');
+  assert.equal(JSON.parse(fs.readFileSync(path.join(first.folder, 'manifest.json'))).version, '0.8.2');
 });

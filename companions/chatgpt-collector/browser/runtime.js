@@ -27,7 +27,7 @@
       if (mode === 'manual' || !next.length) return;
       observer = new win.MutationObserver(mutations => { if (mutations.some(adapter.relevantMutation)) schedule(); });
       for (const target of next) observer.observe(target, { childList: true, subtree: true, characterData: true, attributes: true,
-        attributeFilter: ['href', 'aria-label', 'data-active', 'aria-current', 'hidden', 'aria-hidden', 'style', 'aria-expanded', 'aria-controls', 'aria-labelledby', 'data-project-id', 'data-project-key', 'id', 'role'] });
+        attributeFilter: ['href', 'aria-label', 'data-active', 'aria-current', 'hidden', 'aria-hidden', 'style', 'aria-expanded', 'aria-controls', 'aria-labelledby', 'data-project-id', 'data-project-key', 'data-app-action-sidebar-project-row', 'data-app-action-sidebar-project-id', 'data-app-action-sidebar-project-label', 'data-sidebar-project-container-id', 'data-sidebar-project-kind', 'id', 'role'] });
       schedule();
     }
     function run(kind) {

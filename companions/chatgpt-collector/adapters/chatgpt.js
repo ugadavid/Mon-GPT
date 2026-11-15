@@ -13,6 +13,9 @@
   const PROJECT_HOME = /^\/g\/(g-p-[A-Za-z0-9_-]{1,124})(?:\/project)?\/?$/;
   const EVIDENCE = Object.freeze({ 'key-only': 0, 'expanded-group': 1, 'direct-link': 2, 'direct-control': 2, 'project-page': 2 });
   const ROOTS = 'nav[aria-label="Historique de chat"], nav[aria-label="Chat history"], [data-testid="history"], aside, nav, [role="navigation"]';
+  // Contrat réellement observé dans Chrome connecté (audit MG-008b).
+  const NATIVE_PROJECT = '[data-app-action-sidebar-project-row][data-app-action-sidebar-project-id]';
+  const NATIVE_OWNER = '[data-sidebar-project-kind="local"][data-sidebar-project-container-id]';
   function parseUrl(value) {
     if (typeof value !== 'string' || value.length > Core.LIMITS.url) throw Error('Lien ChatGPT invalide.');
     const raw = value.trim();
@@ -115,7 +118,7 @@
     return [...found.values()];
   }
   function auxiliary(node) { return node.hasAttribute('data-trailing-button') || node.getAttribute('aria-haspopup') === 'menu'; }
-  function projectName(node, win) {
+  function projectName(node, win, { allowActionWords = false } = {}) {
     if (auxiliary(node)) return null;
     const parts = []; let visited = 0, overflow = false;
     function read(child) {
@@ -129,8 +132,36 @@
     if (overflow) return null;
     // Le texte propre est préférable à un aria-label contenant une action/décoration.
     const value = parts.join(' ').replace(/\s+/g, ' ').trim() || node.getAttribute('aria-label');
-    if (typeof value !== 'string' || !value.trim() || value.length > Core.LIMITS.name || /[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/.test(value) || /^(?:ouvrir\b|open\b|options?\b|couleur personnalisée\b|custom colou?r\b)/i.test(value.trim())) return null;
+    if (typeof value !== 'string' || !value.trim() || value.length > Core.LIMITS.name || /[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/.test(value) || (!allowActionWords && /^(?:ouvrir\b|open\b|options?\b|couleur personnalisée\b|custom colou?r\b)/i.test(value.trim()))) return null;
     return value.replace(/\s+/g, ' ').trim();
+  }
+  function nativeProjectName(control, identity, doc, win) {
+    if (!control.matches('[role="button"]')) return null;
+    const owner = control.closest(NATIVE_OWNER);
+    if (!owner || owner.getAttribute('data-sidebar-project-container-id') !== 'project:' + identity) return null;
+    if ([...owner.querySelectorAll(NATIVE_PROJECT)].some(node => node !== control && node.closest(NATIVE_OWNER) === owner)) return null;
+    const declared = control.getAttribute('data-app-action-sidebar-project-label');
+    if (typeof declared !== 'string' || !declared.trim() || declared.length > Core.LIMITS.name || /[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/.test(declared)) return null;
+    const name = declared.replace(/\s+/g, ' ').trim();
+    const labelledBy = control.getAttribute('aria-labelledby'); let labels;
+    if (labelledBy !== null) {
+      if (!/^[A-Za-z0-9_:-]{1,128}$/.test(labelledBy)) return null;
+      const label = doc.getElementById(labelledBy);
+      if (!label || doc.querySelectorAll(`[id="${labelledBy}"]`).length !== 1 || !control.contains(label)) return null;
+      labels = [label];
+    } else labels = [...control.querySelectorAll('[data-marquee-content]')].filter(node => node.closest(NATIVE_PROJECT) === control);
+    const names = labels.filter(node => visible(node, win)).map(node => projectName(node, win, { allowActionWords: true }));
+    if (!names.length || names.some(value => value !== name)) return null;
+    // Le propriétaire est une frontière, jamais le dernier titre rencontré.
+    const links = [...owner.querySelectorAll('a[href*="/c/"]')];
+    if (links.length > Core.LIMITS.batch) return null;
+    for (const link of links) {
+      if (!visible(link, win) || link.closest(NATIVE_OWNER) !== owner) continue;
+      let parsed;
+      try { parsed = parseUrl(absolute(link.getAttribute('href'))); } catch { continue; }
+      if (parsed.context !== identity) return null;
+    }
+    return name;
   }
   function scanProjects(doc, win, mode = 'broad', conversations = scan(doc, win, mode)) {
     if (!allowedPage(win.location.href)) return [];
@@ -138,7 +169,7 @@
     let home = null;
     try { home = parseProjectUrl(win.location.href); allowed.add(home.identity); } catch { /* Conversation ou accueil général. */ }
     if (mode === 'targeted' && !allowed.size) return [];
-    const candidates = new Map(); let checked = 0;
+    const candidates = new Map(), nativeProjectKeys = new Set(); let checked = 0;
     function add(identity, name, kind, url) {
       if (!PROJECT_KEY.test(identity || '') || (mode === 'targeted' && !allowed.has(identity))) return;
       const observation = normalizeEntity({ source: 'chatgpt', identity, name, evidence: { kind: name === null ? 'key-only' : kind, url } });
@@ -149,18 +180,21 @@
     if (home) add(home.identity, null, 'key-only', home.url);
     for (const sidebar of [...doc.querySelectorAll(ROOTS)]) {
       if (!visible(sidebar, win)) continue;
-      for (const control of sidebar.querySelectorAll('a[href*="/g/g-p-"], button[data-project-id], button[data-project-key], [role="treeitem"][data-project-id], [role="treeitem"][data-project-key], [role="button"][data-project-id], [role="button"][data-project-key]')) {
+      for (const control of sidebar.querySelectorAll('a[href*="/g/g-p-"], button[data-project-id], button[data-project-key], [role="treeitem"][data-project-id], [role="treeitem"][data-project-key], [role="button"][data-project-id], [role="button"][data-project-key], ' + NATIVE_PROJECT)) {
         if (++checked > 20000) throw Error('Trop de contrôles projet rendus.');
         if (!visible(control, win) || auxiliary(control)) continue;
         let direct = null;
         try { direct = parseProjectUrl(absolute(control.getAttribute('href'))); } catch { /* Attribut explicite ou lien de fil, qui n’est pas un nom de projet. */ }
         if (control.matches('a[href]') && !direct) continue;
-        const attributes = ['data-project-id', 'data-project-key'].filter(a => control.hasAttribute(a)).map(a => control.getAttribute(a));
+        const attributes = ['data-project-id', 'data-project-key', 'data-app-action-sidebar-project-id'].filter(a => control.hasAttribute(a)).map(a => control.getAttribute(a));
         const keys = [...attributes, ...(direct ? [direct.identity] : [])];
         if (!keys.length || keys.some(k => !PROJECT_KEY.test(k)) || new Set(keys).size !== 1) continue;
         const identity = keys[0];
         if (mode === 'targeted' && !allowed.has(identity)) continue;
-        add(identity, projectName(control, win), direct ? 'direct-link' : 'direct-control', direct?.url || null);
+        const native = control.matches(NATIVE_PROJECT);
+        if (native) nativeProjectKeys.add(identity);
+        const name = native ? nativeProjectName(control, identity, doc, win) : projectName(control, win);
+        add(identity, name, direct ? 'direct-link' : 'direct-control', direct?.url || null);
       }
       for (const control of sidebar.querySelectorAll('button[aria-expanded="true"], [role="treeitem"][aria-expanded="true"]')) {
         if (++checked > 20000) throw Error('Trop de contrôles projet rendus.');
@@ -200,7 +234,9 @@
         }
       }
     }
-    if (home) {
+    // Un H1 générique n’arbitre jamais un contrôle natif explicitement identifié,
+    // même si ce dernier manque de nom fiable. Il reste un fallback de page.
+    if (home && !nativeProjectKeys.has(home.identity)) {
       const titles = [...doc.querySelectorAll('main h1, [role="main"] h1')].filter(n => visible(n, win));
       if (titles.length === 1) add(home.identity, projectName(titles[0], win), 'project-page', home.url);
     }
@@ -219,8 +255,8 @@
         observedUrls: [...r.observedUrls].sort(), observedProjectKeys: [...r.contexts].sort(), lastObservedActive: r.active }) });
   }
   function relevantMutation(m) {
-    const relevant = 'a[href], button[aria-expanded], [role="treeitem"], [data-project-id], [data-project-key], h1';
-    if (m.type === 'attributes') return m.target.matches?.(relevant) || ['hidden', 'aria-hidden', 'style'].includes(m.attributeName);
+    const relevant = 'a[href], button[aria-expanded], [role="treeitem"], [data-project-id], [data-project-key], [data-app-action-sidebar-project-row], [data-app-action-sidebar-project-id], [data-sidebar-project-container-id], h1';
+    if (m.type === 'attributes') return m.target.matches?.(relevant) || ['hidden', 'aria-hidden', 'style', 'data-app-action-sidebar-project-row', 'data-app-action-sidebar-project-id', 'data-app-action-sidebar-project-label', 'data-sidebar-project-container-id', 'data-sidebar-project-kind'].includes(m.attributeName);
     if (m.type === 'characterData') return Boolean(m.target.parentElement?.closest(relevant));
     return [...(m.addedNodes || []), ...(m.removedNodes || [])].some(n => n.nodeType === 1 && (n.matches?.(relevant) || n.querySelector?.(relevant))) || Boolean(m.target.closest?.(relevant));
   }

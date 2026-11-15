@@ -1,6 +1,6 @@
 # Contrat d’export v2 — projets et conversations
 
-MG-008a, Mon GPT Collector **0.8.1**. Format neuf, stockage neuf `monGptCollectorStateV2`. **Aucun lecteur v1, migration ou compatibilité historique.** Aucune importation dans le catalogue Python n’est livrée.
+Contrat introduit par MG-008a, conservé par MG-008b / Mon GPT Collector **0.8.2**. Même schéma v2 et même stockage `monGptCollectorStateV2` lors de la correction. **Aucun lecteur v1, migration ou compatibilité historique.** Aucune importation dans le catalogue Python n’est livrée.
 
 ## Exemple fictif
 
@@ -80,14 +80,14 @@ Un nom peut changer ; la même clé reste le même projet. Deux clés de même n
 | `kind` | Surface exacte | Niveau interne | `url` |
 | --- | --- | --- | --- |
 | `direct-link` | Lien d’accueil projet avec nom propre sur le même contrôle | 2, direct | URL d’accueil observée |
-| `direct-control` | Bouton/treeitem portant `data-project-id` ou `data-project-key` concordants, nom propre ; actions secondaires exclues | 2, direct | `null` : la clé vient de l’attribut, pas d’une URL inventée |
+| `direct-control` | Contrôle natif `div[role="button"]` portant `data-app-action-sidebar-project-id` et `data-app-action-sidebar-project-label`, propriétaire et titre propre concordants ; ou bouton/treeitem aux attributs `data-project-id` / `data-project-key` précédents. Actions secondaires exclues | 2, direct | `null` : la clé vient de l’attribut, pas d’une URL inventée |
 | `project-page` | Accueil projet ouvert à URL valide, un seul H1 visible dans main ; jamais sur `/c/UUID` | 2, direct | URL d’accueil courante |
 | `expanded-group` | Propriétaire treeitem, bouton contenant ses liens, ou contrôle/groupe réciproquement reliés par aria ; aucun sous-projet concurrent ; clés de tous les enfants utilisables concordantes | 1, prudent | Une URL de fil enfant réellement observée portant cette clé |
 | `key-only` | Clé observée, sans nom prouvé ou avec preuve contradictoire | 0, inconnu | URL de fil/accueil portant la clé, ou `null` si attribut seul |
 
 Le niveau est calculé depuis `kind`, pas accepté comme une autorité externe ni exporté comme champ libre. `observedName: null` exige `key-only`. Les URL de preuve doivent porter la même clé. Contrôles aux attributs contradictoires, relation aria ambiguë (dont identifiants DOM dupliqués), groupe mixte ou section globale ne fournissent aucun nom. Les noms génériques de sections (`Projets`, `Chats`, etc.) sont exclus du fallback de groupe, même si un projet peut légitimement porter ce nom ; une preuve directe reste possible. Les noms d’action sont rejetés, sans découpage heuristique de préfixes.
 
-Les formes prises en charge sont vérifiées sur fixtures dans Chrome réel. Elles ne garantissent pas la forme actuelle de la sidebar d’un compte connecté. Le [rapport d’audit](../reports/MG-008a/audit-dom.md) distingue confiance logique et validation réelle encore **PARTIELLE**.
+MG-008b ajoute une forme **réellement observée dans la session Chrome authentifiée**, sans changer le contrat : contrôle marqué `data-app-action-sidebar-project-row`, propriétaire `data-sidebar-project-kind="local"` et `data-sidebar-project-container-id="project:CLÉ"`. Le nom déclaré doit concorder avec son titre propre rendu dans ce contrôle, relié par `aria-labelledby` ou l’emplacement sémantique `data-marquee-content`. Les mots génériques ou préfixes d’action sont alors conservés intégralement s’ils sont réellement le nom prouvé. Un propriétaire contradictoire, des enfants visibles de clés discordantes, des IDs de titre ambigus ou un désaccord nom/texte laissent le nom inconnu. Le H1 de page reste un fallback seulement si cette clé n’a pas de contrôle natif identifié. Voir l’[audit réel anonymisé](../reports/MG-008b/audit-dom-reel-anonymise.md) et le [bilan de validation](../reports/MG-008b/rapport.md).
 
 ## Validation, bornes et sécurité
 
