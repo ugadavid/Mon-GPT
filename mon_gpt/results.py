@@ -1,7 +1,8 @@
-"""Deux rendus, un seul widget et le contrat d'interactions de CatalogList.
+"""Trois rendus, un seul widget et le contrat d'interactions de CatalogList.
 
 Le mode Liste délègue intégralement au composant validé. Le mode Détaillée
-change seulement dessin et géométrie ; aucun accès au catalogue ou aux URL.
+change seulement dessin et géométrie ; Mosaïque délègue à son renderer.
+Aucun accès au catalogue ou aux URL.
 """
 from collections import OrderedDict
 import tkinter as tk
@@ -11,17 +12,23 @@ from .atelier import CatalogList, rounded, shorten
 from .identity import DEFAULTS
 from .identity_ui import contained_picture
 from .theme import COLORS as C
+from .mosaic import MosaicRenderer
 
 
-class ResultsView(CatalogList):
-    def __init__(self,parent,library,icons,view="list"):
+class ResultsView(MosaicRenderer,CatalogList):
+    def __init__(self,parent,library,icons,view="list",mosaic_size="normal"):
         self.view,self.library,self.icons=view,library,icons
+        self.mosaic_size=mosaic_size
         self.covers=OrderedDict()
         super().__init__(parent)
         self.detail_title_font=Font(self,font=("Segoe UI",11,"bold"))
+        self.bind("<Left>",lambda e:self.mosaic_navigate(-1,0) if self.view=="mosaic" else self.focus_action(False))
+        self.bind("<Right>",lambda e:self.mosaic_navigate(1,0) if self.view=="mosaic" else self.focus_action(True))
+        self.bind("<Configure>",self.mosaic_resize,add="+")
+        self.bind("<FocusOut>",lambda e:self.hide_tip() if self.view=="mosaic" else None,add="+")
 
     def set_view(self,view):
-        if view not in ("list","detail"): raise ValueError("Vue inconnue")
+        if view not in ("list","detail","mosaic"): raise ValueError("Vue inconnue")
         if self.view==view: return
         self.hide_tip()
         self.view=view
@@ -33,6 +40,10 @@ class ResultsView(CatalogList):
         if self.selected in self.rows: self.see(self.selected)
 
     def layout(self):
+        if self.view=="mosaic":
+            self.row_height,self.header_height=self.grid_layout().stride,0
+            self.secondary_order=[]
+            return {}
         if self.view=="list":
             self.row_height,self.header_height=42,34
             return super().layout()
@@ -44,6 +55,7 @@ class ResultsView(CatalogList):
         return {"#0":(10,image_width),"title":(self.text_x,max(30,width-self.text_x-42)),"open":(width-36,36)}
 
     def bbox(self,identity,column=None):
+        if self.view=="mosaic": return self.mosaic_bbox(identity,column)
         result=super().bbox(identity,column)
         if self.view=="detail" and result and column=="title":
             x,y,w,_=result
@@ -51,6 +63,7 @@ class ResultsView(CatalogList):
         return result
 
     def open_hit(self,identity,x,y):
+        if self.view=="mosaic": return self.mosaic_open_hit(identity,x,y)
         if self.view=="list": return super().open_hit(identity,x,y)
         if identity not in self.rows or "project" in self.rows[identity].get("tags",()): return False
         if self.identify_row(y)!=identity: return False
@@ -59,6 +72,12 @@ class ResultsView(CatalogList):
         return (bx<=x<=bx+self.detail_title_font.measure(title) and by<=y<by+26) or (self.winfo_width()-36<=x<self.winfo_width() and by<=y<by+28)
 
     def select_click(self,event):
+        if self.view=="mosaic":
+            self.hide_tip();self.focus_set()
+            identity=self.identify_at(event.x,event.y)
+            if identity:
+                self.focused=identity;self.selection_set(identity)
+            return
         if self.view=="list": return super().select_click(event)
         self.hide_tip();self.focus_set()
         identity=self.identify_row(event.y)
@@ -73,6 +92,7 @@ class ResultsView(CatalogList):
         return (0,1)
 
     def yview(self,*args):
+        if self.view=="mosaic": return self.mosaic_yview(*args)
         result=super().yview(*args)
         if args and self.view=="detail":
             x,y=self.winfo_pointerx()-self.winfo_rootx(),self.winfo_pointery()-self.winfo_rooty()
@@ -90,6 +110,7 @@ class ResultsView(CatalogList):
         return self.covers[key]
 
     def show_tip(self,identity,y):
+        if self.view=="mosaic": return self.mosaic_tip(identity,y)
         if self.view=="list": return super().show_tip(identity,y)
         self.tip_timer=None
         if identity not in self.rows: return
@@ -120,6 +141,7 @@ class ResultsView(CatalogList):
         return lines[:2]
 
     def draw(self):
+        if self.view=="mosaic": return self.draw_mosaic()
         if self.view=="list": return super().draw()
         self.delete_canvas();layout=self.layout()
         width,height=self.winfo_width(),self.winfo_height()
@@ -160,3 +182,37 @@ class ResultsView(CatalogList):
             self.create_text(width/2,min(height/2,160)+30,text="Changez de recherche, ou ajoutez un fil.",width=max(100,width-40),font=self.body_font,fill=C["muted"])
         if self.ycommand: self.ycommand(*self.yview())
         if self.xcommand: self.xcommand(0,1)
+
+    def identify_at(self,x,y):
+        return self.mosaic_identify(x,y) if self.view=="mosaic" else self.identify_row(y)
+
+    def identify_row(self,y):
+        if self.view=="mosaic": return self.mosaic_identify(self.winfo_pointerx()-self.winfo_rootx(),y)
+        return super().identify_row(y)
+
+    def motion(self,event):
+        if self.view!="mosaic": return super().motion(event)
+        self.hover(self.identify_at(event.x,event.y));self.hide_tip()
+        identity=self.identify_at(event.x,event.y)
+        if identity: self.tip_timer=self.after(600,lambda:self.show_tip(identity,event.y))
+
+    def navigate(self,step):
+        if self.view=="mosaic": return self.mosaic_navigate(0,step)
+        return super().navigate(step)
+
+    def see(self,identity):
+        if self.view=="mosaic": return self.mosaic_see(identity)
+        return super().see(identity)
+
+    def set_mosaic_size(self,size):
+        if size not in ("normal","large"): raise ValueError("Taille de cartes inconnue")
+        self.mosaic_size=size
+        if self.view=="mosaic":
+            self.hide_tip();self.top=0;self.draw()
+            if self.selected in self.rows: self.see(self.selected)
+            self.event_generate("<<MosaicLayout>>",when="tail")
+
+    def mosaic_resize(self,event):
+        if self.view=="mosaic":
+            if self.selected in self.rows: self.see(self.selected)
+            self.event_generate("<<MosaicLayout>>",when="tail")

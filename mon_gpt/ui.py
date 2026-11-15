@@ -39,6 +39,8 @@ class App(DetailEditor):
             preferences,warning={},ui_state.WARNING
         self.restoring_workspace=True
         self.view=tk.StringVar(value=preferences.get("view","list"))
+        self.mosaic_size=tk.StringVar(value=preferences.get("mosaic_size","normal"))
+        self.sort_caption="Tri · Titre ↑"
         apply_theme(root)
         self.icons = make_icons(root)
         self.project_icons=ProjectIconCache(root)
@@ -102,6 +104,7 @@ class App(DetailEditor):
         self.view_menu=view
         view.add_command(label="Liste", command=lambda:self.set_view("list"))
         view.add_command(label="Détaillée", command=lambda:self.set_view("detail"))
+        view.add_command(label="Mosaïque", command=lambda:self.set_view("mosaic"))
         self.update_view_menu()
         view.add_command(label="Afficher / masquer l'inspecteur", command=self.toggle_inspector)
         view.add_command(label="Rechercher", accelerator="Ctrl+K", command=self.focus_search)
@@ -112,7 +115,7 @@ class App(DetailEditor):
         bar.add_cascade(label="Affichage", menu=view)
         help_menu = tk.Menu(bar, tearoff=False)
         help_menu.add_command(label="Gestes et raccourcis", command=self.help)
-        help_menu.add_command(label="À propos de Mon GPT<3", command=lambda: messagebox.showinfo("Mon GPT<3", f"Version {__version__} · Atelier chaleureux\nCatalogue local, aucune modification dans ChatGPT.\nListe et Détaillée disponibles. Mosaïque : prévue, non livrée.", parent=self.root))
+        help_menu.add_command(label="À propos de Mon GPT<3", command=lambda: messagebox.showinfo("Mon GPT<3", f"Version {__version__} · Atelier chaleureux\nCatalogue local, aucune modification dans ChatGPT.\nListe, Détaillée et Mosaïque disponibles. Cartes Normal / Grand.", parent=self.root))
         bar.add_cascade(label="Aide", menu=help_menu)
         self.main_menu = MainMenuBar(self.root, [("Fichier", file), ("Édition", edit), ("Affichage", view), ("Aide", help_menu)])
         self.main_menu.pack(fill="x")
@@ -121,7 +124,7 @@ class App(DetailEditor):
         self.plus.add_command(label="Nouveau projet", accelerator="Ctrl+Maj+P", command=lambda: self.new("project"))
 
     def update_view_menu(self):
-        for index,(key,label) in enumerate((("list","Liste"),("detail","Détaillée"))):
+        for index,(key,label) in enumerate((("list","Liste"),("detail","Détaillée"),("mosaic","Mosaïque"))):
             self.view_menu.entryconfigure(index,label=label+(" · vue actuelle" if self.view.get()==key else ""))
 
     def update_view_buttons(self):
@@ -131,17 +134,59 @@ class App(DetailEditor):
         if hasattr(self,"detail_sort_button"):
             if self.view.get()=="detail": self.detail_sort_button.pack(side="right")
             else: self.detail_sort_button.pack_forget()
+        if hasattr(self,"mosaic_tools"): self.layout_view_controls()
 
-    def detail_sort_popup(self):
+    def layout_view_controls(self,event=None):
+        width=self.viewbar.winfo_width()
+        narrow=width<380
+        self.detail_sort_button.configure(text="Tri" if narrow else self.sort_caption,width=35 if narrow else 112)
+        if self.view.get()=="mosaic":
+            if width<530:
+                self.mosaic_tools.pack(side="bottom",fill="x",before=self.mode_buttons_frame,pady=(4,0))
+            else:
+                self.mosaic_tools.pack(side="right",before=self.mode_buttons_frame,pady=0)
+            self.mosaic_size_button.configure(text="Cartes · "+("Grand" if self.mosaic_size.get()=="large" else "Normal")+" ⌄")
+        else: self.mosaic_tools.pack_forget()
+
+    def mosaic_size_popup(self):
+        menu=skin_menu(tk.Menu(self.root,tearoff=False))
+        for value,label in (("normal","Normal"),("large","Grand")):
+            menu.add_command(label=label+(" · actuel" if self.mosaic_size.get()==value else ""),command=lambda v=value:self.set_mosaic_size(v))
+        self.active_menu=menu
+        button=self.mosaic_size_button
+        menu.tk_popup(button.winfo_rootx(),button.winfo_rooty()+button.winfo_height())
+
+    def set_mosaic_size(self,size):
+        if size not in ("normal","large"): return
+        self.mosaic_size.set(size);self.results.set_mosaic_size(size)
+        self.layout_view_controls()
+        self.position_mosaic_rename()
+
+    def position_mosaic_rename(self,event=None):
+        if self.view.get()!="mosaic" or self.inline is None or self.inline.master!=self.results: return
+        bbox=self.results.bbox(self.draft["id"],"title")
+        if bbox:
+            x,y,width,height=bbox
+            self.inline.place(x=x,y=y,width=max(40,width),height=28)
+        else: self.inline.place_forget()
+
+    def results_context_menu(self):
+        box=self.results.bbox(self.current) if self.current else None
+        if self.view.get()=="mosaic" and box:
+            x,y,width,height=box
+            return self.context_menu(self.current,self.results.winfo_rootx()+int(x+width/2),self.results.winfo_rooty()+int(max(0,y)+30))
+        return self.context_menu(self.current,self.results.winfo_rootx()+80,self.results.winfo_rooty()+80)
+
+    def detail_sort_popup(self,anchor=None):
         menu=skin_menu(tk.Menu(self.root,tearoff=False))
         for key,label in (("title","Titre"),("context","Emplacements"),("categories","Catégories"),("tags","Tags")):
             menu.add_command(label=label+(" ↓" if self.sort_reverse else " ↑") if key==self.sort_column else label,command=lambda k=key:self.sort_results(k))
         self.active_menu=menu
-        button=self.detail_sort_button
+        button=anchor or self.detail_sort_button
         menu.tk_popup(button.winfo_rootx(),button.winfo_rooty()+button.winfo_height())
 
     def set_view(self,view):
-        if view not in ("list","detail") or view==self.view.get(): return
+        if view not in ui_state.VIEWS or view==self.view.get(): return
         # Une bascule de présentation ne quitte pas une fiche en cours d’édition.
         self.clear_drop()
         self.drag=None
@@ -267,12 +312,20 @@ class App(DetailEditor):
         title_text.pack(side="left",expand=True,fill="x")
         self.viewbar=ttk.Frame(self.middle,padding=(9,0,6,5))
         self.viewbar.pack(fill="x")
+        self.mode_buttons_frame=ttk.Frame(self.viewbar)
+        self.mode_buttons_frame.pack(side="left")
         self.view_buttons={}
-        for key,label in (("list","Liste"),("detail","Détaillée")):
-            button=self.button(self.viewbar,text=label,command=lambda k=key:self.set_view(k),width=80 if key=="detail" else 63,height=28)
+        for key,label in (("list","Liste"),("detail","Détaillée"),("mosaic","Mosaïque")):
+            button=self.button(self.mode_buttons_frame,text=label,command=lambda k=key:self.set_view(k),width=63 if key=="list" else 80 if key=="detail" else 75,height=28)
             button.pack(side="left",padx=(0,4))
             self.view_buttons[key]=button
         self.detail_sort_button=self.button(self.viewbar,text="Tri · Titre ↑",command=self.detail_sort_popup,width=112,height=28)
+        self.mosaic_tools=ttk.Frame(self.viewbar)
+        self.mosaic_size_button=self.button(self.mosaic_tools,text="Cartes · Normal ⌄",command=self.mosaic_size_popup,width=136,height=28)
+        self.mosaic_size_button.pack(side="left")
+        self.mosaic_sort_button=self.button(self.mosaic_tools,text=self.sort_caption,command=lambda:self.detail_sort_popup(self.mosaic_sort_button),width=112,height=28)
+        self.mosaic_sort_button.pack(side="right",padx=(5,0))
+        self.viewbar.bind("<Configure>",self.layout_view_controls)
         self.update_view_buttons()
         self.work=ttk.Frame(self.middle,padding=12,style="Paper.TFrame")
         self.work_error=tk.StringVar()
@@ -282,7 +335,7 @@ class App(DetailEditor):
         self.work_error.trace_add("write",lambda *args:error_label.pack(anchor="w",pady=(6,0)) if self.work_error.get() else error_label.pack_forget())
         self.results_box=box=ttk.Frame(self.middle,padding=(3,3,3,8))
         box.pack(fill="both",expand=True)
-        self.results=ResultsView(box,self.store.images,self.project_icons,self.view.get())
+        self.results=ResultsView(box,self.store.images,self.project_icons,self.view.get(),self.mosaic_size.get())
         self.results.heading("#0",text="")
         self.results.column("#0",width=32,minwidth=32,stretch=False)
         for key,label,width in [("title","Titre local",310),("context","Projet / emplacements",150),("categories","Catégories",150),("tags","Tags",150)]:
@@ -296,6 +349,7 @@ class App(DetailEditor):
         self.horizontal_scroll.pack(fill="x",padx=10)
         self.results.configure(xscrollcommand=self.horizontal_scroll.set)
         self.results.bind("<<TreeviewSelect>>",self.select_record)
+        self.results.bind("<<MosaicLayout>>",self.position_mosaic_rename)
         self.results.bind("<Return>",self.result_enter)
         self.results.bind("<Double-Button-1>",self.result_double)
         self.results.bind("<Motion>",self.hover_result,add=True)
@@ -358,7 +412,7 @@ class App(DetailEditor):
         self.tree.bind("<Alt-Up>", lambda e: (self.reorder(-1), "break")[1])
         self.tree.bind("<Alt-Down>", lambda e: (self.reorder(1), "break")[1])
         self.tree.bind("<Menu>", lambda e: self.context_menu(self.scope, self.tree.winfo_rootx()+40, self.tree.winfo_rooty()+80))
-        self.results.bind("<Menu>", lambda e: self.context_menu(self.current, self.results.winfo_rootx()+80, self.results.winfo_rooty()+80))
+        self.results.bind("<Menu>", lambda e:self.results_context_menu())
 
     def open_data(self):
         self.safe(lambda: os.startfile(self.store.directory))
@@ -383,7 +437,7 @@ class App(DetailEditor):
         self.root.geometry(f"{width}x{height}")
 
     def help(self):
-        messagebox.showinfo("Gestes et raccourcis", "Titre ou icône ↗ : ouvrir le fil. Autre colonne : sélectionner.\nDouble-clic sur une ligne / Entrée dans la liste : ouvrir.\nCtrl+K : rechercher · Ctrl+N : nouveau fil\nCtrl+Maj+P : nouveau projet · F2 : renommer\nCtrl+S : enregistrer la fiche · Échap : annuler l'édition intégrée\nAlt+↑/↓ dans l'arbre : ordre manuel\nClic droit / touche Menu : actions de classement\nGlisser gauche : déplacer · Glisser droit : choix à la dépose\nLes autres rattachements sont préservés.\nFichier : sauvegarde/restauration du catalogue.", parent=self.root)
+        messagebox.showinfo("Gestes et raccourcis", "Titre ou ↗ : ouvrir le fil. Image en Détaillée/Mosaïque : sélectionner.\nDouble-clic sur un résultat / Entrée : ouvrir.\nMosaïque : flèches dans la grille, Entrée pour ouvrir.\nCtrl+K : rechercher · Ctrl+N : nouveau fil\nCtrl+Maj+P : nouveau projet · F2 : renommer\nCtrl+S : enregistrer la fiche · Échap : annuler l'édition intégrée\nAlt+↑/↓ dans l'arbre : ordre manuel\nClic droit / touche Menu : actions de classement\nGlisser gauche : déplacer · Glisser droit : choix à la dépose\nLes autres rattachements sont préservés.\nFichier : sauvegarde/restauration du catalogue.", parent=self.root)
 
     def focus_search(self):
         self.search_entry.focus_set()
@@ -553,7 +607,9 @@ class App(DetailEditor):
         self.sort_reverse = not self.sort_reverse if self.sort_column == column else False
         self.sort_column = column
         label={"title":"Titre","context":"Lieu","categories":"Catégories","tags":"Tags"}[column]
-        self.detail_sort_button.configure(text="Tri · "+label+(" ↓" if self.sort_reverse else " ↑"))
+        self.sort_caption="Tri · "+label+(" ↓" if self.sort_reverse else " ↑")
+        self.mosaic_sort_button.configure(text=self.sort_caption)
+        self.layout_view_controls()
         self.refresh_results()
 
     def select_record(self, event=None):
@@ -676,7 +732,7 @@ class App(DetailEditor):
         return "break"
 
     def result_double(self, event):
-        identity = self.results.identify_row(event.y)
+        identity = self.results.identify_at(event.x,event.y)
         if identity in self.cat.records:
             if self.cat.records[identity].kind == "item":
                 self.open_click(identity)
@@ -688,7 +744,7 @@ class App(DetailEditor):
         return "break"
 
     def hover_result(self, event):
-        identity = self.results.identify_row(event.y)
+        identity = self.results.identify_at(event.x,event.y)
         self.results.configure(cursor="hand2" if identity in self.cat.records and self.title_hit(event, identity) else "")
 
     def clear_work(self):
@@ -807,6 +863,8 @@ class App(DetailEditor):
             self.refresh_tree()
             self.refresh_results()
             self.select_identity(r.id, checked=True)
+            if self.view.get()=="mosaic" and self.inspector_visible and not self.editing:
+                self.show_summary(r.id,checked=True)
             if r.kind == "project":
                 self.tree.selection_set(r.id)
                 self.tree.see(r.id)
@@ -831,7 +889,10 @@ class App(DetailEditor):
             return
         x, y, width, height = bbox
         self.inline = ttk.Entry(widget)
-        self.inline.place(x=x+(24 if widget == self.tree else 0), y=y, width=max(140, width-24), height=height)
+        if widget==self.results and self.view.get()=="mosaic":
+            self.inline.place(x=x,y=y,width=max(40,width),height=28)
+        else:
+            self.inline.place(x=x+(24 if widget == self.tree else 0), y=y, width=max(140, width-24), height=height)
         self.inline.insert(0, self.cat.records[identity].title)
         self.inline.selection_range(0, "end")
         self.inline.focus_set()
@@ -993,7 +1054,7 @@ class App(DetailEditor):
         self.apply_transfer = apply
 
     def drag_press(self, event, widget, button):
-        identity = widget.identify_row(event.y)
+        identity = widget.identify_at(event.x,event.y) if widget==self.results else widget.identify_row(event.y)
         self.drag = {"id": identity, "widget": widget, "button": button, "x": event.x_root, "y": event.y_root, "active": False, "origin": self.scope, "double": False}
 
     def clear_drop(self):
@@ -1085,7 +1146,7 @@ class App(DetailEditor):
         try:
             selection=self.results.selection()
             ui_state.save(self.preferences_path, self.inspector_visible, f"{max(1000,self.root.winfo_width())}x{max(680,self.root.winfo_height())}", self.view.get(),
-                query=self.query.get(),tag=self.tag.get(),category=self.category.get(),scope=self.scope,
+                query=self.query.get(),tag=self.tag.get(),category=self.category.get(),scope=self.scope,mosaic_size=self.mosaic_size.get(),
                 selected=selection[0] if selection else None,
                 expanded_projects=[r.id for r in self.cat.records.values() if r.kind=="project" and self.tree.exists(r.id) and self.tree.item(r.id,"open")])
         except (OSError,ValueError) as exc:

@@ -56,7 +56,7 @@ class WorkspaceTests(unittest.TestCase):
         bad=[{'query':[]},{'query':'x'*4097},{'tag':False},{'category':None},{'scope':self.fils[0].id+'x'},
              {'selected':'https://chatgpt.com/c/fictif'},{'expanded_projects':'all'},
              {'expanded_projects':[self.parent.id]*2},{'expanded_projects':[self.parent.id]*4097},
-             {'expanded_projects':[False]},{'view':'mosaic'},{'version':True},{'geometry':[]},{'geometry':'99999x99999'}]
+             {'expanded_projects':[False]},{'view':'future'},{'version':True},{'geometry':[]},{'geometry':'99999x99999'}]
         for change in bad:
             with self.subTest(change=str(change)[:60]):
                 self.write(self.state(**change));data,warning=ui_state.load(self.path)

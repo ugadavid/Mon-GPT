@@ -139,7 +139,7 @@ class DetailedViewTests(unittest.TestCase):
         for view in ('list','detail'):
             ui_state.save(path,True,'1000x680',view)
             data,warning=ui_state.load(path);self.assertFalse(warning);self.assertEqual(data['view'],view)
-        data['view']='mosaic';path.write_text(json.dumps(data),encoding='utf-8')
+        data['view']='future';path.write_text(json.dumps(data),encoding='utf-8')
         self.assertEqual(ui_state.load(path)[0],{});self.assertTrue(ui_state.load(path)[1])
         self.assertEqual(encode(self.cat,self.adapter),before)
         ui_state.save(path,False,'1360x820','detail')

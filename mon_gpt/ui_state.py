@@ -3,16 +3,18 @@ import json
 import re
 from .storage import atomic_write
 
-VIEWS = ("list", "detail")
+VIEWS = ("list", "detail", "mosaic")
 MAX_BYTES = 256 * 1024
 IDENTITY = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\Z")
 WARNING = "Préférences d’affichage illisibles ; affichage par défaut, catalogue préservé."
-FIELDS = {"version", "view", "inspector", "geometry", "query", "tag", "category", "scope", "selected", "expanded_projects"}
+FIELDS = {"version", "view", "inspector", "geometry", "query", "tag", "category", "scope", "selected", "expanded_projects", "mosaic_size"}
 
 
 def validate(data):
     if not isinstance(data, dict) or set(data)-FIELDS or type(data.get("version")) is not int or data["version"] != 1 or data.get("view") not in VIEWS or type(data.get("inspector")) is not bool:
         raise ValueError("Préférences incompatibles")
+    if data.get("mosaic_size","normal") not in ("normal","large"):
+        raise ValueError("Taille de cartes invalide")
     geometry=data.get("geometry")
     if not isinstance(geometry,str) or not re.fullmatch(r"\d{3,5}x\d{3,5}",geometry) or not all(100<=int(n)<=20000 for n in geometry.split("x")):
         raise ValueError("Taille de fenêtre invalide")
@@ -43,8 +45,9 @@ def load(path):
         return {}, WARNING
 
 
-def save(path, inspector, geometry, view="list", *, query="", tag="", category="", scope="all", selected=None, expanded_projects=None):
+def save(path, inspector, geometry, view="list", *, query="", tag="", category="", scope="all", selected=None, expanded_projects=None, mosaic_size=None):
     data={"version":1,"view":view,"inspector":inspector,"geometry":geometry,
           "query":query,"tag":tag,"category":category,"scope":scope,"selected":selected}
     if expanded_projects is not None: data["expanded_projects"]=expanded_projects
+    if mosaic_size is not None: data["mosaic_size"]=mosaic_size
     atomic_write(path,validate(data))
