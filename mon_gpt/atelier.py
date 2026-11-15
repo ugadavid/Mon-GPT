@@ -535,7 +535,10 @@ class CatalogList(tk.Canvas):
             self.create_line(10,y+self.row_height-1,width-10,y+self.row_height-1,fill="#EEE9E0")
             vals=data.get("values",("",)*4)
             project="project" in data.get("tags",())
-            self.row_icon(17,cy,project,C["link"] if project else C["pine"])
+            if not project and data.get("visual") and data.get("image"):
+                self.create_image(17,cy,image=data["image"],tags=("effective_icon",identity))
+            else:
+                self.row_icon(17,cy,project,C["link"] if project else C["pine"])
             tx,tw=layout["title"]
             self.create_text(tx+6,cy,text=shorten(self.title_font,vals[0],tw-16),font=self.title_font,fill=C["ink"],anchor="w")
             for key in self.secondary_order:

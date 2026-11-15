@@ -33,8 +33,8 @@ ASSET = re.compile(r"asset:([0-9a-f]{64})\Z")
 
 
 def validate_visual(value, kind="project"):
-    if not isinstance(value, dict) or set(value)-set(DEFAULTS) or (kind!="project" and value):
-        raise ValueError("Repères visuels de projet invalides.")
+    if not isinstance(value, dict) or set(value)-set(DEFAULTS) or kind not in ("project","item"):
+        raise ValueError("Repères visuels invalides.")
     if any(not isinstance(v,str) for v in value.values()):
         raise ValueError("Repères visuels : identifiants texte attendus.")
     image=value.get("image",DEFAULTS["image"])
@@ -52,7 +52,7 @@ class VisualIdentity:
     color: str = "atelier"
 
 
-def resolve_identity(catalog, identity=None, scope=None):
+def inherited_identity(catalog, identity=None, scope=None):
     """Projet choisi ; sinon contexte direct du fil, puis son premier lien."""
     record=catalog.records.get(identity)
     project=None
@@ -65,6 +65,16 @@ def resolve_identity(catalog, identity=None, scope=None):
     return VisualIdentity(project.id,visual["image"],visual["icon"],visual["color"])
 
 
+def resolve_identity(catalog, identity=None, scope=None):
+    """Base héritée puis surcharges du fil, indépendantes et sans mutation."""
+    base=inherited_identity(catalog,identity,scope)
+    record=catalog.records.get(identity)
+    if not record or record.kind!="item": return base
+    visual=record.visual
+    return VisualIdentity(base.project,visual.get("image",base.image),
+                          visual.get("icon",base.icon),visual.get("color",base.color))
+
+
 def image_references(catalog):
     return {r.visual["image"] for r in catalog.records.values()
-            if r.kind=="project" and ASSET.fullmatch(r.visual.get("image",""))}
+            if ASSET.fullmatch(r.visual.get("image",""))}

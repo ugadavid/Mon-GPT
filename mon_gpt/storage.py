@@ -20,12 +20,12 @@ MAX_EXPANDED=200*1024*1024
 
 
 def encode(catalog, adapter):
-    return {"schema": 2, "records": catalog.to_list(), "chatgpt": adapter.to_list()}
+    return {"schema": 3, "records": catalog.to_list(), "chatgpt": adapter.to_list()}
 
 
 def decode(data):
     try:
-        if type(data) is not dict or set(data) != {"schema", "records", "chatgpt"} or type(data["schema"]) is not int or data["schema"] not in (1,2):
+        if type(data) is not dict or set(data) != {"schema", "records", "chatgpt"} or type(data["schema"]) is not int or data["schema"] not in (1,2,3):
             raise ValueError("Version de sauvegarde non prise en charge.")
         if not isinstance(data["records"], list) or not isinstance(data["chatgpt"], list):
             raise ValueError("Listes attendues.")
@@ -39,6 +39,8 @@ def decode(data):
         for r in rows:
             UUID(r.id)
             validate_visual(r.visual,r.kind)
+            if data["schema"]<3 and r.kind=="item" and r.visual:
+                raise ValueError("Personnalisation des fils réservée au schéma 3.")
             if r.kind not in ("project", "item") or not isinstance(r.title, str) or not r.title.strip():
                 raise ValueError("Fiche invalide.")
             if not all(isinstance(v, str) for v in (r.description, r.notes, r.created, r.modified)):
@@ -122,8 +124,8 @@ class Store:
         data=read_json(self.path)
         cat,adapter=decode(data)
         self.validate_images(cat)
-        if data["schema"]==1:
-            # Copie exacte avant la première écriture du format 2.
+        if data["schema"]<3:
+            # Copie exacte avant la première écriture du format 3.
             self.save(cat,adapter)
         return cat,adapter
 
@@ -150,11 +152,11 @@ class Store:
         self.validate_images(cat)
         if self.path.exists():
             old=read_json(self.path)
-            if not isinstance(old,dict) or type(old.get("schema")) is not int or old["schema"] not in (1,2):
+            if not isinstance(old,dict) or type(old.get("schema")) is not int or old["schema"] not in (1,2,3):
                 raise ValueError("Version du catalogue existant non prise en charge ; fichier conservé.")
-            if old["schema"]==1:
+            if old["schema"]<3:
                 decode(old)
-                backup=self.directory/("avant-migration-v1-"+datetime.now().strftime("%Y%m%d-%H%M%S-%f")+".json")
+                backup=self.directory/(f"avant-migration-v{old['schema']}-"+datetime.now().strftime("%Y%m%d-%H%M%S-%f")+".json")
                 shutil.copy2(self.path,backup)
         atomic_write(self.path, data)
 

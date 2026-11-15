@@ -72,7 +72,7 @@ class GestureTests(unittest.TestCase):
         self.app.commit_inline()
         created = next(r for r in self.cat.records.values() if r.title == "Sous-projet créé")
         self.assertEqual(created.parent, self.b.id)
-        self.assertEqual(encode(*self.store.load())["schema"], 2)
+        self.assertEqual(encode(*self.store.load())["schema"], 3)
 
     def test_item_inline_invalid_duplicate_and_cancel(self):
         before = encode(self.cat, self.adapter)
@@ -196,7 +196,7 @@ class GestureTests(unittest.TestCase):
     def test_schema_two_remains_strict_and_source_adapter_unchanged(self):
         self.store.save(self.cat, self.adapter)
         data = json.loads(self.store.path.read_text(encoding="utf-8"))
-        self.assertEqual(data["schema"], 2)
+        self.assertEqual(data["schema"], 3)
         self.assertNotIn("view", data)
         self.assertNotIn("cover", data["records"][0])
 
@@ -218,7 +218,7 @@ class GestureTests(unittest.TestCase):
             self.app.restore()
         self.assertEqual(len(self.app.cat.records), 4)
         self.assertFalse(self.app.inspector_visible)
-        self.assertEqual(encode(*self.store.load())["schema"], 2)
+        self.assertEqual(encode(*self.store.load())["schema"], 3)
         self.assertEqual(len(list(Path(self.temp.name).glob("avant-restauration-*.json"))), 1)
 
     def test_rename_and_manual_order_keyboard_bindings(self):

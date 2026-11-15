@@ -1,0 +1,9 @@
+Recette de stockage MG-006 — catalogue fictif Windows.
+Migration v2 : copie préalable exacte, 31 fiches et toutes données préservées.
+Migration v1 : copie préalable exacte, anciens URL et rattachements conservés.
+Ancien ZIP v2 avec images de projets : restauration neuve réussie.
+PNG/JPEG/WebP importés par UI : originaux renommés, catalogue et images toujours lisibles.
+ZIP v3 : restauration neuve identique, surcharges partielles et images référencées conservées.
+Comparaison finale hors visual des fils et dates modified : identique au catalogue initial.
+Journal après les relances réelles : toujours 2 ouvertures explicites ; zéro ouverture automatique.
+Catalogue restauré réellement lancé : images et commandes visibles, aucun journal d’ouverture créé.

@@ -10,6 +10,7 @@ from .inspector import InspectorAction
 from .theme import COLORS
 from .chatgpt import parse_url
 from .identity_ui import ProjectVisualFields
+from .identity import inherited_identity, DEFAULTS
 
 
 def confirm_delete(parent,message):
@@ -161,9 +162,11 @@ class DetailEditor:
             wrapped.append(error)
         self.pickers = {}
         field("title", "Titre", r.title)
-        if r.kind=="project":
-            self.project_visual=ProjectVisualFields(form,self,r.visual)
-            self.project_visual.pack(fill="x",pady=(9,0))
+        base=inherited_identity(self.cat,r.id,self.scope)
+        inherited={"image":base.image or DEFAULTS["image"],"icon":base.icon,"color":base.color} if r.kind=="item" else None
+        origin=self.cat.records[base.project].title if base.project else None
+        self.project_visual=ProjectVisualFields(form,self,r.visual,inherited=inherited,origin=origin)
+        self.project_visual.pack(fill="x",pady=(9,0))
         if r.kind == "item":
             field("url", "Lien", self.adapter.conversations[r.id].url)
         field("description", "Description" if r.kind == "project" else "Résumé", r.description, 2)
@@ -257,12 +260,15 @@ class DetailEditor:
             def mutate():
                 if r.kind == "item":
                     self.adapter.change_url(r.id, values["url"])
-                    self.cat.attach(r.id, [self.project_ids[i] for i in self.locations.curselection()])
+                    chosen=[self.project_ids[i] for i in self.locations.curselection()]
+                    # Garder le premier rattachement stable lors d’une simple édition.
+                    ordered=[pid for pid in r.projects if pid in chosen]+[pid for pid in chosen if pid not in r.projects]
+                    self.cat.attach(r.id,ordered)
                 else:
                     parent = self.parent_ids[self.parent_box.current()]
                     if parent != r.parent:
                         self.cat.move(r.id, parent)
-                    r.visual=self.project_visual.get()
+                r.visual=self.project_visual.get()
                 for key in ("title", "description", "notes"):
                     setattr(r, key, values[key])
                 for key in ("tags", "categories"):

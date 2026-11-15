@@ -14,7 +14,7 @@ from .atelier import Masthead, Surface, PillButton, CatalogList, AutoScrollbar, 
 from .main_menu import MainMenuBar
 from .inspector import InspectorSummary, InspectorScrollbar
 from .navigation import NavigationTree, NavigationScrollbar, navigation_icons
-from .identity import resolve_identity
+from .identity import resolve_identity, inherited_identity, DEFAULTS
 from .identity_ui import ContextMasthead, ProjectVisualStrip
 from .project_icons import ProjectIconCache
 from .results import ResultsView
@@ -587,7 +587,8 @@ class App(DetailEditor):
         rows.sort(key=lambda r: fold(values(r)[self.sort_column]), reverse=self.sort_reverse)
         for r in rows:
             v = values(r)
-            self.results.insert("", "end", iid=r.id, image=self.icons[r.kind], tags=(r.kind,), categories=r.categories, labels=r.tags, summary=r.description, visual=resolve_identity(self.cat,r.id,self.scope), values=(r.title, v["context"], v["tags"], datetime.fromisoformat(r.modified).strftime("%d/%m/%Y")))
+            visual=resolve_identity(self.cat,r.id,self.scope)
+            self.results.insert("", "end", iid=r.id, image=self.project_icons.get(visual.icon,visual.color,20) if r.kind=="item" else self.icons[r.kind], tags=(r.kind,), categories=r.categories, labels=r.tags, summary=r.description, visual=visual, values=(r.title, v["context"], v["tags"], datetime.fromisoformat(r.modified).strftime("%d/%m/%Y")))
         if selected and self.results.exists(selected):
             self.results.selection_set(selected)
             self.results.focus(selected)
@@ -661,10 +662,15 @@ class App(DetailEditor):
         self.summary=InspectorSummary(self.editor,self.cat.records.get(identity),self.project_label,
             self.toggle_inspector,lambda:self.open_thread(identity),lambda:self.copy_link(identity),lambda:self.show_record(identity))
         record=self.cat.records.get(identity)
-        if record and record.kind=="project":
+        if record:
             edit=self.summary.actions["edit"]
-            self.summary.visual_strip=ProjectVisualStrip(edit.master,self.store.images,record.visual)
-            self.summary.visual_strip.pack(side="left",before=edit,padx=(0,5))
+            base=inherited_identity(self.cat,record.id,self.scope)
+            inherited={"image":base.image or DEFAULTS["image"],"icon":base.icon,"color":base.color} if record.kind=="item" else None
+            origin=self.cat.records[base.project].title if base.project else None
+            parent=edit.master if record.kind=="project" else self.summary
+            self.summary.visual_strip=ProjectVisualStrip(parent,self.store.images,record.visual,inherited=inherited,origin=origin)
+            if record.kind=="project": self.summary.visual_strip.pack(side="left",before=edit,padx=(0,5))
+            else: self.summary.visual_strip.pack(anchor="w",before=edit.master,pady=(0,5))
         self.summary.pack(fill="x")
         self.canvas.yview_moveto(0)
 

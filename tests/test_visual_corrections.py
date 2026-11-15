@@ -99,7 +99,8 @@ class VisualCorrectionsTests(unittest.TestCase):
         self.assertFalse(self.app.editing)
         self.assertIsNone(getattr(self.app,'visual_layer',None))
         self.app.show_summary(self.item.id);self.root.update()
-        self.assertFalse(hasattr(self.app.summary,'visual_strip'))
+        self.assertTrue(hasattr(self.app.summary,'visual_strip'))
+        self.assertIsNone(self.app.summary.visual_strip.choose)
 
     def test_round_swatches_names_keyboard_focus_and_grid_of_icons(self):
         self.app.show_record(self.a.id);self.root.update()

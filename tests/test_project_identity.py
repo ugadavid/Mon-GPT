@@ -53,7 +53,7 @@ class IdentityDataTests(unittest.TestCase):
         before=encode(self.cat,self.adapter)
         actual=encode(*self.store.load())
         self.assertEqual(actual,before)
-        self.assertEqual(json.loads(self.store.path.read_bytes())['schema'],2)
+        self.assertEqual(json.loads(self.store.path.read_bytes())['schema'],3)
         backups=list(self.store.directory.glob('avant-migration-v1-*.json'))
         self.assertEqual(len(backups),1);self.assertEqual(backups[0].read_bytes(),raw)
         self.store.load()
@@ -91,6 +91,7 @@ class IdentityDataTests(unittest.TestCase):
             data=encode(self.cat,self.adapter)
             row=next(r for r in data['records'] if r['kind']==kind)
             row['visual']={key:value}
+            data['schema']=2  # L’ancien format reste strict, même après l’ajout du schéma 3.
             with self.subTest(kind=kind,key=key),self.assertRaises(ValueError): decode(data)
         data=encode(self.cat,self.adapter);data['records'][0]['visual']={'x':'y'}
         with self.assertRaises(ValueError): decode(data)
@@ -280,7 +281,7 @@ class IdentityUITests(unittest.TestCase):
         self.app.select_identity(self.item.id);self.root.update()
         self.assertEqual(self.app.masthead.identity.project,self.project.id)
         self.app.show_record(self.item.id);self.root.update()
-        self.assertIsNone(self.app.project_visual)
+        self.assertEqual(self.app.project_visual.get(),{})
         self.assertNotIn('image',self.app.fields)
         self.app.select_identity(None);self.root.update()
         self.assertIsNone(self.app.masthead.identity.image)

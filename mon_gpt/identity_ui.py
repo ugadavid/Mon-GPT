@@ -1,4 +1,4 @@
-"""Trois sélecteurs de projet et illustration contextuelle, sans règle métier."""
+"""Trois sélecteurs partagés et illustration contextuelle, sans règle métier."""
 import tkinter as tk
 from tkinter import ttk, filedialog
 from PIL import Image, ImageDraw, ImageOps, ImageTk
@@ -73,7 +73,7 @@ class ContextMasthead(Masthead):
                 return
         x,y,_,_=self.cover_box
         self.create_image(x,y,image=self.photo,anchor="nw",tags="context_cover")
-        if visual and visual.project and free_width-w>=28:
+        if visual and (visual.project or visual.icon!="folder" or visual.color!="atelier") and free_width-w>=28:
             self.badge=ImageTk.PhotoImage(icon_picture(visual.icon,PALETTE[visual.color][1],20),master=self)
             self.create_image(x-17,height/2,image=self.badge,tags="context_badge")
 
@@ -133,10 +133,13 @@ class IdentityControl(tk.Canvas):
 
 
 class ProjectVisualStrip(ttk.Frame):
-    def __init__(self,parent,library,value,choose=None):
+    def __init__(self,parent,library,value,choose=None,*,inherited=None,origin=None):
         super().__init__(parent,style="Paper.TFrame")
         self.library,self.choose=library,choose
-        self.value={**DEFAULTS,**value}
+        self.inherited=inherited
+        self.origin=origin
+        self.overrides=dict(value)
+        self.value={**DEFAULTS,**(inherited or {}),**value}
         self.buttons={}
         for kind in ("image","icon","color"):
             button=IdentityControl(self,kind,(lambda k=kind:choose(k)) if choose else None)
@@ -147,7 +150,8 @@ class ProjectVisualStrip(ttk.Frame):
 
     def control_name(self,kind):
         label={"image":"Image","icon":"Icône","color":"Couleur"}[kind]
-        return f"{label} · {choice_name(kind,self.value[kind])}"+(" — choisir" if self.choose else "")
+        status="" if self.inherited is None else (" · Personnalisée" if kind in self.overrides else " · Héritée "+(f"de « {self.origin} »" if self.origin else "du défaut"))
+        return f"{label} · {choice_name(kind,self.value[kind])}"+status+(" — choisir" if self.choose else "")
 
     def refresh(self):
         for kind,value in self.value.items():
@@ -160,11 +164,22 @@ class ProjectVisualStrip(ttk.Frame):
 
 
 class ProjectVisualFields(ProjectVisualStrip):
-    def __init__(self,parent,app,value):
+    def __init__(self,parent,app,value,*,inherited=None,origin=None):
         self.app=app
-        super().__init__(parent,app.store.images,value,self.open)
+        super().__init__(parent,app.store.images,value,self.open,inherited=inherited,origin=origin)
 
-    def get(self): return dict(self.value)
+    def get(self): return dict(self.overrides if self.inherited is not None else self.value)
+
+    def set_choice(self,kind,value):
+        previous=self.get()
+        if value is None and self.inherited is not None:
+            self.overrides.pop(kind,None)
+            self.value[kind]=self.inherited[kind]
+        else:
+            self.overrides[kind]=value
+            self.value[kind]=value
+        if self.get()!=previous: self.app.dirty=True
+        self.refresh()
 
     def open(self,kind):
         if getattr(self.app,"visual_layer",None): self.app.visual_layer.cancel()
@@ -195,6 +210,7 @@ class ChoiceTile(tk.Canvas):
     def choose(self):
         self.focus_set()
         self.layer.selected=self.value
+        self.layer.inheriting=False
         self.layer.refresh()
         return "break"
 
@@ -247,16 +263,20 @@ class VisualLayer(ttk.Frame):
         super().__init__(app.canvas,style="Paper.TFrame",padding=12)
         self.app,self.fields,self.kind=app,fields,kind
         self.selected=fields.value[kind]
+        self.inheriting=fields.inherited is not None and kind not in fields.overrides
         self.columns=2 if kind=="image" else 4
         self.place(x=0,y=0,relwidth=1,relheight=1)
         self.lift()
         header=ttk.Frame(self,style="Paper.TFrame")
         header.pack(fill="x",pady=(0,8))
-        ttk.Label(header,text={"image":"Une image pour ce projet","icon":"Un repère au trait","color":"La couleur du projet"}[kind],style="Paper.TLabel",foreground=C["pine"],font=("Segoe UI",11,"bold"),wraplength=220).pack(side="left")
+        ttk.Label(header,text={"image":"Une image pour ce fil" if fields.inherited is not None else "Une image pour ce projet","icon":"Un repère au trait","color":"La couleur du fil" if fields.inherited is not None else "La couleur du projet"}[kind],style="Paper.TLabel",foreground=C["pine"],font=("Segoe UI",11,"bold"),wraplength=220).pack(side="left")
         small_button(app,header,"×",self.cancel,28).pack(side="right")
         footer=ttk.Frame(self,style="Paper.TFrame")
         footer.pack(side="bottom",fill="x",pady=(8,0))
-        small_button(app,footer,"Par défaut",self.defaults,85).pack(side="left")
+        if fields.inherited is not None:
+            small_button(app,footer,"Revenir à l’héritage",self.defaults,165).pack(anchor="w",pady=(0,5))
+        else:
+            small_button(app,footer,"Par défaut",self.defaults,85).pack(side="left")
         small_button(app,footer,"Utiliser",self.accept,69).pack(side="right")
         small_button(app,footer,"Annuler",self.cancel,69).pack(side="right",padx=4)
         self.error=ttk.Label(self,text="",background="#F7E6DF",foreground="#8C4F38",font=("Segoe UI",9),wraplength=270,justify="left")
@@ -316,7 +336,8 @@ class VisualLayer(ttk.Frame):
             image=swatch_picture(PALETTE[self.selected][1],30)
         self.photo=ImageTk.PhotoImage(image,master=self)
         self.preview.configure(image=self.photo)
-        self.name.configure(text=choice_name(self.kind,self.selected))
+        status="" if self.fields.inherited is None else (" · Héritée" if self.inheriting else " · Personnalisée")
+        self.name.configure(text=choice_name(self.kind,self.selected)+status)
         for tile in self.tiles: tile.draw()
 
     def layout_icons(self,event):
@@ -328,7 +349,8 @@ class VisualLayer(ttk.Frame):
         for index,tile in enumerate(self.tiles): tile.grid(row=index//columns,column=index%columns)
 
     def defaults(self):
-        self.selected=DEFAULTS[self.kind]
+        self.inheriting=self.fields.inherited is not None
+        self.selected=self.fields.inherited[self.kind] if self.inheriting else DEFAULTS[self.kind]
         self.refresh()
 
     def import_image(self):
@@ -337,6 +359,7 @@ class VisualLayer(ttk.Frame):
         try:
             reference=self.app.store.images.import_file(path)
             self.selected=reference
+            self.inheriting=False
             self.error.configure(text="")
             self.error.pack_forget()
             self.refresh()
@@ -346,10 +369,7 @@ class VisualLayer(ttk.Frame):
             self.error.pack(side="bottom",fill="x",before=self.body,pady=(4,0))
 
     def accept(self):
-        if self.selected!=self.fields.value[self.kind]:
-            self.fields.value[self.kind]=self.selected
-            self.app.dirty=True
-            self.fields.refresh()
+        self.fields.set_choice(self.kind,None if self.inheriting else self.selected)
         self.cancel()
 
     def cancel(self):
