@@ -1,0 +1,17 @@
+OK · Extension MV3 installée et activée dans Chrome/157.0.8103.52
+OK · Manuel : aucune collecte avant clic, état vide et actions d’export désactivées
+OK · Scan réel : 15 nouvelles, URL globale/projet fusionnées, titre inconnu, faux domaine et contenu exclus
+OK · Second scan : 0 nouvelle / 15 connues ; Tab/Entrée et copie effective des URLs
+OK · Téléchargements JSON/TXT réels relus : contrat v2, 15 UUID, une URL observée par ligne, projet sans nom honnête
+OK · Confirmation de vidage affichée ; Échap annule sans modification
+OK · Échec de stockage injecté dans le profil fictif : erreur visible, aucune perte, nouvelle tentative réussie
+OK · Auto cible : uniquement URL courante ; mutation de titre et route SPA détectées sans double comptage
+OK · Auto large : sidebar rendue, nouvelle mutation, liste scrollable jusqu’au dernier élément
+OK · Autre onglet/domaine : scan désactivé, exports disponibles, collecte suspendue
+OK · Désactivation/réactivation par Chrome : mode et 16 observations conservés, sans permission management dans l’extension
+OK · Redémarrage réel de Chrome et rechargement CDP : même ID, mode Manuel et 16 observations conservés
+OK · Vidage confirmé dans la vraie popup : seules les observations fictives sont retirées, mode conservé
+OK · Projets : deux Développement distincts par clé, preuve directe et groupe explicite, trois noms connus / un inconnu, aucun message ni lien caché collecté
+OK · Renommages en Auto large : même clé, aucune duplication ; groupe replié sans fausse mise à jour, enrichissement après réouverture manuelle
+OK · Accueil projet : nom depuis H1 sur URL projet ; Auto cible conserve seulement ce projet, export JSON actif même sans conversation
+PARTIEL : site ChatGPT réel chargé dans le profil neuf, 0 lien(s) de discussion observables ; aucun compte personnel utilisé.

@@ -43,7 +43,7 @@ test('Titre fidèle : null reste inconnu, aria prioritaire, titre récent et cha
 test('Contrat JSON déterministe, whitelist, TXT = URL observée par ligne', () => {
   const state = Core.merge(Core.empty('chatgpt'), [link(ID2, { title: null }), link()], T1, { normalize: Adapter.normalize });
   const data = Adapter.exportJson(state, T2);
-  assert.equal(data.source, 'mon-gpt-collector'); assert.equal(data.schemaVersion, 1); assert.equal(data.conversations[0].conversationId, ID);
+  assert.equal(data.source, 'mon-gpt-collector'); assert.equal(data.schemaVersion, 2); assert.deepEqual(data.projects, []); assert.equal(data.conversations[0].conversationId, ID);
   assert.equal(data.conversations[1].observedTitle, null);
   assert.deepEqual(Object.keys(data.conversations[0]), ['conversationId', 'url', 'observedTitle', 'firstSeenAt', 'lastSeenAt', 'seenCount', 'observedUrls', 'observedProjectKeys', 'lastObservedActive']);
   assert.equal(JSON.stringify(Adapter.exportJson(state, T2)), JSON.stringify(data));
@@ -93,8 +93,8 @@ function memory() {
 }
 test('Pont : écritures de plusieurs onglets sérialisées, requête répétée idempotente', async () => {
   const storage = memory(), repository = createRepository(storage, { source: 'chatgpt', normalize: Adapter.normalize, now: () => T1 });
-  await Promise.all([repository.ingest([link()], 'onglet-A', 'manual'), repository.ingest([link(ID2)], 'onglet-B', 'manual')]);
-  await repository.ingest([link()], 'onglet-A', 'manual');
+  await Promise.all([repository.ingest({ observations: [link()], entities: [] }, 'onglet-A', 'manual'), repository.ingest({ observations: [link(ID2)], entities: [] }, 'onglet-B', 'manual')]);
+  await repository.ingest({ observations: [link()], entities: [] }, 'onglet-A', 'manual');
   const { state } = await repository.get(); assert.equal(Object.keys(state.records).length, 2); assert.equal(state.records[ID].seenCount, 1);
   assert.deepEqual(Object.keys(storage.snapshot()), [KEY]);
 });
@@ -103,9 +103,9 @@ test('Pont : modes persistants, échec visible, reprise et vidage limité à la 
   const repository = createRepository(storage, { source: 'chatgpt', normalize: Adapter.normalize, now: () => T1 });
   assert.equal((await repository.get()).state.mode, 'targeted'); await repository.setMode('manual');
   assert.equal((await createRepository(storage, { source: 'chatgpt', normalize: Adapter.normalize }).get()).state.mode, 'manual');
-  storage.fail(true); await assert.rejects(repository.ingest([link()], 'fail', 'manual'), /Quota/); storage.fail(false);
+  storage.fail(true); await assert.rejects(repository.ingest({ observations: [link()], entities: [] }, 'fail', 'manual'), /Quota/); storage.fail(false);
   assert.match((await repository.get()).error, /Quota/); assert.equal(Object.keys((await repository.get()).state.records).length, 0);
-  await repository.ingest([link()], 'retry', 'manual'); await repository.clear();
+  await repository.ingest({ observations: [link()], entities: [] }, 'retry', 'manual'); await repository.clear();
   assert.equal((await repository.get()).state.mode, 'manual'); assert.deepEqual(storage.snapshot().autreExtension, { intact: true });
   assert.equal(Object.keys((await repository.get()).state.records).length, 0);
 });

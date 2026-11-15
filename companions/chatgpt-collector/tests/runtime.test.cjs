@@ -8,9 +8,9 @@ function harness() {
   const win = { location: { href: 'https://example.test/a' }, setTimeout: fn => { timers.set(++id, fn); return id; }, clearTimeout: n => timers.delete(n),
     setInterval: fn => { intervals.set(++id, fn); return id; }, clearInterval: n => intervals.delete(n),
     MutationObserver: class { constructor(callback) { this.callback = callback; this.active = false; observers.push(this); } observe() { this.active = true; } disconnect() { this.active = false; } } };
-  let observations = [{ source: 'fictif', identity: 'A', url: 'https://example.test/a', title: 'A' }, { source: 'fictif', identity: 'B', url: 'https://example.test/b', title: 'B' }];
+  let entities = [], observations = [{ source: 'fictif', identity: 'A', url: 'https://example.test/a', title: 'A' }, { source: 'fictif', identity: 'B', url: 'https://example.test/b', title: 'B' }];
   const adapter = { roots: () => [target], relevantMutation: m => m.useful,
-    scan: (_, window, mode) => mode === 'targeted' ? observations.filter(o => o.url === window.location.href) : observations };
+    scanBatch: (_, window, mode) => ({ observations: mode === 'targeted' ? observations.filter(o => o.url === window.location.href) : observations, entities }) };
   const runtime = createRuntime({ win, doc: {}, adapter, uuid: () => 'scan-' + (++id), send: async message => {
     calls.push(message); if (failed) throw Error('Quota fictif');
     return { summary: { detectedCount: new Set(message.observations.map(o => o.identity)).size } };
@@ -19,7 +19,7 @@ function harness() {
     const pending = [...timers]; timers.clear(); for (const [, fn] of pending) fn();
     await new Promise(resolve => setImmediate(resolve));
   }
-  return { runtime, win, timers, intervals, observers, calls, flush, fail: v => { failed = v; }, observations: v => { observations = v; } };
+  return { runtime, win, timers, intervals, observers, calls, flush, fail: v => { failed = v; }, observations: v => { observations = v; }, entities: v => { entities = v; } };
 }
 test('Manuel : aucun timer, observer ou scan initial ; double événement partagé', async () => {
   const h = harness(); h.runtime.applyMode('manual');
@@ -50,4 +50,12 @@ test('Échec visible, pending conservé, relance manuelle et suspension complèt
   h.runtime.applyMode('manual'); assert.equal(h.runtime.status().pendingCount, 2);
   h.fail(false); await h.runtime.manual(); assert.equal(h.runtime.status().pendingCount, 0); assert.equal(h.runtime.status().error, '');
   h.runtime.dispose(); await assert.rejects(h.runtime.manual(), /suspendue/);
+});
+test('Projet renommé sans mutation de fil : nouveau lot atomique, attente préservée après erreur', async () => {
+  const h = harness(); const entity = { source: 'fictif', identity: 'p-a', name: 'Développement', confidence: 2, evidence: { kind: 'direct-control', url: null } };
+  h.entities([entity]); h.fail(true); h.runtime.applyMode('broad'); await h.flush();
+  assert.equal(h.runtime.status().pendingEntityCount, 1); assert.equal(h.calls[0].observations.length, 2); assert.equal(h.calls[0].entities.length, 1);
+  h.fail(false); await h.flush(); assert.equal(h.runtime.status().pendingEntityCount, 0);
+  h.entities([{ ...entity, name: 'Atelier renommé' }]); h.observers.at(-1).callback([{ useful: true }]); await h.flush();
+  assert.deepEqual(h.calls.at(-1).observations, []); assert.equal(h.calls.at(-1).entities[0].name, 'Atelier renommé');
 });

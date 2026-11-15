@@ -8,11 +8,13 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 const ROOT = path.resolve(__dirname, '..');
-const REPORT = path.resolve(ROOT, '../../reports/MG-008');
+const REPORT = path.resolve(ROOT, '../../reports/MG-008a');
 const WORK = path.join(ROOT, '.recette');
 const PROFILE = path.join(WORK, 'chrome-' + Date.now());
 const ID = '00000000-0000-4000-8000-000000000801';
-const KEY = 'monGptCollectorStateV1';
+const KEY = 'monGptCollectorStateV2';
+const A = 'g-p-11111111111111111111111111111111', B = 'g-p-22222222222222222222222222222222', C = 'g-p-33333333333333333333333333333333', D = 'g-p-44444444444444444444444444444444';
+const PACKAGED = JSON.parse(execFileSync('python', ['tools/package_collector.py'], { cwd: path.resolve(ROOT, '../..'), encoding: 'utf8' })).folder;
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const checkpoints = process.argv.includes('--hold');
 let browser, worker, popup, extensionId, page;
@@ -39,11 +41,13 @@ async function chooseMode(mode) {
   await popup.waitForFunction(value => document.querySelector(`input[value="${value}"]`).checked && !document.querySelector(`input[value="${value}"]`).disabled, {}, mode);
 }
 async function checkpoint(stage) {
-  console.log('POPUP_HEIGHT', stage, await popup.evaluate(() => ({ body: document.body.scrollHeight, viewport: document.documentElement.clientHeight })));
+  const size = await popup.evaluate(() => ({ body: document.body.scrollHeight, viewport: document.documentElement.clientHeight }));
+  console.log('POPUP_HEIGHT', stage, size); assert.ok(size.body <= 600, 'Popup entièrement utilisable sous le plafond Chrome');
   await popup.screenshot({ path: path.join(WORK, stage + '-renderer.png') });
-  if (!checkpoints) return;
+  if (!checkpoints || !stage.includes('projets-')) return;
+  if (process.env.COLLECTOR_CAPTURE_STAGE && process.env.COLLECTOR_CAPTURE_STAGE !== stage) return;
   const continuation = 'continue-' + path.basename(PROFILE) + '-' + stage;
-  await fs.writeFile(path.join(WORK, 'stage.json'), JSON.stringify({ stage, continuation, extensionId, fixtureTitle: 'Recette fictive MG-008' }));
+  await fs.writeFile(path.join(WORK, 'stage.json'), JSON.stringify({ stage, continuation, extensionId, fixtureTitle: 'Recette fictive MG-008a' }));
   console.log('CAPTURE_NATIVE · ' + stage);
   await until(async () => { try { await fs.access(path.join(WORK, continuation)); return true; } catch { return false; } }, 'capture native ' + stage, 20 * 60 * 1000);
 }
@@ -52,16 +56,16 @@ async function launch(install = false) {
     pipe: true, enableExtensions: true, protocolTimeout: 30000, userDataDir: PROFILE, defaultViewport: null, args: ['--window-size=1360,850'] });
   // Le chargement de test CDP est propre au processus Chrome : même chemin,
   // même ID et même stockage, rechargés explicitement après redémarrage.
-  const loadedId = await browser.installExtension(ROOT);
+  const loadedId = await browser.installExtension(PACKAGED);
   if (install) extensionId = loadedId;
   else assert.equal(loadedId, extensionId);
   const target = await browser.waitForTarget(t => t.type() === 'service_worker' && t.url().endsWith('/browser/background.js'));
   worker = await target.worker();
 }
-async function fixture(url = 'https://chatgpt.com/') {
+async function fixture(url = 'https://chatgpt.com/', filename = 'sidebar.html') {
   const p = await browser.newPage(); const requests = [];
   await p.setRequestInterception(true);
-  const html = await fs.readFile(path.join(__dirname, 'fixtures/sidebar.html'), 'utf8');
+  const html = await fs.readFile(path.join(__dirname, 'fixtures', filename), 'utf8');
   p.on('request', request => {
     requests.push(request.url());
     if (request.isNavigationRequest() && request.frame() === p.mainFrame()) request.respond({ status: 200, contentType: 'text/html; charset=utf-8', body: html });
@@ -113,9 +117,10 @@ async function fixture(url = 'https://chatgpt.com/') {
   await popup.click('#jsonButton'); await popup.click('#txtButton');
   await until(async () => { try { await fs.access(path.join(downloads, 'mon-gpt-observations.json')); await fs.access(path.join(downloads, 'mon-gpt-urls.txt')); return true; } catch { return false; } }, 'exports');
   const exported = JSON.parse(await fs.readFile(path.join(downloads, 'mon-gpt-observations.json'), 'utf8'));
-  assert.equal(exported.schemaVersion, 1); assert.equal(exported.conversations.length, 15);
+  assert.equal(exported.schemaVersion, 2); assert.equal(exported.conversations.length, 15);
+  assert.equal(exported.projects.length, 1); assert.equal(exported.projects[0].observedName, null);
   assert.ok((await fs.readFile(path.join(downloads, 'mon-gpt-urls.txt'), 'utf8')).trim() === expected);
-  pass('Téléchargements JSON/TXT réels relus : contrat v1, 15 UUID, une URL observée par ligne');
+  pass('Téléchargements JSON/TXT réels relus : contrat v2, 15 UUID, une URL observée par ligne, projet sans nom honnête');
   await popup.click('#clearButton'); assert.ok(await popup.$eval('#clearDialog', e => e.open));
   await popup.keyboard.press('Escape'); assert.equal(await popup.$eval('#clearDialog', e => e.open), false);
   assert.equal(Object.keys((await state()).records).length, 15);
@@ -178,6 +183,51 @@ async function fixture(url = 'https://chatgpt.com/') {
   assert.equal((await state()).mode, 'manual');
   pass('Vidage confirmé dans la vraie popup : seules les observations fictives sont retirées, mode conservé');
   await popup.close();
+  for (const tab of await browser.pages()) if (tab !== page) await tab.close();
+  const projectsFixture = await fixture('https://chatgpt.com/', 'projects.html'); await page.close(); page = projectsFixture.page;
+  await sleep(600); assert.equal(Object.keys((await state()).entities).length, 0);
+  const projectDomBefore = await page.content();
+  await openPopup(); await popup.click('#scanButton');
+  await until(async () => Object.keys((await state()).entities).length === 4, 'quatre projets fictifs');
+  current = await state();
+  assert.equal(Object.keys(current.records).length, 3);
+  assert.equal(current.entities[A].name, 'Développement'); assert.equal(current.entities[B].name, 'Développement');
+  assert.equal(current.entities[B].evidence.kind, 'expanded-group'); assert.equal(current.entities[C].name, null);
+  assert.equal(current.entities[D].name, 'Été — Recherche & idées'); assert.equal(Object.keys(current.entities).length, 4);
+  assert.equal(await page.content(), projectDomBefore); assert.ok(!JSON.stringify(current).includes('INTERDIT'));
+  await popup.waitForFunction(() => document.querySelectorAll('.project-row').length === 4);
+  assert.ok((await popup.$eval('#projectsSummary', el => el.textContent)).includes('3 nommé(s) · 1 sans nom'));
+  await checkpoint('01-projets-homonymes');
+  pass('Projets : deux Développement distincts par clé, preuve directe et groupe explicite, trois noms connus / un inconnu, aucun message ni lien caché collecté');
+  const projectDownloads = path.join(PROFILE, 'exports-projets-fictifs'); await fs.mkdir(projectDownloads, { recursive: true });
+  await browser.defaultBrowserContext().setDownloadBehavior({ policy: 'allow', downloadPath: projectDownloads });
+  await popup.click('#jsonButton');
+  const projectExport = path.join(projectDownloads, 'mon-gpt-observations.json');
+  await until(async () => { try { await fs.access(projectExport); return true; } catch { return false; } }, 'export projets');
+  const projectData = JSON.parse(await fs.readFile(projectExport, 'utf8'));
+  assert.equal(projectData.schemaVersion, 2); assert.equal(projectData.projects.length, 4); assert.equal(projectData.conversations.length, 3);
+  assert.deepEqual(projectData.conversations.find(c => c.conversationId.endsWith('901')).observedProjectKeys, [A, B]);
+  assert.equal(projectData.projects.filter(p => p.observedName === 'Développement').length, 2);
+  await chooseMode('broad'); await popup.close(); await page.click('#renameA');
+  await until(async () => (await state()).entities[A].name === 'Développement solaire', 'nom direct muté');
+  await page.click('#toggleB'); await page.click('#renameB'); await sleep(700);
+  assert.equal((await state()).entities[B].name, 'Développement');
+  await openPopup(); await checkpoint('02-projets-renommes-replies'); await popup.close();
+  await page.click('#toggleB'); await until(async () => (await state()).entities[B].name === 'Développement secret', 'groupe rouvert');
+  assert.equal(Object.keys((await state()).entities).length, 4);
+  pass('Renommages en Auto large : même clé, aucune duplication ; groupe replié sans fausse mise à jour, enrichissement après réouverture manuelle');
+  await page.click('#openUnknown'); await until(async () => (await state()).entities[C].name === 'Carnets d’hiver', 'nom sur accueil projet');
+  assert.equal((await state()).entities[C].evidence.kind, 'project-page');
+  await openPopup(); await checkpoint('03-projets-accueil');
+  await chooseMode('manual'); await popup.close(); await worker.evaluate(() => repository.clear());
+  await openPopup(); await chooseMode('targeted');
+  await until(async () => Object.keys((await state()).entities).length === 1, 'cible projet seul');
+  assert.equal(Object.keys((await state()).records).length, 0); assert.equal((await state()).entities[C].name, 'Carnets d’hiver');
+  await popup.waitForFunction(() => !document.getElementById('jsonButton').disabled && document.getElementById('copyButton').disabled);
+  await checkpoint('04-projets-cible-seule');
+  pass('Accueil projet : nom depuis H1 sur URL projet ; Auto cible conserve seulement ce projet, export JSON actif même sans conversation');
+  await chooseMode('manual'); await popup.close();
+  assert.ok(projectsFixture.requests.every(url => url === 'https://chatgpt.com/' || url === 'https://chatgpt.com/favicon.ico'));
   // Diagnostic du site réel dans ce profil neuf, sans connexion et sans aucun geste de compte.
   const live = await browser.newPage(); let liveStatus = 'PARTIEL : diagnostic ChatGPT réel indisponible';
   try {

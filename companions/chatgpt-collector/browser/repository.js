@@ -6,12 +6,12 @@
   else root.CollectorRepository = api;
 })(globalThis, function (Core) {
   'use strict';
-  const KEY = 'monGptCollectorStateV1';
-  function createRepository(storage, { source, normalize, limits = Core.LIMITS, key = KEY, now = () => new Date().toISOString() }) {
+  const KEY = 'monGptCollectorStateV2';
+  function createRepository(storage, { source, normalize, normalizeEntity = Core.entityObservation, limits = Core.LIMITS, key = KEY, now = () => new Date().toISOString() }) {
     let queue = Promise.resolve(); let lastError = ''; const requests = new Map();
     async function read() {
       const data = await storage.get(key);
-      return data[key] === undefined ? Core.empty(source) : Core.validate(data[key], source, normalize, limits);
+      return data[key] === undefined ? Core.empty(source) : Core.validate(data[key], source, normalize, limits, normalizeEntity);
     }
     function transact(fn) {
       const next = queue.then(fn);
@@ -24,10 +24,11 @@
     }
     return {
       get: () => transact(async () => ({ state: await read(), error: lastError })),
-      ingest: (observations, requestId, kind) => transact(async () => {
+      ingest: (batch, requestId, kind) => transact(async () => {
         if (typeof requestId !== 'string' || requestId.length > 128 || !requestId) throw Error('Requête de scan invalide.');
         if (requests.has(requestId)) return requests.get(requestId);
-        const state = Core.merge(await read(), observations, now(), { normalize, limits, kind });
+        if (!batch || !Array.isArray(batch.observations) || !Array.isArray(batch.entities)) throw Error('Lot d’observations invalide.');
+        const state = Core.merge(await read(), batch.observations, now(), { normalize, normalizeEntity, entities: batch.entities, limits, kind });
         await write(state);
         requests.set(requestId, state.lastScan);
         if (requests.size > 128) requests.delete(requests.keys().next().value);

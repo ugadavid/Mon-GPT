@@ -1,0 +1,30 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Recette fictive MG-008a</title><style>
+body{margin:0;font:15px 'Segoe UI',sans-serif;background:#f7f3eb;color:#285545;display:flex}nav{width:340px;padding:24px;height:100vh;overflow:auto;background:#eeeadd;box-sizing:border-box}nav a{display:block;color:#285545;text-decoration:none;padding:8px 6px;border-bottom:1px solid #d7d8cc;font-size:13px}main{padding:38px;max-width:660px}button{padding:8px;margin:4px;border:1px solid #abc0a5;border-radius:7px;background:#fffaf2;color:#285545}nav>button{display:block}small{display:block;margin-top:16px;color:#6d796d}[hidden]{display:none!important}[role=group]{padding-left:15px;border-left:2px solid #ced8c2}
+</style></head><body>
+<nav aria-label="Historique de chat"><h2>Projets fictifs</h2>
+<a id="projectA" href="/g/g-p-11111111111111111111111111111111/project">Développement</a>
+<a data-sidebar-item href="/g/g-p-11111111111111111111111111111111/c/00000000-0000-4000-8000-000000000901">Carnet du jardin solaire</a>
+<button id="projectB" aria-expanded="true" aria-controls="groupB">Développement</button>
+<div role="group" id="groupB" aria-labelledby="projectB">
+<a data-sidebar-item href="/g/g-p-22222222222222222222222222222222/c/00000000-0000-4000-8000-000000000902">Un atelier sous les étoiles</a>
+<a data-sidebar-item href="/g/g-p-22222222222222222222222222222222/c/00000000-0000-4000-8000-000000000901">Carnet du jardin solaire</a>
+</div>
+<a href="/g/g-p-33333333333333333333333333333333/c/00000000-0000-4000-8000-000000000903">Ce titre de fil n’est PAS le nom du projet</a>
+<button data-project-key="g-p-44444444444444444444444444444444">Été — Recherche &amp; idées</button>
+<button aria-expanded="false">Projet replié sans clé observable</button>
+<div hidden><a href="/g/g-p-99999999999999999999999999999999/c/00000000-0000-4000-8000-000000000997">Invisible</a></div>
+<button id="mixed" aria-expanded="true" aria-controls="mixedGroup">Preuve ambiguë à rejeter</button>
+<div role="group" id="mixedGroup" aria-labelledby="mixed">
+<a href="/g/g-p-11111111111111111111111111111111/c/00000000-0000-4000-8000-000000000901">Carnet du jardin solaire</a>
+<a href="/g/g-p-22222222222222222222222222222222/c/00000000-0000-4000-8000-000000000902">Un atelier sous les étoiles</a>
+</div></nav>
+<main><p>MON GPT COLLECTOR · FIXTURE MG-008a</p><h1 id="pageTitle">Deux homonymes, deux clés.</h1><p>Cette page de test ne représente aucune donnée personnelle. Les relations aria et les URL sont volontairement explicites.</p>
+<button id="renameA">Renommer le projet A fictif</button><button id="renameB">Renommer le projet B fictif</button><button id="toggleB">Replier / ouvrir B</button><button id="openUnknown">Afficher l’accueil du projet sans nom</button>
+<div><p>PROMPT_FICTIF_INTERDIT : ne jamais collecter.</p><a href="/g/g-p-88888888888888888888888888888888/project">PROJET_MESSAGE_INTERDIT</a><input value="TOKEN_FICTIF_INTERDIT"></div>
+<small>Les boutons ci-dessus sont des gestes du banc de recette. Le collecteur n’effectue aucun clic.</small>
+</main><script>
+document.getElementById('renameA').onclick=()=>document.getElementById('projectA').textContent='Développement solaire';
+document.getElementById('renameB').onclick=()=>document.getElementById('projectB').textContent='Développement secret';
+document.getElementById('toggleB').onclick=()=>{const b=document.getElementById('projectB'),g=document.getElementById('groupB');g.hidden=!g.hidden;b.setAttribute('aria-expanded',String(!g.hidden));};
+document.getElementById('openUnknown').onclick=()=>{history.pushState({},'', '/g/g-p-33333333333333333333333333333333/project');document.getElementById('pageTitle').textContent='Carnets d’hiver';};
+</script></body></html>

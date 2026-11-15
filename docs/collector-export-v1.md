@@ -1,5 +1,7 @@
 # Contrat d’observation et d’export — version 1
 
+**Document historique MG-008.** MG-008a repart de zéro avec le [contrat v2](collector-export-v2.md). La version courante ne lit ni ne convertit ce format v1.
+
 MG-008, Mon GPT Collector 0.8.0. Ce document décrit un **échange**, pas le schéma métier du catalogue. Aucun import n’est livré : MG-009 le traitera séparément.
 
 ## Enveloppe ChatGPT

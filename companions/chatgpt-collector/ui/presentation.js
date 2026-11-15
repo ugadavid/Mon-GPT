@@ -7,7 +7,7 @@
   'use strict';
   const MODES = {
     manual: { name: 'Manuel', description: 'Aucune collecte automatique. Vous décidez quand scanner la page.' },
-    targeted: { name: 'Auto cible', description: 'Seulement la discussion ouverte. Le titre reste inconnu si son lien n’est pas observable.' },
+    targeted: { name: 'Auto cible', description: 'Discussion ou accueil projet ouvert. Le nom du projet exige une preuve explicite.' },
     broad: { name: 'Auto large', description: 'Les liens déjà rendus dans la sidebar. Peut conserver beaucoup de discussions, sans ouvrir les projets.' }
   };
   function listModel(records, limit = 50) {
@@ -23,6 +23,21 @@
     const link = doc.createElement('a'); link.href = url; link.download = filename;
     doc.body.appendChild(link); link.click(); link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  function entityListModel(entities, limit = 50) {
+    return [...entities].sort((a, b) => (a.name === null) - (b.name === null) || (a.name || '').localeCompare(b.name || '', 'fr') || a.identity.localeCompare(b.identity)).slice(0, limit)
+      .map(e => ({ name: e.name || 'Nom non observé', key: e.identity, known: e.name !== null, evidence: e.evidence.kind, at: e.nameObservedAt }));
+  }
+  function renderEntities(doc, list, entities) {
+    const scroll = list.scrollTop; list.textContent = '';
+    for (const item of entityListModel(entities)) {
+      const row = doc.createElement('li'); row.className = 'project-row';
+      const name = doc.createElement('span'); name.textContent = item.name; name.className = item.known ? 'project-name' : 'project-name unknown';
+      name.title = `${item.name} · ${item.key} · ${item.evidence}${item.at ? ' · ' + item.at : ''}`;
+      const key = doc.createElement('span'); key.className = 'project-key'; key.textContent = item.key.length > 20 ? item.key.slice(0, 4) + '…' + item.key.slice(-8) : item.key;
+      key.title = item.key; row.append(name, key); list.append(row);
+    }
+    list.scrollTop = scroll;
   }
   function renderList(doc, list, records, { emptyHeading = 'Votre prochaine idée commence ici', emptyText = 'Aucun lien observé pour le moment.' } = {}) {
     const scroll = list.scrollTop;
@@ -52,5 +67,5 @@
     list.scrollTop = scroll;
     if (focusedUrl) [...list.querySelectorAll('a')].find(a => a.href === focusedUrl)?.focus({ preventScroll: true });
   }
-  return { MODES, listModel, renderList, downloadTextFile };
+  return { MODES, listModel, renderList, entityListModel, renderEntities, downloadTextFile };
 });

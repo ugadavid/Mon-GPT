@@ -19,3 +19,9 @@ test('Popup : libellés, radios, statut accessible, confirmation distincte et re
   assert.doesNotMatch(js, /ChatGPT|chatgpt\.com/, 'le composant partagé ne dépend pas du site');
   assert.match(html, /La collecte ne garantit pas l’exhaustivité/);
 });
+test('Liste des conteneurs : homonymes conservés, clés distinctes et noms inconnus explicites', () => {
+  const entities = ['g-p-b', 'g-p-a', 'g-p-c'].map((identity, n) => ({ identity, name: n === 2 ? null : 'Développement', evidence: { kind: n === 2 ? 'key-only' : 'direct-control' }, nameObservedAt: null }));
+  const rows = View.entityListModel(entities);
+  assert.deepEqual(rows.map(r => r.key), ['g-p-a', 'g-p-b', 'g-p-c']);
+  assert.equal(rows[0].name, rows[1].name); assert.equal(rows[2].name, 'Nom non observé'); assert.equal(rows[2].known, false);
+});
