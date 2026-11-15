@@ -1,8 +1,10 @@
-# Mon GPT<3 — 0.7.0
+# Mon GPT<3 — 0.8.0
 
 Application Windows locale pour organiser ses discussions ChatGPT. MG-002a donne corps à l’« Atelier chaleureux » : bandeau illustré, cartes papier, titres affirmés, icônes harmonisées, badges et menus dessinés. La **vue Liste** conserve l’ouverture directe. Aucun serveur, compte applicatif ou API OpenAI ; aucune modification dans ChatGPT.
 
 ![La Mosaïque réelle sur CODEX-VM](reports/MG-005/01-mosaique-normale.png)
+
+**MG-008 : Mon GPT Collector, extension Chrome locale.** Trois modes (Manuel, Auto cible par défaut, Auto large), collecte passive de liens ChatGPT observés, dédoublonnage par UUID et exports JSON/TXT. Popup ivoire/sapin/terracotta, sans interface injectée dans ChatGPT. Aucun import dans le catalogue à ce stade. [Installation et utilisation](companions/chatgpt-collector/README.md) · [Contrat v1](docs/collector-export-v1.md) · [Rapport et cinq captures Chrome natives](reports/MG-008/rapport.md). La recette sur fixtures dans Chrome est réussie ; la collecte sur une bibliothèque ChatGPT connectée reste **PARTIELLE**, le profil de recette étant sans compte.
 
 **MG-007 : 31 couvertures locales.** Les 24 illustrations fournies par David rejoignent les sept historiques dans les mêmes sélecteurs Image des projets et des fils. Versions JPEG optimisées 1200×675, scènes entières ; les anciens choix et l’héritage restent inchangés. [Correspondances, recette et captures](reports/MG-007/rapport.md).
 

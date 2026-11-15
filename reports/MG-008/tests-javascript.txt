@@ -1,0 +1,34 @@
+
+> mon-gpt-collector@0.8.0 test
+> node --test tests/*.test.cjs
+
+✔ URL : UUID strict, hôte exact, URL de projet, query conservée et fragment retiré (2.3453ms)
+✔ Accord avec le validateur Python existant sur les URLs admises et refusées (66.5764ms)
+✔ Une fiche par UUID : deux URLs, plusieurs occurrences et titres égaux distincts (2.1102ms)
+✔ Titre fidèle : null reste inconnu, aria prioritaire, titre récent et champs non prévus absents (0.6024ms)
+✔ Contrat JSON déterministe, whitelist, TXT = URL observée par ligne (5.0438ms)
+✔ Deux alias au même scan : garder le titre accessible actif, sans inventer un contexte trop long (0.2299ms)
+✔ Limites et corruption : refus atomique, aucune suppression ou normalisation de date inventée (1.2699ms)
+✔ Bornes de variantes : aucune URL évincée silencieusement (0.4914ms)
+✔ Même API pure sur deux sources fictives, sans site, DOM ni Chrome (0.3555ms)
+✔ Pont : écritures de plusieurs onglets sérialisées, requête répétée idempotente (0.8865ms)
+✔ Pont : modes persistants, échec visible, reprise et vidage limité à la clé dédiée (1.2209ms)
+✔ Présentation commune bornée, titre long disponible, inconnu explicite et aucun UUID mural (5.5906ms)
+✔ Popup : libellés, radios, statut accessible, confirmation distincte et rendu sûr (0.8164ms)
+✔ Manuel : aucun timer, observer ou scan initial ; double événement partagé (0.8081ms)
+✔ Transitions cible/large/manuel et route SPA sans remplacer history (2.2284ms)
+✔ Mutations utiles debouncées, frappe hors liens ignorée, scan inchangé sans écriture (0.8696ms)
+✔ Échec visible, pending conservé, relance manuelle et suspension complète (0.903ms)
+✔ Scanner 3GPT3 adapté : aria puis texte, projets, actif, titre inconnu (1.2461ms)
+✔ Scanner : UUID sans lien, domaine piégé, caché et DOM absent ne sont pas collectés (1.4256ms)
+✔ Auto cible : aucun parcours large, seulement l’URL courante ; manuel/large voient les liens (0.5263ms)
+✔ URLs de projet et globale conservées, doublons de nœuds neutralisés (0.3227ms)
+✔ Manifest et code : permissions minimales, pas d’injection UI ou collecte de contenu (2.7572ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 147.6716

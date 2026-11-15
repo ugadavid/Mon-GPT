@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Mon GPT Collector",
+  "description": "Conservez les liens ChatGPT observés et exportez-les localement. Aucun message collecté, aucune modification de ChatGPT.",
+  "version": "0.8.0",
+  "minimum_chrome_version": "120",
+  "permissions": ["storage"],
+  "icons": {"16": "assets/icon16.png", "32": "assets/icon32.png", "48": "assets/icon48.png", "128": "assets/icon128.png"},
+  "action": {"default_title": "Mon GPT Collector", "default_popup": "ui/popup.html"},
+  "background": {"service_worker": "browser/background.js"},
+  "content_scripts": [{
+    "matches": ["https://chatgpt.com/*"],
+    "js": ["core/observations.js", "adapters/chatgpt.js", "browser/runtime.js", "browser/content.js"],
+    "run_at": "document_idle",
+    "all_frames": false
+  }]
+}

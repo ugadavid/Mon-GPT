@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mon GPT Collector</title><link rel="stylesheet" href="popup.css">
+</head>
+<body>
+<main>
+  <header class="brand"><img src="../assets/mark.svg" width="42" height="42" alt=""><div><p class="eyebrow">VOTRE MÉMOIRE LOCALE</p><h1>Mon GPT <span>Collector</span></h1></div><span class="local-dot" title="Stockage local" aria-label="Stockage local"></span></header>
+  <section class="overview" aria-label="Observations conservées">
+    <div><strong id="total">—</strong><p>discussions conservées</p></div>
+    <div class="last-scan"><span id="newCount">—</span><p id="scanSummary">Pas encore de scan</p></div>
+  </section>
+  <fieldset class="modes"><legend>Votre rythme <span id="modeName">Auto cible</span></legend>
+    <div class="segments">
+      <label><input type="radio" name="collectionMode" value="manual"><span>Manuel</span></label>
+      <label><input type="radio" name="collectionMode" value="targeted"><span>Auto cible</span></label>
+      <label><input type="radio" name="collectionMode" value="broad"><span>Auto large</span></label>
+    </div>
+    <p id="modeHelp">Seulement la discussion ouverte.</p>
+  </fieldset>
+  <section class="collect" aria-label="Collecte et export">
+    <button id="scanButton" class="primary" type="button" disabled><span aria-hidden="true">＋</span> Scanner cette page <span class="action-arrow" aria-hidden="true">↗</span></button>
+    <p id="pageStatus" class="page-status">Connexion à l’onglet…</p>
+    <div class="exports"><button id="copyButton" type="button" disabled>Copier les URLs</button><button id="jsonButton" type="button" disabled>Exporter JSON <span aria-hidden="true">↓</span></button><button id="txtButton" class="text-action" type="button" disabled>TXT</button></div>
+  </section>
+  <p id="status" class="status" role="status" aria-live="polite">Chargement du catalogue local…</p>
+  <section class="recent" aria-labelledby="recentTitle"><div class="section-heading"><h2 id="recentTitle">Derniers liens observés</h2><span id="recentCount">0</span></div><ul id="conversationList" aria-label="Dernières discussions observées"></ul></section>
+  <p id="capacity" class="capacity" hidden></p>
+  <footer><p>Liens observés, jamais les messages.<br><span>La collecte ne garantit pas l’exhaustivité.</span></p><button id="clearButton" class="text-action danger" type="button" disabled>Vider</button></footer>
+  <dialog id="clearDialog" aria-labelledby="clearTitle"><h2 id="clearTitle">Vider les observations ?</h2><p>Seul ce collecteur sera vidé. ChatGPT et Mon GPT restent intacts.</p><div class="dialog-actions"><button id="cancelClear" type="button" autofocus>Annuler</button><button id="confirmClear" class="danger-fill" type="button">Vider</button></div></dialog>
+</main>
+<script src="../core/observations.js"></script><script src="../adapters/chatgpt.js"></script><script src="presentation.js"></script><script src="popup.js"></script>
+</body>
+</html>
