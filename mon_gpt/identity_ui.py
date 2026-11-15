@@ -4,37 +4,10 @@ from tkinter import ttk, filedialog
 from PIL import Image, ImageDraw, ImageOps, ImageTk
 from .identity import COVERS, ICONS, PALETTE, DEFAULTS
 from .images import IMPORT_HINT
-from .atelier import Masthead, rounded, AutoScrollbar
+from .atelier import Masthead, rounded
 from .inspector import InspectorScrollbar
 from .theme import COLORS as C
-
-
-def icon_picture(key,color,size=28):
-    scale=4
-    image=Image.new("RGBA",(24*scale,24*scale))
-    draw=ImageDraw.Draw(image)
-    def line(points): draw.line([(x*scale,y*scale) for x,y in points],fill=color,width=scale,joint="curve")
-    def oval(box): draw.ellipse(tuple(v*scale for v in box),outline=color,width=scale)
-    if key=="folder": line([(3,19),(3,6),(9,6),(12,9),(21,9),(21,19),(3,19)])
-    elif key=="book":
-        line([(12,6),(7,4),(3,5),(3,19),(7,18),(12,20),(17,18),(21,19),(21,5),(17,4),(12,6),(12,20)])
-    elif key=="leaf":
-        line([(5,20),(12,12),(20,4)])
-        draw.arc((4*scale,4*scale,21*scale,21*scale),0,180,fill=color,width=scale)
-        draw.arc((4*scale,3*scale,21*scale,20*scale),180,360,fill=color,width=scale)
-    elif key=="compass":
-        oval((3,3,21,21));line([(16,7),(14,14),(7,17),(10,10),(16,7)]);line([(10,10),(14,14)])
-    elif key=="mountain":
-        line([(2,20),(10,5),(15,13),(18,9),(23,20),(2,20)]);line([(7,10),(10,12),(12,9)])
-    elif key=="flask":
-        line([(8,3),(16,3),(14,3),(14,10),(21,20),(3,20),(10,10),(10,3)]);line([(7,15),(17,15)])
-    elif key=="palette":
-        oval((3,3,21,21));oval((7,7,9,9));oval((13,6,15,8));oval((16,11,18,13));oval((7,13,9,15));line([(14,20),(12,17),(15,15),(18,17)])
-    else:
-        line([(7,7),(17,7),(17,17),(7,17),(7,7)])
-        for n in (9,12,15):
-            line([(n,3),(n,7)]);line([(n,17),(n,21)]);line([(3,n),(7,n)]);line([(17,n),(21,n)])
-    return image.resize((size,size),Image.Resampling.LANCZOS)
+from .project_icons import icon_picture
 
 
 def thumbnail(library,reference,width,height,radius=7):
@@ -43,6 +16,20 @@ def thumbnail(library,reference,width,height,radius=7):
     ImageDraw.Draw(mask).rounded_rectangle((0,0,width-1,height-1),radius=radius,fill=255)
     image.putalpha(mask)
     return image
+
+
+def contained_picture(library,reference,width,height):
+    """Toute l’image, y compris un portrait, dans un cadre 16:9 sans masque."""
+    image=ImageOps.contain(library.open(reference),(width,height),method=Image.Resampling.LANCZOS)
+    frame=Image.new("RGBA",(width,height),C["ivory"])
+    frame.alpha_composite(image,((width-image.width)//2,(height-image.height)//2))
+    return frame
+
+
+def swatch_picture(color,size=30):
+    image=Image.new("RGBA",(size*4,size*4))
+    ImageDraw.Draw(image).ellipse((8,8,size*4-9,size*4-9),fill=color)
+    return image.resize((size,size),Image.Resampling.LANCZOS)
 
 
 def choice_name(kind,value):
@@ -65,62 +52,119 @@ class ContextMasthead(Masthead):
     def draw(self,event=None):
         super().draw(event)
         visual=self.identity
-        if visual is None or not visual.image: return
-        width=self.winfo_width()
-        scale=.45 if width>=560 else .25 if width>=420 else .15
-        w,h=round(500*scale),round(114*scale)
-        key=(visual.image,visual.icon,visual.color,w,h)
+        reference=visual.image if visual and visual.image else DEFAULTS["image"]
+        self.delete("landscape")
+        width,height=self.winfo_width(),self.winfo_height()
+        text_right=max((self.bbox(item)[2] for item in self.find_all() if self.type(item)=="text"),default=240)
+        free_width=max(0,width-8-text_right-12)
+        # Multiples 16:9 dans l’espace libre ; le gabarit de 80 px ne change pas.
+        w=min(128,(free_width//16)*16,(max(0,height-8)//9)*16)
+        if w<16: return
+        h=w*9//16
+        self.cover_box=(width-w-8,(height-h)//2,w,h)
+        key=(reference,w,h)
         if key!=self.photo_key:
             try:
-                image=thumbnail(self.library,visual.image,w,h,5)
-                draw=ImageDraw.Draw(image)
-                draw.rectangle((3,h-3,w-4,h-1),fill=PALETTE[visual.color][1])
-                if h>=28:
-                    draw.rounded_rectangle((4,4,26,26),radius=5,fill=C["paper"])
-                    image.alpha_composite(icon_picture(visual.icon,PALETTE[visual.color][1],20),(5,5))
+                image=contained_picture(self.library,reference,w,h)
                 self.photo=ImageTk.PhotoImage(image,master=self)
                 self.photo_key=key
             except (ValueError,OSError):
-                # Une ressource endommagée après chargement ne détruit pas le bandeau neutre.
+                self.photo_key=None
                 return
-        self.delete("landscape")
-        self.create_image(width-w-8,78-h,image=self.photo,anchor="nw",tags="context_cover")
+        x,y,_,_=self.cover_box
+        self.create_image(x,y,image=self.photo,anchor="nw",tags="context_cover")
+        if visual and visual.project and free_width-w>=28:
+            self.badge=ImageTk.PhotoImage(icon_picture(visual.icon,PALETTE[visual.color][1],20),master=self)
+            self.create_image(x-17,height/2,image=self.badge,tags="context_badge")
 
 
-class ProjectVisualFields(ttk.Frame):
-    def __init__(self,parent,app,value):
+class ControlTip:
+    """Nom visible au survol et au focus, sans consommer de ligne de formulaire."""
+    def __init__(self,widget,text):
+        self.widget,self.text=widget,text
+        self.timer,self.window=None,None
+        for event in ("<Enter>","<FocusIn>"): widget.bind(event,lambda e:self.schedule(),add="+")
+        for event in ("<Leave>","<FocusOut>","<ButtonPress-1>","<KeyPress>","<Destroy>"):
+            widget.bind(event,lambda e:self.hide(),add="+")
+
+    def schedule(self):
+        self.hide()
+        self.timer=self.widget.after(450,self.show)
+
+    def show(self):
+        self.timer=None
+        self.window=tk.Toplevel(self.widget)
+        self.window.overrideredirect(True)
+        text=self.text() if callable(self.text) else self.text
+        tk.Label(self.window,text=text,font=("Segoe UI",9),background=C["ivory"],foreground=C["ink"],padx=8,pady=5,wraplength=250,relief="solid",borderwidth=1).pack()
+        self.window.update_idletasks()
+        x=min(self.widget.winfo_rootx(),self.widget.winfo_screenwidth()-self.window.winfo_reqwidth()-8)
+        y=min(self.widget.winfo_rooty()+self.widget.winfo_height()+5,self.widget.winfo_screenheight()-self.window.winfo_reqheight()-8)
+        self.window.geometry(f"+{max(0,x)}+{max(0,y)}")
+
+    def hide(self):
+        if self.timer is not None:
+            self.widget.after_cancel(self.timer);self.timer=None
+        if self.window is not None:
+            self.window.destroy();self.window=None
+
+
+class IdentityControl(tk.Canvas):
+    def __init__(self,parent,kind,command=None):
+        self.kind,self.command=kind,command
+        self.picture=None
+        super().__init__(parent,width=94 if kind=="image" else 46,height=56,background=C["paper"],highlightthickness=0,takefocus=bool(command),cursor="hand2" if command else "")
+        self.bind("<Configure>",self.draw)
+        self.bind("<FocusIn>",self.draw);self.bind("<FocusOut>",self.draw)
+        self.bind("<Button-1>",lambda e:self.activate())
+        self.bind("<Return>",lambda e:self.activate());self.bind("<space>",lambda e:self.activate())
+
+    def activate(self):
+        if self.command:
+            self.focus_set();self.command()
+        return "break"
+
+    def draw(self,event=None):
+        self.delete("all")
+        w,h=self.winfo_width(),self.winfo_height()
+        if self.command:
+            rounded(self,1,1,w-1,h-1,8,fill=C["paper"],outline=C["pine"] if self.focus_get()==self else C["line"],width=2 if self.focus_get()==self else 1)
+        if self.picture: self.create_image(w/2,h/2,image=self.picture)
+
+
+class ProjectVisualStrip(ttk.Frame):
+    def __init__(self,parent,library,value,choose=None):
         super().__init__(parent,style="Paper.TFrame")
-        self.app=app
+        self.library,self.choose=library,choose
         self.value={**DEFAULTS,**value}
-        self.previews={}
-        self.names={}
         self.buttons={}
-        for kind,title in (("image","Image"),("icon","Icône"),("color","Couleur")):
-            ttk.Label(self,text=title,style="Paper.TLabel",font=("Segoe UI",10,"bold")).pack(anchor="w",pady=(9,4))
-            row=ttk.Frame(self,style="Paper.TFrame")
-            row.pack(fill="x")
-            picture=tk.Label(row,background=C["paper"],borderwidth=0)
-            picture.pack(side="left",padx=(0,8))
-            button=small_button(app,row,"Choisir",lambda k=kind:self.open(k),74)
-            button.pack(side="right",padx=(6,0))
-            name=ttk.Label(row,style="PaperMuted.TLabel",font=("Segoe UI",9),wraplength=100)
-            name.pack(side="left",fill="x",expand=True)
-            self.previews[kind],self.names[kind],self.buttons[kind]=picture,name,button
+        for kind in ("image","icon","color"):
+            button=IdentityControl(self,kind,(lambda k=kind:choose(k)) if choose else None)
+            button.pack(side="left",padx=(0,7))
+            self.buttons[kind]=button
+            button.tip=ControlTip(button,lambda k=kind:self.control_name(k))
         self.refresh()
 
-    def get(self): return dict(self.value)
+    def control_name(self,kind):
+        label={"image":"Image","icon":"Icône","color":"Couleur"}[kind]
+        return f"{label} · {choice_name(kind,self.value[kind])}"+(" — choisir" if self.choose else "")
 
     def refresh(self):
         for kind,value in self.value.items():
-            if kind=="image": image=thumbnail(self.app.store.images,value,90,51)
+            if kind=="image": image=contained_picture(self.library,value,80,45)
             elif kind=="icon": image=icon_picture(value,PALETTE[self.value["color"]][1],28)
-            else:
-                image=Image.new("RGBA",(28,28))
-                ImageDraw.Draw(image).ellipse((2,2,25,25),fill=PALETTE[value][1])
-            photo=ImageTk.PhotoImage(image,master=self)
-            self.previews[kind].configure(image=photo)
-            self.previews[kind].image=photo
-            self.names[kind].configure(text=choice_name(kind,value))
+            else: image=swatch_picture(PALETTE[value][1])
+            button=self.buttons[kind]
+            button.picture=ImageTk.PhotoImage(image,master=self)
+            button.draw()
+
+
+class ProjectVisualFields(ProjectVisualStrip):
+    def __init__(self,parent,app,value):
+        self.app=app
+        super().__init__(parent,app.store.images,value,self.open)
+
+    def get(self): return dict(self.value)
 
     def open(self,kind):
         if getattr(self.app,"visual_layer",None): self.app.visual_layer.cancel()
@@ -137,14 +181,16 @@ class ChoiceTile(tk.Canvas):
     def __init__(self,parent,layer,value):
         self.layer,self.value=layer,value
         self.photo=None
-        super().__init__(parent,height=94 if layer.kind=="image" else 72,width=1,
+        super().__init__(parent,height=94 if layer.kind=="image" else 54 if layer.kind=="color" else 68,width=1,
                          background=C["paper"],highlightthickness=0,takefocus=1)
+        self.accessible_name=choice_name(layer.kind,value)
         self.bind("<Configure>",self.draw)
         self.bind("<FocusIn>",self.focused);self.bind("<FocusOut>",self.draw)
         self.bind("<Button-1>",lambda e:self.choose())
         self.bind("<Return>",lambda e:self.choose());self.bind("<space>",lambda e:self.choose())
-        for key,step in (("Left",-1),("Right",1),("Up",-layer.columns),("Down",layer.columns)):
-            self.bind("<"+key+">",lambda e,s=step:self.neighbor(s))
+        for key,step,vertical in (("Left",-1,False),("Right",1,False),("Up",-1,True),("Down",1,True)):
+            self.bind("<"+key+">",lambda e,s=step,v=vertical:self.neighbor(s*self.layer.columns if v else s))
+        if layer.kind in ("color","icon"): self.tip=ControlTip(self,self.accessible_name)
 
     def choose(self):
         self.focus_set()
@@ -170,6 +216,17 @@ class ChoiceTile(tk.Canvas):
         w,h=self.winfo_width(),self.winfo_height()
         selected=self.layer.selected==self.value
         focused=self.focus_get()==self
+        if self.layer.kind=="color":
+            x,y=w/2,h/2
+            self.photo=ImageTk.PhotoImage(swatch_picture(PALETTE[self.value][1],36),master=self)
+            self.create_image(x,y,image=self.photo)
+            if selected or focused:
+                self.create_oval(x-21,y-21,x+21,y+21,outline=C["pine"],width=2 if selected else 1,dash=() if selected else (2,2))
+            if selected:
+                rgb=PALETTE[self.value][1]
+                light=sum(int(rgb[n:n+2],16)*k for n,k in ((1,.299),(3,.587),(5,.114)))>155
+                self.create_text(x,y,text="✓",fill=C["ink"] if light else C["paper"],font=("Segoe UI",10,"bold"))
+            return
         rounded(self,2,2,w-2,h-2,9,fill=C["selection"] if selected else C["paper"],
                 outline=C["pine"] if selected or focused else C["line"],width=2 if selected or focused else 1)
         kind=self.layer.kind
@@ -180,10 +237,8 @@ class ChoiceTile(tk.Canvas):
         elif kind=="icon":
             self.photo=ImageTk.PhotoImage(icon_picture(self.value,C["pine"],28),master=self)
             self.create_image(w/2,22,image=self.photo)
-        else:
-            color=PALETTE[self.value][1]
-            self.create_oval(w/2-12,9,w/2+12,33,fill=color,outline="")
-        self.create_text(w/2,h-17,text=choice_name(kind,self.value),font=("Segoe UI",8),fill=C["ink"],width=max(10,w-9),justify="center")
+        label=choice_name(kind,self.value)
+        self.create_text(w/2,h-17,text=label,font=("Segoe UI",7 if kind=="icon" and len(label)>11 else 8),fill=C["ink"],width=max(10,w-9),justify="center")
         if selected: self.create_text(w-10,10,text="✓",fill=C["pine"],font=("Segoe UI",9,"bold"))
 
 
@@ -217,14 +272,22 @@ class VisualLayer(ttk.Frame):
         window=self.canvas.create_window(0,0,window=self.content,anchor="nw")
         self.canvas.bind("<Configure>",lambda e:self.canvas.itemconfigure(window,width=e.width))
         self.content.bind("<Configure>",lambda e:self.canvas.configure(scrollregion=self.canvas.bbox("all")))
-        self.preview=tk.Label(self.content,background=C["paper"],borderwidth=0)
-        self.preview.pack(anchor="w",pady=(2,5))
-        self.name=ttk.Label(self.content,style="Paper.TLabel",font=("Segoe UI",10,"bold"),wraplength=260)
-        self.name.pack(anchor="w",pady=(0,10))
+        intro=self.content
+        if kind=="color":
+            intro=ttk.Frame(self.content,style="Paper.TFrame")
+            intro.pack(fill="x",pady=(3,12))
+        self.preview=tk.Label(intro,background=C["paper"],borderwidth=0)
+        self.name=ttk.Label(intro,style="Paper.TLabel",font=("Segoe UI",10,"bold"),wraplength=240)
+        if kind=="color":
+            self.preview.pack(side="left")
+            self.name.pack(side="left",padx=8)
+        else:
+            self.preview.pack(anchor="w",pady=(2,5))
+            self.name.pack(anchor="w",pady=(0,10))
         if kind=="image":
             ttk.Label(self.content,text=IMPORT_HINT,style="PaperMuted.TLabel",font=("Segoe UI",8),wraplength=264,justify="left").pack(fill="x",pady=(0,5))
             small_button(app,self.content,"Importer mon image…",self.import_image,170).pack(anchor="w",pady=(0,12))
-        grid=ttk.Frame(self.content,style="Paper.TFrame")
+        grid=self.grid_frame=ttk.Frame(self.content,style="Paper.TFrame")
         grid.pack(fill="x")
         values=["pack:"+key for key in COVERS] if kind=="image" else list(ICONS if kind=="icon" else PALETTE)
         self.tiles=[]
@@ -233,6 +296,7 @@ class VisualLayer(ttk.Frame):
             tile.grid(row=index//self.columns,column=index%self.columns,sticky="nsew",padx=2,pady=3)
             grid.columnconfigure(index%self.columns,weight=1,uniform="tiles")
             self.tiles.append(tile)
+        if kind=="icon": grid.bind("<Configure>",self.layout_icons)
         def wheel(event):
             self.canvas.yview_scroll(-1 if event.delta>0 else 1,"units")
             return "break"
@@ -249,12 +313,19 @@ class VisualLayer(ttk.Frame):
         if self.kind=="image": image=thumbnail(self.app.store.images,self.selected,264,148)
         elif self.kind=="icon": image=icon_picture(self.selected,PALETTE[self.fields.value["color"]][1],42)
         else:
-            image=Image.new("RGBA",(48,48))
-            ImageDraw.Draw(image).ellipse((2,2,45,45),fill=PALETTE[self.selected][1])
+            image=swatch_picture(PALETTE[self.selected][1],30)
         self.photo=ImageTk.PhotoImage(image,master=self)
         self.preview.configure(image=self.photo)
         self.name.configure(text=choice_name(self.kind,self.selected))
         for tile in self.tiles: tile.draw()
+
+    def layout_icons(self,event):
+        columns=max(4,min(6,event.width//68))
+        if columns==self.columns: return
+        for index in range(max(columns,self.columns)):
+            self.grid_frame.columnconfigure(index,weight=1 if index<columns else 0,uniform="tiles" if index<columns else "")
+        self.columns=columns
+        for index,tile in enumerate(self.tiles): tile.grid(row=index//columns,column=index%columns)
 
     def defaults(self):
         self.selected=DEFAULTS[self.kind]

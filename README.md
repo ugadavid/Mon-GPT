@@ -1,10 +1,10 @@
-# Mon GPT<3 — 0.3.0
+# Mon GPT<3 — 0.3.1
 
 Application Windows locale pour organiser ses discussions ChatGPT. MG-002a donne corps à l’« Atelier chaleureux » : bandeau illustré, cartes papier, titres affirmés, icônes harmonisées, badges et menus dessinés. La **vue Liste** conserve l’ouverture directe. Aucun serveur, compte applicatif ou API OpenAI ; aucune modification dans ChatGPT.
 
-![La vraie application sur CODEX-VM](reports/MG-003a/03-projet-ecriture.png)
+![La vraie application sur CODEX-VM](reports/MG-003b/01-navigation-montagne.png)
 
-**MG-003a : l’univers de chaque projet.** Image, Icône et Couleur se choisissent dans sa fiche, avec six illustrations originales locales, huit icônes au trait et seize nuances. Le bandeau adopte ces repères ; les fils en héritent sans perdre leurs emplacements. Les images personnelles sont copiées dans les données et incluses dans la sauvegarde complète. [Rapport et cinq captures](reports/MG-003a/rapport.md) · [Illustrations et prompts de création](docs/illustrations-MG-003a.md).
+**MG-003b : les repères deviennent visibles.** L’arbre affiche l’icône et la couleur de chaque projet ; la fiche regroupe ses trois sélecteurs sur une rangée. Le bandeau montre toute l’image en 16:9 dans son gabarit existant. Sept illustrations locales, dont la prairie solaire par défaut, 36 icônes au trait et les seize nuances conservées en pastilles rondes. Les images personnelles restent incluses dans les sauvegardes complètes. [Rapport et cinq captures réelles](reports/MG-003b/rapport.md) · [Origine des illustrations](docs/illustrations-MG-003a.md).
 
 MG-002b-02 place les colonnes directement sous le menu validé : arbre et aperçu utilisent toute la hauteur, tandis que l’identité et la recherche compacte restent au centre. La recherche est plafonnée en largeur ; les pastilles n’occupent une ligne que si un périmètre ou un filtre est actif. [Rapport et trois captures](reports/MG-002b-02/rapport.md).
 
@@ -57,11 +57,11 @@ Supprimer demande confirmation. Un projet supprimé remonte ses enfants au paren
 
 ## Personnaliser un projet
 
-Dans **Modifier la fiche**, les propriétés Image, Icône et Couleur ont chacune un bouton Choisir. Le panneau temporaire permet de prévisualiser puis **Utiliser** le choix ; Annuler, la croix ou Échap reviennent au choix précédent. Par défaut rétablit le repère fourni par l’application. Les choix restent dans le même brouillon que les notes et suivent **Enregistrer / Ctrl+S**. Ctrl+S depuis un sélecteur applique sa prévisualisation puis enregistre la fiche. Revenir à l’aperçu ou quitter protège les modifications non enregistrées comme auparavant.
+Dans **Modifier la fiche**, cliquer sur la miniature d’image, l’icône ou la pastille de couleur, côte à côte sous le titre. Leurs noms apparaissent au survol et au focus clavier ; Tab puis Entrée ou Espace ouvrent le sélecteur. Le panneau temporaire permet de prévisualiser puis **Utiliser** le choix ; Annuler, la croix ou Échap reviennent au choix précédent. Par défaut rétablit le repère fourni par l’application. Les choix restent dans le même brouillon que les notes et suivent **Enregistrer / Ctrl+S**. Ctrl+S depuis un sélecteur applique sa prévisualisation puis enregistre la fiche. Revenir à l’aperçu ou quitter protège les modifications non enregistrées comme auparavant.
 
-Une couverture est fournie automatiquement à tout projet. Le pack de six illustrations 1200×675 est livré avec le code et fonctionne hors connexion. **Importer mon image…** accepte PNG, JPG/JPEG et WebP fixes, vérifiés selon leur contenu réel : 20 Mo (20 × 1024² octets), 8192 px par côté et 24 millions de pixels maximum ; minimum 16 px par côté. Format conseillé : paysage 1200×675. Les images sont orientées selon EXIF, converties en PNG sans métadonnées et réduites à 2400 px par côté au plus. L’original reste intact ; sa copie demeure utilisable après déplacement du fichier source. Un import refusé garde la couverture précédente.
+Une couverture solaire est fournie automatiquement à tout projet sans choix explicite, y compris après migration v1. Les anciens choix restent conservés. Le pack de sept illustrations 1200×675 est livré avec le code et fonctionne hors connexion. **Importer mon image…** accepte PNG, JPG/JPEG et WebP fixes, vérifiés selon leur contenu réel : 20 Mo (20 × 1024² octets), 8192 px par côté et 24 millions de pixels maximum ; minimum 16 px par côté. Format conseillé : paysage 1200×675. Les images sont orientées selon EXIF, converties en PNG sans métadonnées et réduites à 2400 px par côté au plus. L’original reste intact ; sa copie demeure utilisable après déplacement du fichier source. Un import refusé garde la couverture précédente.
 
-Le bandeau utilise les repères du projet sélectionné. Pour un fil, il préfère le projet actif **s’il est un rattachement direct de ce fil** ; en contexte global, il prend le premier rattachement dans l’ordre existant, sans le modifier. Un fil sans projet ou une absence de sélection conserve le paysage neutre. Les fils n’ont aucun champ de personnalisation supplémentaire. Icône et couleur accompagnent la petite couverture du bandeau, sans recolorer les zones validées de l’application.
+Le bandeau utilise les repères du projet sélectionné. Pour un fil, il préfère le projet actif **s’il est un rattachement direct de ce fil** ; en contexte global, il prend le premier rattachement dans l’ordre existant, sans le modifier. Un fil sans projet ou une absence de sélection conserve le paysage neutre. Les fils n’ont aucun champ de personnalisation supplémentaire. L’arbre reprend l’icône colorée du projet. Le bandeau contient la scène entière au ratio 16:9 ; les portraits conservent des marges, sans étirement. Son gabarit reste inchangé.
 
 ## Menus et données
 

@@ -15,7 +15,8 @@ from .main_menu import MainMenuBar
 from .inspector import InspectorSummary, InspectorScrollbar
 from .navigation import NavigationTree, NavigationScrollbar, navigation_icons
 from .identity import resolve_identity
-from .identity_ui import ContextMasthead
+from .identity_ui import ContextMasthead, ProjectVisualStrip
+from .project_icons import ProjectIconCache
 from . import ui_state, __version__
 
 
@@ -33,6 +34,7 @@ class App(DetailEditor):
         preferences, warning = ui_state.load(self.preferences_path)
         apply_theme(root)
         self.icons = make_icons(root)
+        self.project_icons=ProjectIconCache(root)
         self.font = Font(root, font=FONT)
         root.title(f"Mon GPT<3 — {__version__}" + (" · RECETTE · ouvertures simulées" if opener else ""))
         root.geometry(preferences.get("geometry", "1360x820"))
@@ -416,7 +418,7 @@ class App(DetailEditor):
         pending = [(r, "") for r in reversed(self.cat.children(None, self.sort.get() != "Manuel"))]
         while pending:
             r, parent = pending.pop()
-            self.tree.insert(parent, "end", iid=r.id, text=r.title, image=self.nav_icons["project"], open=(r.id in opened or not opened))
+            self.tree.insert(parent, "end", iid=r.id, text=r.title, image=self.project_icons.for_project(r), open=(r.id in opened or not opened))
             pending.extend((c, r.id) for c in reversed(self.cat.children(r.id, self.sort.get() != "Manuel")))
         if not self.tree.exists(self.scope):
             self.scope = "all"
@@ -518,6 +520,11 @@ class App(DetailEditor):
             child.destroy()
         self.summary=InspectorSummary(self.editor,self.cat.records.get(identity),self.project_label,
             self.toggle_inspector,lambda:self.open_thread(identity),lambda:self.copy_link(identity),lambda:self.show_record(identity))
+        record=self.cat.records.get(identity)
+        if record and record.kind=="project":
+            edit=self.summary.actions["edit"]
+            self.summary.visual_strip=ProjectVisualStrip(edit.master,self.store.images,record.visual)
+            self.summary.visual_strip.pack(side="left",before=edit,padx=(0,5))
         self.summary.pack(fill="x")
         self.canvas.yview_moveto(0)
 
@@ -617,12 +624,18 @@ class App(DetailEditor):
             host = parent or ""
             if parent:
                 self.tree.item(parent, open=True)
-            self.tree.insert(host, "end", iid="__draft__", text="", image=self.icons["project"])
+            self.tree.insert(host, "end", iid="__draft__", text="", image=self.project_icons.get())
             self.tree.see("__draft__")
             self.root.update_idletasks()
             self.inline = ttk.Entry(self.tree)
             x, y, width, height = self.tree.bbox("__draft__")
-            self.inline.place(x=x+38, y=y, width=max(140, width-40), height=height)
+            depth=0
+            ancestor=host
+            while ancestor:
+                depth+=1
+                ancestor=self.tree.parent(ancestor)
+            offset=38+18*depth
+            self.inline.place(x=x+offset, y=y, width=max(48,width-offset-2), height=height)
             self.inline.focus_set()
             self.draft = {"kind": "project", "parent": parent}
             self.inline.bind("<Return>", self.commit_inline)

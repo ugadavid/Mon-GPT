@@ -4,12 +4,20 @@ import re
 
 
 COVERS = {
+    "soleil": "Prairie au soleil",
     "ecriture": "Le jardin des mots", "voyage": "L’échappée belle",
     "montagne": "Les grands horizons", "laboratoire": "Le cabinet des curiosités",
     "creation": "La fabrique des idées", "technique": "L’atelier des inventions",
 }
 ICONS = {"folder":"Dossier", "book":"Carnet", "leaf":"Nature", "compass":"Exploration",
-         "mountain":"Montagne", "flask":"Laboratoire", "palette":"Création", "circuit":"Technique"}
+         "mountain":"Montagne", "flask":"Laboratoire", "palette":"Création", "circuit":"Technique",
+         "pen":"Stylo", "feather":"Plume", "chat":"Bulle", "conversation":"Conversation",
+         "lamp":"Lampe", "bulb":"Idée", "planet":"Planète", "star":"Étoile",
+         "map":"Carte", "globe":"Globe", "tree":"Arbre", "flower":"Fleur",
+         "sun":"Soleil", "moon":"Lune", "search":"Loupe", "code":"Code",
+         "terminal":"Terminal", "database":"Données", "tools":"Outils", "gear":"Mécanique",
+         "microscope":"Microscope", "music":"Musique", "camera":"Photo", "brush":"Pinceau",
+         "calendar":"Calendrier", "clock":"Horloge", "home":"Maison", "heart":"Cœur"}
 PALETTE = {
     "atelier": ("Atelier", "#315E4F"), "sauge": ("Sauge", "#8FA98B"),
     "mousse": ("Mousse", "#6D7C52"), "eucalyptus": ("Eucalyptus", "#6A9990"),
@@ -20,7 +28,7 @@ PALETTE = {
     "brume": ("Bleu brume", "#91A8BD"), "petrole": ("Pétrole", "#447984"),
     "lavande": ("Lavande", "#AB9BBE"), "ardoise": ("Ardoise", "#6E7D94"),
 }
-DEFAULTS = {"image":"pack:ecriture", "icon":"folder", "color":"atelier"}
+DEFAULTS = {"image":"pack:soleil", "icon":"folder", "color":"atelier"}
 ASSET = re.compile(r"asset:([0-9a-f]{64})\Z")
 
 

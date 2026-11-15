@@ -23,3 +23,7 @@ Pour chacun des cinq autres fichiers, le prompt commun suivant a été utilisé 
 | technique.jpg | an elegant inventor's wooden desk with a small brass mechanical model, a circuit board, precise tools and a glowing lamp, muted petrol blue backdrop and warm honey highlights |
 
 Ces prompts décrivent les couvertures réellement livrées. Le pack doit rester fourni avec le code pour permettre l’usage et la restauration hors connexion. Aucun appel à imagegen n’est nécessaire au lancement de Mon GPT<3.
+
+## Ajout MG-003b : Prairie au soleil
+
+`soleil.jpg` est une illustration locale originale 1200×675, redessinée par code dans le langage du paysage historique : soleil miel, prairie et collines sauge, trois arbres et livre ouvert. Elle se régénère avec `python -m examples.create_solar_cover` (Pillow). Aucune photo externe ni nouvelle image de référence ; les six JPEG précédents restent inchangés. Le rendu du bandeau conserve toute cette scène, au même titre que les autres couvertures.

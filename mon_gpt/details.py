@@ -163,7 +163,7 @@ class DetailEditor:
         field("title", "Titre", r.title)
         if r.kind=="project":
             self.project_visual=ProjectVisualFields(form,self,r.visual)
-            self.project_visual.pack(fill="x")
+            self.project_visual.pack(fill="x",pady=(9,0))
         if r.kind == "item":
             field("url", "Lien", self.adapter.conversations[r.id].url)
         field("description", "Description" if r.kind == "project" else "Résumé", r.description, 2)

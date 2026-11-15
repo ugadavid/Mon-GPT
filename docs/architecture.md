@@ -1,6 +1,6 @@
 # Architecture — Mon GPT<3
 
-État actuel : 0.3.0, 15 novembre 2026. Les sections MG-002/MG-002a décrivent leur état historique avant MG-003a.
+État actuel : 0.3.1, 15 novembre 2026. Les sections MG-002/MG-002a décrivent leur état historique avant MG-003a ; MG-003b précise les corrections de présentation actuelles.
 
 ## Choix techniques
 
@@ -71,3 +71,11 @@ Au lancement, les séparateurs sont positionnés après réalisation de la fenê
 Les archives refusent doublons de noms (y compris casse), liens symboliques, chiffrement, chemins inattendus, fichiers supplémentaires, empreintes incorrectes et ressources manquantes. Aucun `extractall` : les noms d’images sont reconstruits depuis les empreintes validées. Bornes : 10 Mo pour le catalogue, 20 Mo par image, 100 Mo pour le ZIP, 200 Mo décompressés et 512 images. Ces limites sont vérifiées aussi à l’écriture afin de ne pas produire une sauvegarde que le lecteur refuserait.
 
 La restauration revalide, vérifie les collisions et sauvegarde d’abord l’existant complètement. Les nouvelles images sont installées avant le remplacement atomique du catalogue. Un échec peut laisser des images supplémentaires, jamais des anciennes références détruites. Les fichiers existants d’un même hash doivent être identiques ; une collision incohérente bloque la restauration au lieu d’écraser une ressource partagée. Le schéma et l’adaptateur ChatGPT restent séparés. Les composants validés de menu, navigation, Liste, tags/catégories, aperçu et dialogues ciblés n’ont pas été redessinés.
+
+## MG-003b — Corrections visuelles (0.3.1)
+
+`project_icons.py` rassemble 36 tracés homogènes et un cache Tk retenu par l’application, indexé par identifiants icône/couleur/taille. Le même dessin sert dans l’arbre, les sélecteurs et le brouillon de création. Les huit identifiants historiques et les seize couleurs sont inchangés. Le champ inline tient compte de la profondeur pour laisser l’icône visible.
+
+`ContextMasthead` remplace les vignettes recadrées du bandeau par `contained_picture` : scène entière contenue dans un cadre exactement 16:9 calculé après les textes existants, au plus 128×72 dans les 80 px de hauteur inchangés. L’icône reste à l’extérieur de l’image. Aucune modification du menu, de la recherche, de la Liste ou des colonnes. La rangée `ProjectVisualStrip` est interactive dans la fiche et strictement passive en aperçu projet ; l’aperçu des fils reste identique. Les layers gardent leurs transactions et commandes précédentes, avec grille d’icônes réactive et palette ronde 4×4.
+
+`pack:soleil` est le défaut pour les repères sans image explicite et le paysage neutre. Les six références existantes restent valides avec leur contenu original. `identity.py` reste pur ; ni le schéma 2, ni `core.py`, `chatgpt.py`, `storage.py` et `images.py` ne changent. La migration, l’import et le ZIP complet sont conservés.
