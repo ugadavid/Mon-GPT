@@ -343,7 +343,7 @@ class App(DetailEditor):
         self.results=ResultsView(box,self.store.images,self.project_icons,self.view.get(),self.mosaic_size.get())
         self.results.heading("#0",text="")
         self.results.column("#0",width=32,minwidth=32,stretch=False)
-        for key,label,width in [("title","Titre local",310),("context","Projet / emplacements",150),("categories","Catégories",150),("tags","Tags",150)]:
+        for key,label,width in [("title","Titre",310),("context","Projet",150),("categories","Catégories",150),("tags","Tags",150)]:
             self.results.heading(key,text=label,command=lambda k=key:self.sort_results(k))
             self.results.column(key,width=width,minwidth=180 if key=="title" else 65,stretch=(key=="title"))
         sb=AutoScrollbar(box,orient="vertical",command=self.results.yview)
@@ -517,7 +517,7 @@ class App(DetailEditor):
             child.destroy()
         choices=[]
         if self.scope!="all":
-            scope_text = "Projet : " + self.cat.records[self.scope].title + " · descendants ×" if self.scope in self.cat.records else "À classer ×"
+            scope_text = "Projet : " + self.cat.records[self.scope].title + " · contenu direct ×" if self.scope in self.cat.records else "À classer ×"
             choices.append((scope_text,self.global_scope))
         for var, label in [(self.tag, "Tag"), (self.category, "Catégorie")]:
             if var.get():
@@ -581,6 +581,10 @@ class App(DetailEditor):
         self.results.delete(*self.results.get_children())
         scope = self.scope if self.scope in self.cat.records else None
         rows = self.cat.search(self.query.get().strip(), scope, self.tag.get().strip(), self.category.get().strip(), self.scope == "unfiled")
+        if scope:
+            # La recherche générique reste récursive ; la navigation montre
+            # les rattachements directs et les enfants immédiats uniquement.
+            rows = [r for r in rows if (r.kind=="item" and scope in r.projects) or (r.kind=="project" and r.parent==scope)]
         rows = [r for r in rows if r.id != scope]
         if not scope and not self.query.get().strip() and not self.tag.get() and not self.category.get():
             rows = [r for r in rows if r.kind == "item"]
@@ -755,6 +759,9 @@ class App(DetailEditor):
         return "break"
 
     def hover_result(self, event):
+        if self.view.get()=="list" and (self.results.resize_column or self.results.separator_at(event.x,event.y)):
+            self.results.configure(cursor="sb_h_double_arrow")
+            return
         identity = self.results.identify_at(event.x,event.y)
         self.results.configure(cursor="hand2" if identity in self.cat.records and self.title_hit(event, identity) else "")
 
@@ -1065,6 +1072,9 @@ class App(DetailEditor):
         self.apply_transfer = apply
 
     def drag_press(self, event, widget, button):
+        if widget==self.results and self.view.get()=="list" and event.y<self.results.header_height:
+            self.drag=None
+            return
         identity = widget.identify_at(event.x,event.y) if widget==self.results else widget.identify_row(event.y)
         self.drag = {"id": identity, "widget": widget, "button": button, "x": event.x_root, "y": event.y_root, "active": False, "origin": self.scope, "double": False}
 

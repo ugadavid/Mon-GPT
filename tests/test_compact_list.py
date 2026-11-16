@@ -91,7 +91,7 @@ class CompactListTests(unittest.TestCase):
         x,y,w,h=self.table.bbox(identity,"title")
         self.table.select_click(SimpleNamespace(x=x+w,y=10))
         self.table.resize_motion(SimpleNamespace(x=x+w-35))
-        self.assertEqual(self.table.column("title","width"),275)
+        self.assertEqual(self.table.column("title","width"),w-35)
         self.table.resize_column=None
         self.table.select_click(SimpleNamespace(x=x+20,y=10))
         self.assertTrue(self.app.sort_reverse)

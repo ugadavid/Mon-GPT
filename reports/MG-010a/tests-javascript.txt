@@ -1,0 +1,55 @@
+
+> mon-gpt-collector@0.8.2 test
+> node --test tests/*.test.cjs
+
+✔ URL : UUID strict, hôte exact, URL de projet, query conservée et fragment retiré (2.6214ms)
+✔ Accord avec le validateur Python existant sur les URLs admises et refusées (87.4826ms)
+✔ Une fiche par UUID : deux URLs, plusieurs occurrences et titres égaux distincts (2.2945ms)
+✔ Titre fidèle : null reste inconnu, aria prioritaire, titre récent et champs non prévus absents (0.639ms)
+✔ Contrat JSON déterministe, whitelist, TXT = URL observée par ligne (5.8282ms)
+✔ Deux alias au même scan : garder le titre accessible actif, sans inventer un contexte trop long (0.1659ms)
+✔ Limites et corruption : refus atomique, aucune suppression ou normalisation de date inventée (0.5959ms)
+✔ Bornes de variantes : aucune URL évincée silencieusement (0.5321ms)
+✔ Même API pure sur deux sources fictives, sans site, DOM ni Chrome (0.2572ms)
+✔ Pont : écritures de plusieurs onglets sérialisées, requête répétée idempotente (0.8637ms)
+✔ Pont : modes persistants, échec visible, reprise et vidage limité à la clé dédiée (1.1221ms)
+✔ Vrai contrat natif réduit : div role button, mêmes contrôles clé/label, un ouvert et un replié (5.7812ms)
+✔ Dépli/repli natif : nom stable, enfants observés seulement quand rendus, aucune clé déduite des noms (5.5273ms)
+✔ Aucune contamination : propriétaire contradictoire, nom voisin et bloc mixte restent sans nom (5.5719ms)
+✔ Nom manquant, désaccord texte/attribut, ID ambigu et contrôle caché : aucun nom inventé (6.2313ms)
+✔ Nom réel générique ou préfixe d’action : preuve concordante acceptée intégralement, sans tronquer (5.44ms)
+✔ Modes et accueil SPA : seul le projet courant en cible, tous les rendus en scan explicite (2.218ms)
+✔ Mutations natives : noms et marqueurs suivis, y compris attribut retiré ; texte de fil non utilisé comme nom (1.2744ms)
+✔ Export v2 inchangé : deux homonymes, clés distinctes, rattachements de conversations et dates conservés (9.2972ms)
+✔ Distribution propre et reproductible : uniquement actifs exécutables, aucun profil, export ou dépendance (343.1695ms)
+✔ Présentation commune bornée, titre long disponible, inconnu explicite et aucun UUID mural (5.6373ms)
+✔ Popup : libellés, radios, statut accessible, confirmation distincte et rendu sûr (8.6317ms)
+✔ Liste des conteneurs : homonymes conservés, clés distinctes et noms inconnus explicites (0.6177ms)
+✔ Preuves directes : deux homonymes, clé sur lien ou contrôle, titres localisés et exclusion des actions (3.4724ms)
+✔ Groupes explicites : enfants concordants, homonymes, groupe replié et voisinage incertain (1.1528ms)
+✔ Aucune supposition : groupes mixtes, sections imbriquées, conflit, faux domaine et titre de fil (1.4743ms)
+✔ Page projet : un H1 propre sur URL projet ; jamais le H1 d’une conversation ni un titre ambigu (0.3886ms)
+✔ Auto cible : seulement projet courant, enrichissement sans collecte des autres projets rendus (2.5551ms)
+✔ Fusion par clé, renommage et protection des preuves plus fiables ; noms inconnus honnêtes (2.3848ms)
+✔ Validation stricte et refus atomique conversations + projets, sans écriture partielle (1.4873ms)
+✔ Export v2 déterministe : deux homonymes distincts, inconnu null et deux contextes pour un seul UUID (5.446ms)
+✔ API de conteneurs réutilisable hors ChatGPT, clés distinctes malgré le nom identique (0.3035ms)
+✔ Clés et preuves strictes : hôte exact, routes de projet, contexte non inventé et dates valides (0.8423ms)
+✔ Manuel : aucun timer, observer ou scan initial ; double événement partagé (0.9614ms)
+✔ Transitions cible/large/manuel et route SPA sans remplacer history (3.0614ms)
+✔ Mutations utiles debouncées, frappe hors liens ignorée, scan inchangé sans écriture (0.8247ms)
+✔ Échec visible, pending conservé, relance manuelle et suspension complète (1.2289ms)
+✔ Projet renommé sans mutation de fil : nouveau lot atomique, attente préservée après erreur (0.7846ms)
+✔ Scanner 3GPT3 adapté : aria puis texte, projets, actif, titre inconnu (2.2248ms)
+✔ Scanner : UUID sans lien, domaine piégé, caché et DOM absent ne sont pas collectés (1.1169ms)
+✔ Auto cible : aucun parcours large, seulement l’URL courante ; manuel/large voient les liens (0.806ms)
+✔ URLs de projet et globale conservées, doublons de nœuds neutralisés (0.2662ms)
+✔ Manifest et code : permissions minimales, pas d’injection UI ou collecte de contenu (19.2126ms)
+ℹ tests 43
+ℹ suites 0
+ℹ pass 43
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 430.8974

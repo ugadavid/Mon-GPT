@@ -259,9 +259,12 @@ class CatalogList(tk.Canvas):
         self.bind("<Right>",lambda e:self.focus_action(True))
         self.bind("<Left>",lambda e:self.focus_action(False))
         self.resize_column = None
+        self.title_resized = False
+        self.separator_hover = None
         self.pending_draw = None
         self.bind("<B1-Motion>",self.resize_motion)
-        self.bind("<ButtonRelease-1>",lambda e:setattr(self,"resize_column",None))
+        self.bind("<ButtonRelease-1>",self.resize_release)
+        self.bind("<Leave>",self.leave_header,add=True)
 
     def configure(self, cnf=None, **kwargs):
         if "yscrollcommand" in kwargs: self.ycommand=kwargs.pop("yscrollcommand")
@@ -292,8 +295,11 @@ class CatalogList(tk.Canvas):
         self.secondary_order=order
         total=sum(self.columns.get(k,{}).get("width",150) for k in order)
         preferred=self.columns.get("title",{}).get("width",300)
-        title=max(180,min(preferred,int(width*.44)))
-        title=max(title,width-icon-action-total)
+        if self.title_resized:
+            title=max(180,min(preferred,width-icon-action-90))
+        else:
+            title=max(180,min(preferred,int(width*.44)))
+            title=max(title,width-icon-action-total)
         self.secondary_start=icon+title
         self.secondary_visible=max(1,width-action-self.secondary_start)
         self.left=min(self.left,max(0,total-self.secondary_visible))
@@ -402,10 +408,15 @@ class CatalogList(tk.Canvas):
         self.hide_tip()
         self.focus_set()
         if event.y<self.header_height:
-            for key,(x,width) in self.layout().items():
-                if key not in ("#0","open","details") and abs(event.x-x-width)<5 and 32<event.x<self.winfo_width()-36:
-                    self.resize_column=(key,event.x,self.columns[key]["width"])
-                    return
+            key=self.separator_at(event.x,event.y)
+            if key:
+                layout=self.layout()
+                # Figer la largeur réellement visible, sans saut au premier pixel.
+                self.columns["title"]["width"]=layout["title"][1]
+                self.title_resized=True
+                self.resize_column=(key,event.x,layout[key][1])
+                self.configure(cursor="sb_h_double_arrow")
+                return
             col=self.identify_column(event.x)
             if col:
                 fn=self.headings.get(self.keys[int(col[1:])],{}).get("command")
@@ -422,6 +433,26 @@ class CatalogList(tk.Canvas):
             self.columns[key]["width"]=max(self.columns[key].get("minwidth",44),width+event.x-start)
             self.draw()
 
+    def separator_at(self,x,y):
+        if not 0<=y<self.header_height or self.winfo_width()<440 or getattr(self,"view","list")!="list": return None
+        layout=self.layout()
+        for key in ["title"]+self.secondary_order:
+            start,size=layout[key]
+            edge=start+size
+            if self.visible_box(key)[1]>0 and self.secondary_start<=edge<=self.winfo_width()-36 and abs(x-edge)<=7:
+                return key
+        return None
+
+    def resize_release(self,event):
+        self.resize_column=None
+        self.motion(event)
+
+    def leave_header(self,event=None):
+        if self.separator_hover is not None:
+            self.separator_hover=None
+            self.draw()
+        if not self.resize_column: self.configure(cursor="")
+
     def navigate(self,step):
         identities=list(self.rows)
         if identities:
@@ -432,6 +463,14 @@ class CatalogList(tk.Canvas):
         return "break"
 
     def motion(self,event):
+        separator=self.separator_at(event.x,event.y)
+        if separator!=self.separator_hover:
+            self.separator_hover=separator
+            self.draw()
+        if separator or self.resize_column:
+            self.configure(cursor="sb_h_double_arrow")
+            self.hide_tip()
+            return
         self.hover(self.identify_row(event.y))
         self.hide_tip()
         identity=self.identify_row(event.y)
@@ -451,7 +490,7 @@ class CatalogList(tk.Canvas):
         if identity not in self.rows: return
         data=self.rows[identity]
         vals=data["values"]
-        text=vals[0]+"\nProjet / emplacements : "+vals[1]
+        text=vals[0]+"\nProjet : "+vals[1]
         text+="\nCatégories : "+(" · ".join(data.get("categories",[])) or "—")
         text+="\nTags : "+(" · ".join(data.get("labels",[])) or "—")
         if self.winfo_width()<900: text+="\nColonnes secondaires repliées ou défilantes."
@@ -571,6 +610,11 @@ class CatalogList(tk.Canvas):
             if key==self.sort_column: text+=(" ↓" if self.sort_reverse else " ↑")
             self.create_text(x+7,18,text=shorten(self.small_font,text,size-12),anchor="w",font=self.small_font,fill=C["muted"])
         self.create_line(6,self.header_height-1,width-6,self.header_height-1,fill=C["line"])
+        grip=self.resize_column[0] if self.resize_column else self.separator_hover
+        if grip and grip in layout:
+            edge=sum(layout[grip])
+            if self.secondary_start<=edge<=width-36:
+                self.create_line(edge,8,edge,self.header_height-7,fill=C["pine"],width=2,tags="column_grip")
         if not self.rows and height>160:
             cx,cy=width/2,min(height/2,self.header_height+120)
             self.row_icon(cx,cy-30,False,C["pine"])

@@ -202,6 +202,7 @@ class ChoiceTile(tk.Canvas):
         self.bind("<Configure>",self.draw)
         self.bind("<FocusIn>",self.focused);self.bind("<FocusOut>",self.draw)
         self.bind("<Button-1>",lambda e:self.choose())
+        if layer.kind=="image": self.bind("<Double-Button-1>",self.double_choose)
         self.bind("<Return>",lambda e:self.choose());self.bind("<space>",lambda e:self.choose())
         for key,step,vertical in (("Left",-1,False),("Right",1,False),("Up",-1,True),("Down",1,True)):
             self.bind("<"+key+">",lambda e,s=step,v=vertical:self.neighbor(s*self.layer.columns if v else s))
@@ -212,6 +213,12 @@ class ChoiceTile(tk.Canvas):
         self.layer.selected=self.value
         self.layer.inheriting=False
         self.layer.refresh()
+        return "break"
+
+    def double_choose(self,event=None):
+        if not self.layer.closed:
+            self.choose()
+            self.layer.accept()
         return "break"
 
     def neighbor(self,step):
@@ -230,6 +237,12 @@ class ChoiceTile(tk.Canvas):
     def draw(self,event=None):
         self.delete("all")
         w,h=self.winfo_width(),self.winfo_height()
+        if self.layer.kind=="image":
+            image_width=max(2,w-12)
+            image_height=max(1,round(image_width*9/16))
+            target_height=image_height+42
+            if int(self.cget("height"))!=target_height:
+                self.configure(height=target_height)
         selected=self.layer.selected==self.value
         focused=self.focus_get()==self
         if self.layer.kind=="color":
@@ -247,8 +260,11 @@ class ChoiceTile(tk.Canvas):
                 outline=C["pine"] if selected or focused else C["line"],width=2 if selected or focused else 1)
         kind=self.layer.kind
         if kind=="image":
-            image=thumbnail(self.layer.app.store.images,self.value,max(2,w-12),60,5)
-            self.photo=ImageTk.PhotoImage(image,master=self)
+            key=(self.value,image_width,image_height)
+            if getattr(self,"photo_key",None)!=key:
+                image=contained_picture(self.layer.app.store.images,self.value,image_width,image_height)
+                self.photo=ImageTk.PhotoImage(image,master=self)
+                self.photo_key=key
             self.create_image(w/2,6,image=self.photo,anchor="n")
         elif kind=="icon":
             self.photo=ImageTk.PhotoImage(icon_picture(self.value,C["pine"],28),master=self)
@@ -262,6 +278,7 @@ class VisualLayer(ttk.Frame):
     def __init__(self,app,fields,kind):
         super().__init__(app.canvas,style="Paper.TFrame",padding=12)
         self.app,self.fields,self.kind=app,fields,kind
+        self.closed=False
         self.selected=fields.value[kind]
         self.inheriting=fields.inherited is not None and kind not in fields.overrides
         self.columns=2 if kind=="image" else 4
@@ -297,6 +314,7 @@ class VisualLayer(ttk.Frame):
             intro=ttk.Frame(self.content,style="Paper.TFrame")
             intro.pack(fill="x",pady=(3,12))
         self.preview=tk.Label(intro,background=C["paper"],borderwidth=0)
+        if kind=="image": self.preview.bind("<Double-Button-1>",lambda e:self.accept())
         self.name=ttk.Label(intro,style="Paper.TLabel",font=("Segoe UI",10,"bold"),wraplength=240)
         if kind=="color":
             self.preview.pack(side="left")
@@ -310,6 +328,7 @@ class VisualLayer(ttk.Frame):
         grid=self.grid_frame=ttk.Frame(self.content,style="Paper.TFrame")
         grid.pack(fill="x")
         values=["pack:"+key for key in COVERS] if kind=="image" else list(ICONS if kind=="icon" else PALETTE)
+        if kind=="image" and self.selected not in values: values.insert(0,self.selected)
         self.tiles=[]
         for index,value in enumerate(values):
             tile=ChoiceTile(grid,self,value)
@@ -317,6 +336,7 @@ class VisualLayer(ttk.Frame):
             grid.columnconfigure(index%self.columns,weight=1,uniform="tiles")
             self.tiles.append(tile)
         if kind=="icon": grid.bind("<Configure>",self.layout_icons)
+        if kind=="image": self.canvas.bind("<Configure>",lambda e:self.refresh(),add=True)
         def wheel(event):
             self.canvas.yview_scroll(-1 if event.delta>0 else 1,"units")
             return "break"
@@ -330,7 +350,9 @@ class VisualLayer(ttk.Frame):
         next((t for t in self.tiles if t.value==self.selected),self.tiles[0]).focus_set()
 
     def refresh(self):
-        if self.kind=="image": image=thumbnail(self.app.store.images,self.selected,264,148)
+        if self.kind=="image":
+            width=max(64,min(512,self.canvas.winfo_width()-8))
+            image=contained_picture(self.app.store.images,self.selected,width,round(width*9/16))
         elif self.kind=="icon": image=icon_picture(self.selected,PALETTE[self.fields.value["color"]][1],42)
         else:
             image=swatch_picture(PALETTE[self.selected][1],30)
@@ -362,6 +384,11 @@ class VisualLayer(ttk.Frame):
             self.inheriting=False
             self.error.configure(text="")
             self.error.pack_forget()
+            if not any(t.value==reference for t in self.tiles):
+                tile=ChoiceTile(self.grid_frame,self,reference)
+                index=len(self.tiles)
+                tile.grid(row=index//self.columns,column=index%self.columns,sticky="nsew",padx=2,pady=3)
+                self.tiles.append(tile)
             self.refresh()
             self.canvas.yview_moveto(0)
         except (OSError,ValueError) as exc:
@@ -369,10 +396,14 @@ class VisualLayer(ttk.Frame):
             self.error.pack(side="bottom",fill="x",before=self.body,pady=(4,0))
 
     def accept(self):
+        if self.closed: return "break"
         self.fields.set_choice(self.kind,None if self.inheriting else self.selected)
         self.cancel()
+        return "break"
 
     def cancel(self):
+        if self.closed: return
+        self.closed=True
         self.app.visual_layer=None
         self.destroy()
         button=self.fields.buttons[self.kind]

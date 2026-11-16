@@ -152,7 +152,9 @@ class MosaicTests(unittest.TestCase):
         drop=SimpleNamespace(x=-100,y=100,x_root=self.app.tree.winfo_rootx()+tx+tw/2,y_root=self.app.tree.winfo_rooty()+ty+th/2)
         self.app.drag_motion(drop);self.app.drag_release(drop,self.table,1)
         self.assertEqual(r.projects,[self.b.id,self.child.id]);self.assertEqual(r.notes,'Note partagée intacte')
-        self.app.scope=self.child.id;self.app.refresh_results();self.root.update();x,y=self.point(r)
+        # Navigation réelle : synchroniser l'arbre et le périmètre, y compris
+        # les événements de sélection laissés en file par le déplacement.
+        self.app.tree.selection_set(self.child.id);self.app.select_scope();self.root.update();x,y=self.point(r)
         event=SimpleNamespace(x=x,y=y,x_root=self.table.winfo_rootx()+x,y_root=self.table.winfo_rooty()+y)
         before=encode(self.cat,self.adapter);self.app.drag_press(event,self.table,1)
         tx,ty,tw,th=self.app.tree.bbox('all');drop.x_root=self.app.tree.winfo_rootx()+tx+20;drop.y_root=self.app.tree.winfo_rooty()+ty+th/2

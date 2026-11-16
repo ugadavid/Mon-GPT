@@ -1,4 +1,6 @@
-# Mon GPT<3 — 0.9.0
+# Mon GPT<3 — 0.9.1
+
+**MG-010a — Corrections de recette.** Un dossier affiche désormais ses fils directement rattachés et ses enfants immédiats dans les trois vues. La Liste utilise **Titre / Projet / Catégories / Tags**, avec poignées de largeur au survol ; les largeurs restent pendant la session. Les couvertures de la galerie grandissent en 16:9 avec le volet. Un double-clic équivaut à **Utiliser**, sans enregistrer la fiche. [Rapport et cinq captures fictives](reports/MG-010a/rapport.md). Les idées de finition restent au parking.
 
 **MG-009 — Import intelligent.** Depuis **Fichier → Importer depuis Mon GPT Collector (JSON)…**, prévisualiser projets et discussions d’un export v2, choisir création séparée, association, fusion explicite ou omission, puis confirmer. Les homonymes restent distincts par défaut ; GUID sources et correspondances locales sont sauvegardés ensemble. Réimporter conserve toutes les personnalisations et ne crée aucun doublon. [Guide d’import](docs/MG-009-import.md) · [Rapport, recette réelle et six captures fictives](reports/MG-009/rapport.md). Collector Chrome **0.8.2 inchangé**.
 
