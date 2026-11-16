@@ -19,6 +19,7 @@ from .identity_ui import ContextMasthead, ProjectVisualStrip
 from .project_icons import ProjectIconCache
 from .results import ResultsView
 from .batch_ui import BatchActions
+from .project_choices import project_choices
 from . import ui_state, __version__
 
 
@@ -49,7 +50,7 @@ class App(BatchActions,DetailEditor):
         root.title(f"Mon GPT<3 — {__version__}" + (" · RECETTE · ouvertures simulées" if opener else ""))
         root.geometry(preferences.get("geometry", "1360x820"))
         root.minsize(1000, 680)
-        self.status = tk.StringVar(value=warning or "Prêt · un clic sur un titre ouvre le fil ; ailleurs, sélectionnez.")
+        self.status = tk.StringVar(value=warning or "Prêt · sélectionnez une ligne ; ↗ ouvre le fil.")
         self.query, self.tag, self.category = tk.StringVar(), tk.StringVar(), tk.StringVar()
         self.sort = tk.StringVar(value="Manuel")
         self.build_menus()
@@ -361,11 +362,15 @@ class App(BatchActions,DetailEditor):
         self.results.bind("<<TreeviewSelect>>",self.select_record)
         self.results.bind("<<MosaicLayout>>",self.position_mosaic_rename)
         self.results.bind("<Return>",self.result_enter)
+        self.results.bind("<Alt-Return>",self.open_focused_action)
         self.results.bind("<Double-Button-1>",self.result_double)
         self.results.bind("<Motion>",self.hover_result,add=True)
         self.empty=ttk.Label(self.middle,text="",style="Muted.TLabel",padding=(12,6),wraplength=600)
         self.empty.pack(anchor="w")
-        ttk.Label(self.middle,text="↗  Un clic sur le titre pour reprendre le fil.   Entrée : ouvrir  ·  F2 : renommer",style="Muted.TLabel",font=("Segoe UI",9),wraplength=800).pack(anchor="w",padx=12,pady=(0,4))
+        self.results_help=ttk.Label(self.middle,style="Muted.TLabel",font=("Segoe UI",9))
+        self.results_help.pack(fill="x",padx=12,pady=(0,4))
+        self.results_help.bind("<Configure>",lambda e:self.results_help.configure(
+            text="Ligne : sélectionner · ↗ : ouvrir\nAlt+Entrée : ↗ · F2 : renommer" if e.width<500 else "Sélectionnez une ligne · ↗ : ouvrir · Alt+Entrée : ↗ du fil focal · F2 : renommer"))
         inspector_surface=Surface(self.right,padding=8,width=330,height=120)
         inspector_surface.pack(fill="both",expand=True)
         holder=inspector_surface.body
@@ -447,7 +452,7 @@ class App(BatchActions,DetailEditor):
         self.root.geometry(f"{width}x{height}")
 
     def help(self):
-        messagebox.showinfo("Gestes et raccourcis", "Titre ou ↗ : ouvrir le fil. Image en Détaillée/Mosaïque : sélectionner.\nDouble-clic sur un résultat / Entrée : ouvrir.\nMosaïque : flèches dans la grille, Entrée pour ouvrir.\nCtrl+K : rechercher · Ctrl+N : nouveau fil\nCtrl+Maj+P : nouveau projet · F2 : renommer\nCtrl+S : enregistrer la fiche · Échap : annuler l'édition intégrée\nAlt+↑/↓ dans l'arbre : ordre manuel\nClic droit / touche Menu : actions de classement\nGlisser gauche : déplacer · Glisser droit : choix à la dépose\nLes autres rattachements sont préservés.\nFichier : sauvegarde/restauration du catalogue.", parent=self.root)
+        messagebox.showinfo("Gestes et raccourcis", "Ligne, titre, icône ou image : sélectionner, sans ouvrir.\n↗ : ouvrir dans ChatGPT · Alt+Entrée : ↗ du fil focal.\nDouble-clic et Entrée sur une ligne : aucune ouverture.\nCtrl+clic / Maj+clic : sélection multiple · Ctrl+A : résultats visibles.\nMosaïque : flèches dans la grille.\nCtrl+K : rechercher · Ctrl+N : nouveau fil\nCtrl+Maj+P : nouveau projet · F2 : renommer\nCtrl+S : enregistrer la fiche · Échap : annuler l'édition intégrée\nAlt+↑/↓ dans l'arbre : ordre manuel\nClic droit / touche Menu : actions de classement\nGlisser gauche : déplacer · Glisser droit : choix à la dépose\nLes autres rattachements sont préservés.\nFichier : sauvegarde/restauration du catalogue.", parent=self.root)
 
     def focus_search(self):
         self.search_entry.focus_set()
@@ -727,7 +732,7 @@ class App(BatchActions,DetailEditor):
         return super().save_record()
 
     def open_thread(self, identity=None):
-        if not self.individual_allowed():return False
+        if identity is None and not self.individual_allowed():return False
         identity = identity or self.current
         if identity not in self.cat.records or self.cat.records[identity].kind != "item":
             return False
@@ -763,31 +768,28 @@ class App(BatchActions,DetailEditor):
         self.open_thread(identity)
 
     def result_enter(self, event=None):
-        if not self.individual_allowed():return "break"
-        if self.root.focus_get() == self.results:
-            identity = self.results.focus()
-            if identity in self.cat.records:
-                if self.cat.records[identity].kind == "project":
-                    self.tree.selection_set(identity)
-                    self.tree.see(identity)
-                else:
-                    self.open_thread(identity)
+        if self.root.focus_get()==self.results:
+            if self.results.action_focus and self.view.get()!='mosaic':return self.open_focused_action(event)
+            identity=self.results.focus()
+            if identity in self.cat.records and self.cat.records[identity].kind=="project":
+                self.tree.selection_set(identity);self.tree.see(identity)
+        return "break"
+
+    def open_focused_action(self,event=None):
+        """Activation explicite de ↗ au clavier, sans ouverture sur Entrée seule."""
+        if self.root.focus_get()==self.results:
+            identity=self.results.focus()
+            if identity in self.results.selection():self.open_click(identity)
         return "break"
 
     def result_double(self, event):
         if getattr(event,"state",0)&5:
             self.results.select_click(event)
             return "break"
-        if not self.individual_allowed():return "break"
-        identity = self.results.identify_at(event.x,event.y)
-        if identity in self.cat.records:
-            if self.cat.records[identity].kind == "item":
-                self.open_click(identity)
-            else:
-                self.tree.selection_set(identity)
-                self.tree.item(identity, open=True)
-        if self.drag:
-            self.drag["double"] = True
+        identity=self.results.identify_at(event.x,event.y)
+        if identity in self.cat.records and self.cat.records[identity].kind=="project":
+            self.tree.selection_set(identity);self.tree.item(identity,open=True)
+        # Le second relâchement sur ↗ passe par le même anti-rebond que le premier.
         return "break"
 
     def hover_result(self, event):
@@ -795,7 +797,11 @@ class App(BatchActions,DetailEditor):
             self.results.configure(cursor="sb_h_double_arrow")
             return
         identity = self.results.identify_at(event.x,event.y)
-        self.results.configure(cursor="hand2" if identity in self.cat.records and self.title_hit(event, identity) else "")
+        opening=identity in self.cat.records and self.title_hit(event,identity)
+        self.results.configure(cursor="hand2" if opening else "")
+        if opening:
+            self.results.hide_tip()
+            self.results.tip_timer=self.results.after(450,lambda:self.results.show_open_tip(identity,event.y))
 
     def clear_work(self):
         for child in self.work_content.winfo_children():
@@ -1058,12 +1064,12 @@ class App(BatchActions,DetailEditor):
         self.work.pack(fill="x", before=self.results_box)
         title = {"move": "Déplacer", "add": "Ajouter un rattachement", "remove": "Retirer un rattachement"}[mode]
         ttk.Label(self.work_content, text=f"{title} · {r.title}", style="Inspector.TLabel", wraplength=650).pack(anchor="w", pady=4)
-        source_ids = list(r.projects) if r.kind == "item" else []
+        source_ids = list(project_choices(self.cat,r.projects).values()) if r.kind == "item" else []
         self.source_box = None
         context = origin if origin is not None else self.scope
         if r.kind == "item" and mode in ("move", "remove") and source_ids:
             ttk.Label(self.work_content, text="Seul ce rattachement sera retiré ; les autres seront conservés.",style="PaperMuted.TLabel",wraplength=600).pack(anchor="w")
-            self.source_box = ttk.Combobox(self.work_content, state="readonly", values=[self.project_label(p) for p in source_ids])
+            self.source_box = ttk.Combobox(self.work_content, state="readonly", values=list(project_choices(self.cat,source_ids)))
             self.source_box.pack(fill="x", pady=4)
             if context in source_ids:
                 self.source_box.current(source_ids.index(context))
@@ -1072,10 +1078,12 @@ class App(BatchActions,DetailEditor):
         destinations = [None] if r.kind == "project" else []
         forbidden = self.cat.descendants(identity) if r.kind == "project" else set()
         destinations += sorted((p.id for p in self.cat.records.values() if p.kind == "project" and p.id not in forbidden), key=self.project_label)
+        choices=project_choices(self.cat,[p for p in destinations if p])
+        destinations=([None] if r.kind=="project" else [])+list(choices.values())
         self.destination_box = None
         if mode != "remove":
             ttk.Label(self.work_content, text="DESTINATION",style="Caption.TLabel").pack(anchor="w")
-            self.destination_box = ttk.Combobox(self.work_content, state="readonly", values=[self.project_label(p) if p else "À la racine" for p in destinations])
+            self.destination_box = ttk.Combobox(self.work_content, state="readonly", values=(["À la racine"] if r.kind=="project" else [])+list(choices))
             self.destination_box.pack(fill="x", pady=4)
             if destination in destinations:
                 self.destination_box.current(destinations.index(destination))
@@ -1095,13 +1103,17 @@ class App(BatchActions,DetailEditor):
                     if self.destination_box.current() < 0:
                         raise ValueError("Choisissez une destination.")
                     target = destinations[self.destination_box.current()]
+                if r.kind=='item':
+                    self.apply_classification((identity,),mode,source,target)
+                    self.clear_work()
+                    return
                 self.transaction(lambda: self.transfer(identity, target, mode, source))
                 self.clear_work()
                 self.refresh_tree()
                 self.refresh_results()
                 if self.inspector_visible:
                     self.show_summary(self.current, checked=True)
-                self.status.set("Classement mis à jour · même fiche, notes conservées.")
+                if r.kind=='project':self.status.set("Projet déplacé.")
             except (ValueError, OSError) as exc:
                 self.work_error.set(str(exc))
         self.button(row, text=title, style="Primary.TButton", command=apply).pack(side="left")
@@ -1110,21 +1122,18 @@ class App(BatchActions,DetailEditor):
 
     def drag_press(self, event, widget, button):
         if widget==self.results and self.view.get()=="list" and event.y<self.results.header_height:
-            self.drag=None
-            return
-        identity = widget.identify_at(event.x,event.y) if widget==self.results else widget.identify_row(event.y)
+            self.drag=None;return
+        identity=widget.identify_at(event.x,event.y) if widget==self.results else widget.identify_row(event.y)
+        modified=bool(getattr(event,"state",0)&5)
         if widget==self.results:
-            if self.results.gesture_blocked:
-                self.drag=None
-                return
-            modified=bool(getattr(event,"state",0)&5)
+            if self.results.gesture_blocked:self.drag=None;return
             if button==3 and identity not in self.results.selection() and identity in self.cat.records:
                 if not self.can_leave():self.drag=None;return
                 self.results.selection_set(identity);self.select_record()
-            if modified or len(self.group_ids())>1:
-                self.drag={"id":identity,"widget":widget,"button":button,"x":event.x_root,"y":event.y_root,"active":False,"origin":self.scope,"double":False,"batch":True,"modified":modified}
-                return
-        self.drag = {"id": identity, "widget": widget, "button": button, "x": event.x_root, "y": event.y_root, "active": False, "origin": self.scope, "double": False}
+        ids=self.group_ids() if widget==self.results and identity in self.results.selection() else (identity,)
+        self.drag={"id":identity,"ids":ids,"widget":widget,"button":button,"x":event.x_root,"y":event.y_root,
+                   "active":False,"origin":self.scope,"double":False,"modified":modified,
+                   "open":widget==self.results and not modified and self.title_hit(event,identity) if identity in self.cat.records else False}
 
     def clear_drop(self):
         for identity in ("all", "unfiled", *self.cat.records):
@@ -1147,11 +1156,7 @@ class App(BatchActions,DetailEditor):
         return identity, identity in self.cat.records and self.cat.records[identity].kind == "project"
 
     def drag_motion(self, event):
-        if self.drag and self.drag.get("batch"):
-            if abs(event.x_root-self.drag["x"])+abs(event.y_root-self.drag["y"])>=9:
-                self.drag["active"]=True
-                self.status.set("Glisser de lot désactivé : utilisez Déplacer… ou Ajouter un rattachement…")
-            return
+        if self.drag and (self.drag.get("modified") or self.drag.get("open")):return
         if not self.drag or self.drag["id"] not in self.cat.records:
             return
         if abs(event.x_root-self.drag["x"])+abs(event.y_root-self.drag["y"]) < 9:
@@ -1164,62 +1169,50 @@ class App(BatchActions,DetailEditor):
             self.tree.see(target)
         self.drag["widget"].configure(cursor="hand2" if allowed else "no")
         self.drop_label.configure(text=("↳  Déposer dans " + (self.cat.records[target].title if target in self.cat.records else "la racine")) if allowed else "×  Cible interdite",foreground=COLORS["pine"] if allowed else COLORS["error"])
-        self.status.set(("Déposer ici : " + (self.project_label(target) if target in self.cat.records else "À la racine") + (" · choix Déplacer / Ajouter à la dépose" if self.drag["button"] == 3 else " · déplacer le lien de départ seulement")) if allowed else "Cible interdite · aucun changement tant qu'une dépose valide n'est pas faite.")
+        count=len(self.drag.get("ids",(self.drag["id"],)))
+        subject="le projet" if self.cat.records[self.drag['id']].kind=='project' else f"{count} discussion(s)"
+        self.status.set((f"Déplacer {subject} vers " + (self.project_label(target) if target in self.cat.records else "la racine")) if allowed else "Cible interdite.")
 
     def drag_release(self, event, widget, button):
-        drag = self.drag
-        if not drag:
-            return
-        if drag.get("batch"):
-            self.drag=None
-            if drag["active"] or drag["modified"]:return "break"
-            if button==3:return self.group_menu(event.x_root,event.y_root)
-            self.results.finish_single()
-            self.select_record()
-            if drag["id"] in self.cat.records and self.title_hit(event,drag["id"]):self.open_click(drag["id"])
-            return "break"
-        target, allowed = self.drop_target(event.x_root, event.y_root)
-        self.clear_drop()
-        self.drag = None
-        identity = drag["id"]
+        drag=self.drag
+        if not drag:return
+        target,allowed=self.drop_target(event.x_root,event.y_root)
+        self.clear_drop();self.drag=None
+        identity=drag["id"]
+        if drag.get("modified"):return "break"
         if drag["active"]:
+            self.results.pending_single=None
             if not allowed:
-                self.status.set("Déplacement annulé : cible interdite, catalogue inchangé.")
-                return "break"
-            if button == 3 and self.cat.records[identity].kind == "item":
-                menu = skin_menu(tk.Menu(self.root, tearoff=False))
-                menu.add_command(label="Déplacer ici", command=lambda: self.drop_action(identity, target, "move", drag["origin"]))
-                menu.add_command(label="Ajouter un rattachement ici", command=lambda: self.drop_action(identity, target, "add", drag["origin"]))
-                menu.add_command(label="Annuler", command=lambda: self.status.set("Dépose annulée · catalogue inchangé."))
-                self.active_menu = menu
-                menu.tk_popup(event.x_root, event.y_root)
-            elif button == 1:
-                self.drop_action(identity, target, "move", drag["origin"])
-            else:
-                self.status.set("Projet : utilisez le glisser gauche ou Déplacer dans son menu.")
+                self.status.set("Cible interdite.");return "break"
+            ids=drag.get("ids",(identity,))
+            if button==3 and self.cat.records[identity].kind=="item":
+                menu=skin_menu(tk.Menu(self.root,tearoff=False))
+                menu.add_command(label="Déplacer ici",command=lambda:self.drop_items(ids,target,"move",drag["origin"]))
+                menu.add_command(label="Ajouter un rattachement ici",command=lambda:self.drop_items(ids,target,"add",drag["origin"]))
+                menu.add_command(label="Annuler",command=lambda:None)
+                self.active_menu=menu;menu.tk_popup(event.x_root,event.y_root)
+            elif button==1:
+                if self.cat.records[identity].kind=="item":self.drop_items(ids,target,"move",drag["origin"])
+                else:self.drop_action(identity,target,"move",drag["origin"])
             return "break"
-        if button == 3:
-            return self.context_menu(identity, event.x_root, event.y_root)
-        if widget == self.results and not drag["double"] and identity in self.cat.records and self.title_hit(event, identity):
-            self.open_click(identity)
+        if button==3:return self.context_menu(identity,event.x_root,event.y_root)
+        if widget==self.results:
+            if drag.get("open") and identity in self.cat.records and self.title_hit(event,identity):
+                self.results.pending_single=None;self.open_click(identity)
+            else:
+                self.results.finish_single();self.select_record()
+        return "break"
 
     def drop_action(self, identity, target, mode, origin):
-        if not self.can_leave():
-            return
-        r = self.cat.records[identity]
-        source = origin if origin in r.projects else (r.projects[0] if len(r.projects)==1 else None)
-        if r.kind == "item" and mode == "move" and len(r.projects)>1 and source is None:
-            self.transfer_panel(identity, mode, target, origin)
-            self.status.set("Choisissez le lien de départ : aucun autre rattachement ne sera retiré.")
-            return
+        if not self.can_leave():return
+        r=self.cat.records.get(identity)
+        if r is None:return
+        if r.kind=="item":return self.drop_items((identity,),target,mode,origin)
         def action():
-            self.transaction(lambda: self.transfer(identity, None if target == "all" else target, mode, source if r.kind=="item" else None))
-            self.refresh_tree()
-            self.refresh_results()
-            if self.inspector_visible:
-                self.show_summary(self.current, checked=True)
-            self.status.set("Rattachement ajouté · même fiche, notes conservées." if mode == "add" else "Déplacement effectué · autres rattachements conservés.")
-            self.drop_label.configure(text="✓  Classé dans " + (self.cat.records[target].title if target in self.cat.records else "la racine"),foreground=COLORS["pine"])
+            self.transaction(lambda:self.transfer(identity,None if target=="all" else target,mode))
+            self.refresh_tree();self.refresh_results()
+            if self.inspector_visible:self.show_summary(self.current,checked=True)
+            self.status.set("Projet déplacé.")
         self.safe(action)
 
     def close(self):

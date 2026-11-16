@@ -108,7 +108,7 @@ class BatchUITests(unittest.TestCase):
         self.select(3);self.click(self.child.id,state=4)
         self.assertEqual(self.table.selection(),(self.child.id,));self.assertEqual(self.app.group_ids(),())
 
-    def test_group_inspector_shortcuts_menu_and_blocked_drag(self):
+    def test_group_inspector_shortcuts_menu_and_invalid_drop(self):
         ids=self.select();self.app.toggle_inspector();self.root.update()
         self.assertIsNone(self.app.current);self.assertFalse(self.app.editing)
         before=encode(self.app.cat,self.app.adapter)
@@ -128,7 +128,7 @@ class BatchUITests(unittest.TestCase):
         self.table.event_generate('<ButtonPress-1>',x=x,y=y,time=60000);self.root.update()
         self.table.event_generate('<B1-Motion>',x=x+50,y=y+30,state=256,time=60100)
         self.table.event_generate('<ButtonRelease-1>',x=x+50,y=y+30,time=60200);self.root.update()
-        self.assertEqual(set(self.table.selection()),set(ids));self.assertIn('Glisser de lot',self.app.status.get())
+        self.assertEqual(set(self.table.selection()),set(ids));self.assertIn('Cible interdite',self.app.status.get())
         self.assertEqual(encode(self.app.cat,self.app.adapter),before)
 
     def test_dirty_editor_cancel_leaves_draft_and_selection_intact(self):

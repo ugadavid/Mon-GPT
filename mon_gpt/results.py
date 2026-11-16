@@ -70,8 +70,7 @@ class ResultsView(MosaicRenderer,CatalogList):
         if identity not in self.rows or "project" in self.rows[identity].get("tags",()): return False
         if self.identify_row(y)!=identity: return False
         bx,by,bw,_=self.bbox(identity,"title")
-        title=shorten(self.detail_title_font,self.rows[identity]["values"][0],bw-4)
-        return (bx<=x<=bx+self.detail_title_font.measure(title) and by<=y<by+26) or (self.winfo_width()-36<=x<self.winfo_width() and by<=y<by+28)
+        return self.winfo_width()-36<=x<self.winfo_width() and by<=y<by+28
 
     def select_click(self,event):
         if self.view=="mosaic":

@@ -87,10 +87,11 @@ class DetailedViewTests(unittest.TestCase):
             self.assertEqual(self.app.current,r.id)
         self.opener.assert_not_called()
         tx,ty,_,_=self.table.bbox(r.id,'title')
-        self.assertTrue(self.table.open_hit(r.id,tx+4,ty+12))
+        self.assertFalse(self.table.open_hit(r.id,tx+4,ty+12))
         self.table.event_generate('<ButtonPress-1>',x=int(tx+4),y=int(ty+12));self.table.event_generate('<ButtonRelease-1>',x=int(tx+4),y=int(ty+12));self.root.update()
-        self.opener.assert_called_once()
-        self.opener.reset_mock();self.table.event_generate('<Return>');self.root.update();self.opener.assert_called_once()
+        self.opener.assert_not_called()
+        self.table.event_generate('<Return>');self.root.update();self.opener.assert_not_called()
+        self.table.event_generate('<Alt-Return>');self.root.update();self.opener.assert_called_once()
 
     def test_geometry_scroll_keyboard_tooltip_empty_and_list_contract(self):
         self.detail()
@@ -132,7 +133,7 @@ class DetailedViewTests(unittest.TestCase):
         self.assertIn('Renommer',[self.app.active_menu.entrycget(n,'label') for n in range(self.app.active_menu.index('end')+1) if self.app.active_menu.type(n)!='separator'])
         target=self.cat.add('Cible fictive','project');self.app.refresh_tree();self.root.update()
         self.app.drop_action(r.id,target.id,'move',self.a.id)
-        self.assertEqual(r.projects,[self.b.id,target.id]);self.assertEqual(r.notes,'Notes communes à préserver')
+        self.assertEqual(self.app.cat.records[r.id].projects,[self.b.id,target.id]);self.assertEqual(self.app.cat.records[r.id].notes,'Notes communes à préserver')
 
     def test_ui_preferences_old_new_unknown_and_no_catalog_field(self):
         path=self.store.directory/'interface.json';before=encode(self.cat,self.adapter)

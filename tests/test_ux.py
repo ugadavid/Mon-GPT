@@ -54,6 +54,9 @@ class GestureTests(unittest.TestCase):
         self.opener.assert_not_called()
         with patch.object(self.root, "focus_get", return_value=self.app.results):
             self.app.result_enter()
+        self.opener.assert_not_called()
+        with patch.object(self.root,"focus_get",return_value=self.app.results):
+            self.app.results.selection_set(self.item.id);self.app.open_focused_action()
         self.opener.assert_called_once()
 
     def test_project_inline_cancel_has_no_ghost_or_popup(self):
@@ -264,10 +267,10 @@ class GestureTests(unittest.TestCase):
             self.assertEqual(set(actions), {"Déplacer ici", "Ajouter un rattachement ici", "Annuler"})
             self.assertEqual(encode(self.cat, self.adapter), before)
             actions["Ajouter un rattachement ici"]()
-        self.assertEqual(set(self.item.projects), {self.a.id, self.b.id, self.c.id})
-        self.assertEqual(self.item.notes, "Note commune")
+        self.assertEqual(set(self.app.cat.records[self.item.id].projects), {self.a.id, self.b.id, self.c.id})
+        self.assertEqual(self.app.cat.records[self.item.id].notes, "Note commune")
 
-    def test_click_title_opens_but_context_click_does_not(self):
+    def test_click_title_and_context_select_but_only_arrow_opens(self):
         self.root.deiconify()
         self.root.update()
         context = self.event_at(self.app.results, self.item.id, "context")
@@ -277,5 +280,8 @@ class GestureTests(unittest.TestCase):
         self.opener.assert_not_called()
         self.app.drag_press(title, self.app.results, 1)
         self.app.drag_release(title, self.app.results, 1)
+        self.opener.assert_not_called()
+        arrow=self.event_at(self.app.results,self.item.id,"open")
+        self.app.drag_press(arrow,self.app.results,1);self.app.drag_release(arrow,self.app.results,1)
         self.opener.assert_called_once()
         self.assertFalse(self.app.inspector_visible)

@@ -96,8 +96,6 @@ class MosaicRenderer:
         box=self.mosaic_bbox(identity,"title")
         if not box: return False
         tx,ty,tw,_=box
-        for i,line in enumerate(self.mosaic_lines(identity,tw)):
-            if tx<=x<=tx+self.detail_title_font.measure(line) and ty+i*20<=y<ty+(i+1)*20: return True
         bx,by,bw,_=self.mosaic_bbox(identity)
         return bx+bw-35<=x<bx+bw-8 and ty<=y<ty+28
 

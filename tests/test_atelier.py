@@ -40,7 +40,7 @@ class AtelierTests(unittest.TestCase):
     def test_unambiguous_global_drop_is_immediate(self):
         self.app.drop_action(self.item.id,self.c.id,"move","all")
         self.assertIsNone(self.app.draft)
-        self.assertEqual(self.item.projects,[self.c.id])
+        self.assertEqual(self.app.cat.records[self.item.id].projects,[self.c.id])
         self.assertEqual(self.item.notes,"Note commune, à conserver.")
 
     def test_inspector_restored_before_mapping_keeps_all_panes_visible(self):

@@ -71,12 +71,12 @@ class MosaicTests(unittest.TestCase):
         self.click(x,y);self.assertEqual(self.app.current,r.id);self.opener.assert_not_called()
         tx,ty,tw,th=self.table.bbox(r.id,'title')
         self.assertFalse(self.table.open_hit(r.id,tx+tw-2,ty+38))
-        self.click(tx+3,ty+8);self.opener.assert_called_once()
+        self.click(tx+3,ty+8);self.opener.assert_not_called()
         self.opener.reset_mock();self.app.last_open=(None,0)
         bx,by,bw,bh=self.table.bbox(r.id);self.click(bx+bw-22,ty+10);self.opener.assert_called_once()
-        self.opener.reset_mock();self.table.event_generate('<Return>');self.root.update();self.opener.assert_called_once()
+        self.opener.reset_mock();self.table.event_generate('<Return>');self.root.update();self.opener.assert_not_called()
         self.opener.reset_mock();self.app.last_open=(None,0)
-        self.app.result_double(SimpleNamespace(x=x,y=y));self.opener.assert_called_once()
+        self.app.result_double(SimpleNamespace(x=x,y=y));self.opener.assert_not_called()
         self.app.scope=self.a.id;self.app.refresh_results();self.root.update();self.table.see(self.child.id)
         x,y,w,h=self.table.bbox(self.child.id)
         self.assertFalse(self.table.open_hit(self.child.id,x+w-22,y+h-40))
@@ -151,15 +151,16 @@ class MosaicTests(unittest.TestCase):
         tx,ty,tw,th=self.app.tree.bbox(self.child.id)
         drop=SimpleNamespace(x=-100,y=100,x_root=self.app.tree.winfo_rootx()+tx+tw/2,y_root=self.app.tree.winfo_rooty()+ty+th/2)
         self.app.drag_motion(drop);self.app.drag_release(drop,self.table,1)
+        r=self.app.cat.records[r.id]
         self.assertEqual(r.projects,[self.b.id,self.child.id]);self.assertEqual(r.notes,'Note partagée intacte')
         # Navigation réelle : synchroniser l'arbre et le périmètre, y compris
         # les événements de sélection laissés en file par le déplacement.
         self.app.tree.selection_set(self.child.id);self.app.select_scope();self.root.update();x,y=self.point(r)
         event=SimpleNamespace(x=x,y=y,x_root=self.table.winfo_rootx()+x,y_root=self.table.winfo_rooty()+y)
-        before=encode(self.cat,self.adapter);self.app.drag_press(event,self.table,1)
+        before=encode(self.app.cat,self.app.adapter);self.app.drag_press(event,self.table,1)
         tx,ty,tw,th=self.app.tree.bbox('all');drop.x_root=self.app.tree.winfo_rootx()+tx+20;drop.y_root=self.app.tree.winfo_rooty()+ty+th/2
         self.app.drag_motion(drop);self.app.drag_release(drop,self.table,1)
-        self.assertEqual(encode(self.cat,self.adapter),before)
+        self.assertEqual(encode(self.app.cat,self.app.adapter),before)
 
     def test_f2_menu_title_tooltip_and_cancel_without_mutation(self):
         r=self.items[0];x,y=self.point(r);self.click(x,y)

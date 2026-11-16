@@ -332,10 +332,7 @@ class CatalogList(tk.Canvas):
     def open_hit(self,identity,x,y):
         if identity not in self.rows or "project" in self.rows[identity].get("tags",()): return False
         if self.identify_row(y)!=identity or not 0<=x<self.winfo_width(): return False
-        layout=self.layout()
-        tx,tw=layout["title"]
-        text=shorten(self.title_font,self.rows[identity]["values"][0],tw-16)
-        return x<32 or tx+6<=x<=tx+6+self.title_font.measure(text) or layout["open"][0]<=x<self.winfo_width()
+        return self.layout()["open"][0]<=x<self.winfo_width()
 
     def focus_action(self,value):
         self.action_focus=value
@@ -402,6 +399,9 @@ class CatalogList(tk.Canvas):
         self.gesture_blocked=False
         self.pending_single=None
         state=getattr(event,"state",0)
+        if event is not None and not state&5 and self.open_hit(identity,event.x,event.y):
+            return "break"
+        self.action_focus=False
         control=control or bool(state&4)
         extend=extend or bool(state&1)
         proposed=Selection();proposed.ids=self.pick.ids;proposed.anchor=self.pick.anchor
@@ -546,6 +546,10 @@ class CatalogList(tk.Canvas):
         self.tip.update_idletasks()
         self.tip.place(x=12,y=max(self.header_height,min(y+20,self.winfo_height()-self.tip.winfo_reqheight()-8)),width=max(1,self.winfo_width()-24))
         self.tip.lift()
+
+    def show_open_tip(self,identity,y):
+        self.show_tip(identity,y)
+        if self.tip is not None:self.tip.configure(text="Ouvrir dans ChatGPT · Alt+Entrée : ↗ du fil focal")
 
     def hover(self,identity):
         if identity!=self.hovered:

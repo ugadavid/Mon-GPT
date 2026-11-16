@@ -1,0 +1,23 @@
+{
+  "donnees": "Exclusivement fictives",
+  "discussions": 1429,
+  "projets": 5,
+  "mappings": 4,
+  "glisser_gauche_natif": 3,
+  "ajout_menu": 3,
+  "clones": 0,
+  "autre_rattachement_conserve": 3,
+  "ordre_rattachements_preserve": true,
+  "champs_hors_classement_identiques": true,
+  "fiches_hors_lot_identiques": true,
+  "mappings_identiques": true,
+  "ouvertures_titres_double_clic": 0,
+  "ouvertures_par_glisser": 0,
+  "ouvertures_explicites_fleche": 2,
+  "lot_conserve_apres_ouverture": true,
+  "lot_absent_apres_relance": true,
+  "ouverture_au_demarrage": 0,
+  "sauvegarde_zip_restauree_identique": true,
+  "image_personnelle_incluse": true,
+  "erreurs_execution": 0
+}
