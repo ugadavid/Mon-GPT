@@ -11,6 +11,7 @@ from .theme import COLORS
 from .chatgpt import parse_url
 from .identity_ui import ProjectVisualFields
 from .identity import inherited_identity, DEFAULTS
+from .project_choices import project_choices
 
 
 def confirm_delete(parent,message):
@@ -169,19 +170,17 @@ class DetailEditor:
         self.project_visual.pack(fill="x",pady=(9,0))
         if r.kind == "item":
             field("url", "Lien", self.adapter.conversations[r.id].url)
-        field("description", "Description" if r.kind == "project" else "Résumé", r.description, 2)
-        field("notes", "Notes", r.notes, 3)
-        field("tags", "Tags", r.tags)
-        field("categories", "Catégories", r.categories)
-        field("metadata", "Informations", "\n".join(f"{k}={v}" for k, v in r.metadata.items()), 2)
-        hint("Une information par ligne : clé=valeur.")
-        self.project_ids = sorted((p.id for p in self.cat.records.values() if p.kind == "project"), key=lambda p: self.project_label(p).casefold())
+        choices=project_choices(self.cat)
+        labels={identity:label for label,identity in choices.items()}
+        self.project_ids=[pid for pid in r.projects if pid in labels]+[pid for pid in choices.values() if pid not in r.projects] if r.kind=="item" else list(choices.values())
         if r.kind == "item":
             label("Emplacements")
+            self.current_locations=ttk.Label(form,text="Actuellement dans : "+(" · ".join(labels[pid] for pid in r.projects) or "À classer"),style="PaperMuted.TLabel",wraplength=280,justify="left")
+            self.current_locations.pack(fill="x",pady=(0,5));wrapped.append(self.current_locations)
             self.locations = tk.Listbox(form, selectmode="extended", exportselection=False, height=3, font=("Segoe UI",10),background=COLORS["paper"],foreground=COLORS["ink"],selectbackground=COLORS["pine"],selectforeground=COLORS["paper"],relief="flat",borderwidth=0,highlightbackground=COLORS["line"],highlightcolor=COLORS["pine"],highlightthickness=1,width=1)
             self.locations.pack(fill="x")
             for n, pid in enumerate(self.project_ids):
-                self.locations.insert("end", self.project_label(pid))
+                self.locations.insert("end", labels[pid])
                 if pid in r.projects:
                     self.locations.selection_set(n)
             self.locations.bind("<<ListboxSelect>>", lambda e: setattr(self, "dirty", True))
@@ -190,10 +189,16 @@ class DetailEditor:
         else:
             self.parent_ids = [None] + [p for p in self.project_ids if p not in self.cat.descendants(r.id)]
             label("Projet parent")
-            self.parent_box = ttk.Combobox(form, state="readonly", values=["À la racine" if p is None else self.project_label(p) for p in self.parent_ids],style="Editor.TCombobox",font=("Segoe UI",10),width=1)
+            self.parent_box = ttk.Combobox(form, state="readonly", values=["À la racine" if p is None else labels[p] for p in self.parent_ids],style="Editor.TCombobox",font=("Segoe UI",10),width=1)
             self.parent_box.current(self.parent_ids.index(r.parent))
             self.parent_box.pack(fill="x")
             self.parent_box.bind("<<ComboboxSelected>>", lambda e: setattr(self, "dirty", True))
+        field("description", "Description" if r.kind == "project" else "Résumé", r.description, 2)
+        field("notes", "Notes", r.notes, 3)
+        field("tags", "Tags", r.tags)
+        field("categories", "Catégories", r.categories)
+        field("metadata", "Informations", "\n".join(f"{k}={v}" for k, v in r.metadata.items()), 2)
+        hint("Une information par ligne : clé=valeur.")
         actions = ttk.Frame(form,style="Paper.TFrame")
         actions.pack(fill="x", pady=(12,8))
         save_button=self.button(actions,text="Enregistrer",style="Primary.TButton",command=self.save_record,width=108,height=32)

@@ -11,6 +11,8 @@ from .theme import COLORS as C
 class GridLayout:
     width: int
     size: str = "normal"
+    extra: int = 0
+    image_limit: int | None = None
 
     @property
     def gap(self): return 22 if self.size=="large" else 16
@@ -26,13 +28,15 @@ class GridLayout:
         return min(maximum,(max(64,self.width)-16-self.gap*(self.columns-1))//self.columns)
 
     @property
-    def image_width(self): return max(16,((self.card_width-20)//16)*16)
+    def image_width(self):
+        width=max(16,((self.card_width-20)//16)*16)
+        return min(width,max(16,(self.image_limit//9)*16)) if self.image_limit is not None else width
 
     @property
     def image_height(self): return self.image_width*9//16
 
     @property
-    def card_height(self): return self.image_height+76
+    def card_height(self): return self.image_height+76+self.extra
 
     @property
     def stride(self): return self.card_height+self.gap
@@ -61,11 +65,15 @@ class GridLayout:
 
 class MosaicRenderer:
     """Mélange de rendu utilisant l’API commune du widget ResultsView."""
-    def grid_layout(self): return GridLayout(self.winfo_width(),self.mosaic_size)
+    def grid_layout(self):
+        # En compact, conserver le titre et les repères entiers avant l'image.
+        limit=max(9,self.winfo_height()-16-76-self.max_card_extra)
+        return GridLayout(self.winfo_width(),self.mosaic_size,self.max_card_extra,limit)
 
     def mosaic_bbox(self,identity,column=None):
         if identity not in self.rows: return ""
         grid=self.grid_layout();x,y,w,h=grid.box(list(self.rows).index(identity),self.top)
+        h=grid.image_height+76+self.card_extras.get(identity,0)
         if y+h<=0 or y>=self.winfo_height(): return ""
         if column=="title":
             project="project" in self.rows[identity].get("tags",())
@@ -74,7 +82,9 @@ class MosaicRenderer:
 
     def mosaic_identify(self,x,y):
         index=self.grid_layout().hit(x,y,self.top,len(self.rows))
-        return list(self.rows)[index] if index is not None and 0<=y<self.winfo_height() else ""
+        if index is None or not 0<=y<self.winfo_height():return ""
+        identity=list(self.rows)[index];box=self.mosaic_bbox(identity)
+        return identity if box and box[1]<=y<box[1]+box[3] else ""
 
     def mosaic_lines(self,identity,width):
         # Même découpage pour le dessin, le hit-test et l’accès au titre entier.
@@ -102,6 +112,7 @@ class MosaicRenderer:
     def mosaic_see(self,identity):
         if identity not in self.rows: return
         grid=self.grid_layout();_,y,_,h=grid.box(list(self.rows).index(identity))
+        h=grid.image_height+76+self.card_extras.get(identity,0)
         if y<self.top: self.top=max(0,y-8)
         elif y+h>self.top+self.winfo_height(): self.top=max(0,y+h-self.winfo_height()+8)
         self.draw()
@@ -136,7 +147,12 @@ class MosaicRenderer:
         box=self.mosaic_bbox(identity)
         if not box: return
         x,cy,w,h=box
-        text=self.rows[identity]["values"][0]+"\n"+self.rows[identity]["values"][1]
+        data=self.rows[identity]
+        text=data["values"][0]+"\n"+data["values"][1]
+        for key,label in (("summary","Résumé"),("notes","Note")):
+            if data.get(key):text+="\n"+label+" : "+data[key]
+        for key,label in (("categories","Catégories"),("labels","Tags")):
+            if data.get(key):text+="\n"+label+" : "+" · ".join(data[key])
         width=min(360,max(100,self.winfo_width()-24))
         self.tip=tk.Label(self,text=text,font=("Segoe UI",9),background=C["ivory"],foreground=C["ink"],justify="left",padx=10,pady=8,wraplength=width-22,highlightthickness=1,highlightbackground=C["line"])
         self.tip.update_idletasks()
@@ -150,6 +166,7 @@ class MosaicRenderer:
         identities=list(self.rows)
         for index in grid.visible(self.top,height,len(identities)):
             identity=identities[index];data=self.rows[identity];x,y,w,h=grid.box(index,self.top)
+            h=grid.image_height+76+self.card_extras.get(identity,0)
             if y+h<=0 or y>=height: continue
             selected=identity in self.pick.ids;hovered=identity==self.hovered
             fill=C["selection"] if selected else C["paper"]
@@ -163,6 +180,16 @@ class MosaicRenderer:
             self.create_image(x+22,ty+10,image=icon,tags=("identity",identity))
             for line_number,line in enumerate(self.mosaic_lines(identity,tw)):
                 self.create_text(tx,ty+line_number*20,text=line,anchor="nw",font=self.detail_title_font,fill=C["ink"],tags=("title",identity))
+            excerpts=self.excerpts(data)
+            from .atelier import shorten
+            for n,(key,label,text) in enumerate(excerpts):
+                self.create_text(x+12,ty+46+n*16,text=shorten(self.small_font,label+' : '+text,w-24),anchor='nw',font=self.small_font,fill=C['muted'],tags=(key,identity))
+            cats,tags=data.get('categories',[]),data.get('labels',[])
+            if cats or tags:
+                badge_width=w-24;cat_width=min(badge_width*.55,sum(self.small_font.measure(t)+21 for t in cats)+6) if cats else 0
+                cy=ty+46+len(excerpts)*16+16
+                self.draw_badges(cats,x+12,cy,cat_width,True)
+                self.draw_badges(tags,x+12+cat_width,cy,badge_width-cat_width,False)
             if "project" not in data.get("tags",()):
                 self.create_text(x+w-22,ty+10,text="↗",font=("Segoe UI",14),fill=C["pine"],tags=("open",identity))
         if not self.rows and height>100:

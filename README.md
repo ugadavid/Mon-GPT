@@ -1,4 +1,6 @@
-# Mon GPT<3 — 0.9.3
+# Mon GPT<3 — 0.9.4
+
+**MG-011 — Finitions fonctionnelles.** Résumé et Note distincts dans Détaillée et Mosaïque, catégories/tags sur les cartes, informations du projet courant dans le bandeau, navigation générale épinglée et compteurs distinguant discussions et sous-projets. Les emplacements remontent en haut de l’éditeur ; Aide et À propos deviennent de vraies fenêtres. La fenêtre se redimensionne librement, sans tailles prédéfinies au menu. [Guide](docs/MG-011-navigation-et-informations.md) · [Rapport et captures fictives](reports/MG-011/rapport.md).
 
 **MG-010c — Colonnes de la Liste.** **Affichage → Colonnes de la liste…** permet de choisir visibilité et ordre, puis Appliquer mémorise les réglages. Largeurs ajustables aux séparateurs, conservées à la relance. Création et Modification sont les dates des fiches locales, avec tri chronologique réel ; elles sont masquées au départ. Le titre et ↗ restent épinglés, les autres colonnes défilent dans l’ordre choisi. Les réglages restent dans `interface.json` v1, sans modification du catalogue. [Guide](docs/MG-010c-colonnes.md) · [Rapport et captures fictives](reports/MG-010c/rapport.md).
 
@@ -24,7 +26,7 @@ Application Windows locale pour organiser ses discussions ChatGPT. MG-002a donne
 
 **MG-006 : personnaliser les fils.** La même rangée Image / Icône / Couleur que sur les projets est disponible dans les discussions. Chaque propriété hérite indépendamment du projet de référence, ou conserve un choix personnel explicite. Les sélecteurs existants proposent **Revenir à l’héritage** ; les infobulles distinguent Héritée et Personnalisée. [Rapport et captures natives](reports/MG-006/rapport.md).
 
-**MG-005 : la Mosaïque.** Une grille adaptative met les couvertures entières au premier plan : image, icône colorée, titre et petite ouverture ↗. Deux tailles **Normal / Grand**, sans chemins ni métadonnées répétés. Les trois vues partagent recherche, filtres, sélection, tri et aperçu ; la reprise de session inclut la taille des cartes. [Rapport, vérifications et cinq captures natives](reports/MG-005/rapport.md).
+**MG-005 : la Mosaïque.** Une grille adaptative met les couvertures entières au premier plan : image, icône colorée, titre et petite ouverture ↗. Deux tailles **Normal / Grand**, sans chemins répétés (notes, résumés et pastilles ajoutés en MG-011). Les trois vues partagent recherche, filtres, sélection, tri et aperçu ; la reprise de session inclut la taille des cartes. [Rapport, vérifications et cinq captures natives](reports/MG-005/rapport.md).
 
 **MG-004a : reprendre son espace de travail.** À la fermeture normale, Mon GPT<3 mémorise aussi recherche, filtres, périmètre, branches ouvertes et fiche sélectionnée. La relance retrouve le même aperçu en lecture seule, sans ouvrir de discussion. Tout reste dans `interface.json`, hors catalogue et sauvegarde métier. Un fichier ancien reste compatible ; un état invalide revient discrètement à l’affichage par défaut. [Rapport et captures avant/après](reports/MG-004a/rapport.md).
 
@@ -64,7 +66,7 @@ L'**inspecteur** est facultatif, masqué au premier lancement. La commande discr
 
 Cliquer **Détaillée** sous Discussions, ou choisir **Affichage → Détaillée**. Les cartes montrent une couverture 16:9 entière, avec des marges pour les portraits. L’icône et la couleur héritent du projet actif selon la même règle que le bandeau. Les résultats, leur tri et leurs UUID restent communs avec la Liste ; aucun projet supplémentaire n’apparaît dans Tous les fils.
 
-Le titre, l’image, les pastilles et le reste de la carte sélectionnent seulement. **↗** ouvre ce fil ; Alt+Entrée active ↗ du fil focal. Double-clic et Entrée sur le titre ne lancent pas ChatGPT. Un projet utilise sa propre couverture et ne s’ouvre jamais dans ChatGPT : Entrée/double-clic navigue vers son périmètre. Flèches haut/bas parcourent les cartes, droite focalise l’action d’ouverture. Un titre coupé, le résumé et les repères complets sont accessibles au survol. En petite largeur, quelques pastilles se replient en `+N`.
+Le titre, l’image, les pastilles et le reste de la carte sélectionnent seulement. **↗** ouvre ce fil ; Alt+Entrée active ↗ du fil focal. Double-clic et Entrée sur le titre ne lancent pas ChatGPT. Un projet utilise sa propre couverture et ne s’ouvre jamais dans ChatGPT : Entrée/double-clic navigue vers son périmètre. Flèches haut/bas parcourent les cartes, droite focalise l’action d’ouverture. Résumé et Note disposent d’extraits séparés. Le titre, les textes et les repères complets sont accessibles au survol. En petite largeur, quelques pastilles se replient en `+N`.
 
 Le bouton **Tri** de Détaillée reprend les quatre tris des en-têtes de Liste ; choisir le tri actif inverse son sens. Clic droit, F2, glisser gauche vers un projet et les raccourcis existants restent disponibles. Aucun nouveau raccourci de vue. À la fermeture, le choix Liste/Détaillée est mémorisé avec recherche, filtres, périmètre, branches et sélection centrale. La relance restaure un aperçu en lecture seule si la fiche figure encore dans les résultats ; aucune discussion ne s’ouvre automatiquement. Les anciens fichiers de préférences restent lisibles. Une sélection supprimée ou un périmètre disparu revient à l’espace par défaut ; une fiche simplement exclue par les filtres n’est pas réintroduite dans les résultats.
 
@@ -72,7 +74,7 @@ Le bouton **Tri** de Détaillée reprend les quatre tris des en-têtes de Liste 
 
 Cliquer **Mosaïque** ou choisir **Affichage → Mosaïque**. **Cartes · Normal / Grand** apparaît uniquement dans cette vue ; **Tri** reprend les mêmes quatre tris. La grille recalcule ses colonnes selon la largeur du centre, jusqu’à une colonne en compact avec aperçu. Grand agrandit principalement l’image ; les deux tailles convergent lorsque la largeur impose une seule petite carte. Les portraits restent entiers dans un cadre 16:9.
 
-L’image, le titre et le fond sélectionnent ; **↗** seul ouvre le fil. Alt+Entrée active ↗ du fil focal ; double-clic et Entrée sur une carte n’ouvrent pas ChatGPT ; un projet navigue dans son périmètre sans navigateur. Les quatre flèches parcourent la grille et font défiler la sélection. Le survol restitue le titre complet et son contexte, sans charger la face des cartes. Clic droit, touche Menu, F2/Échap et glisser gauche conservent les gestes existants. Le fil partagé apparaît une seule fois, avec les repères hérités du contexte actif.
+L’image, le titre et le fond sélectionnent ; **↗** seul ouvre le fil. Alt+Entrée active ↗ du fil focal ; double-clic et Entrée sur une carte n’ouvrent pas ChatGPT ; un projet navigue dans son périmètre sans navigateur. Les quatre flèches parcourent la grille et font défiler la sélection. La face affiche des extraits distincts de Résumé et Note, puis catégories et tags quand présents. Les cartes sans contenu restent sobres. Le survol restitue le titre, les textes et les repères complets. En faible hauteur, la couverture entière se réduit pour préserver les informations. Clic droit, touche Menu, F2/Échap et glisser gauche conservent les gestes existants. Le fil partagé apparaît une seule fois, avec les repères hérités du contexte actif.
 
 La fermeture normale mémorise aussi **Mosaïque et Normal/Grand** dans `interface.json`. La relance restaure les mêmes critères, périmètre, branches, sélection visible et aperçu en lecture seule, sans ouvrir ChatGPT. Le tri et la position exacte de défilement restent des états de la fenêtre courante.
 
@@ -117,7 +119,7 @@ Catalogue : `%LOCALAPPDATA%\MonGPT\catalogue.json`, hors dépôt ; chemin affich
 
 Limites vérifiées : catalogue de 10 Mo maximum, archive ZIP de 100 Mo, contenu décompressé de 200 Mo et 512 images personnelles au plus. Les ressources inutilisées après annulation ou remplacement sont conservées localement par précaution ; elles ne sont pas exportées. Aucun nettoyage automatique susceptible de supprimer une image partagée.
 
-`interface.json` conserve séparément taille de fenêtre, vue active, taille des cartes, recherche, filtres, périmètre, branches, sélection et état de l’inspecteur à la fermeture. Ce fichier de confort est exclu des exports métier ; colonnes, séparateurs, tri et position exacte de défilement ne persistent pas entre lancements. Le vrai catalogue n’est pas utilisé pour les recettes.
+`interface.json` conserve séparément taille de fenêtre, vue active, taille des cartes, recherche, filtres, périmètre, branches, sélection et état de l’inspecteur à la fermeture. Ce fichier de confort est exclu des exports métier ; les colonnes et leurs largeurs persistent également ; le tri et la position exacte de défilement restent propres à la session. Le vrai catalogue n’est pas utilisé pour les recettes.
 
 ## URL reconnues
 

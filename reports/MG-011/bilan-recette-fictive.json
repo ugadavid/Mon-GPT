@@ -1,0 +1,15 @@
+{
+  "conversations_fictives": 1429,
+  "projets_fictifs": 67,
+  "fiches_modifiees_par_drag": 2,
+  "champs_modifies": [
+    "modified",
+    "projects"
+  ],
+  "aucun_doublon": true,
+  "identites_sources_intactes": true,
+  "champs_documentaires_intacts": true,
+  "ouvertures_simulees": 1,
+  "stderr_vide": true,
+  "captures_natives": 8
+}

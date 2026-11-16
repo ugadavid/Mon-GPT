@@ -27,7 +27,7 @@ def navigation_icons(root):
     return result
 
 
-class NavigationTree(ttk.Treeview):
+class _NavigationBranch(ttk.Treeview):
     def __init__(self,parent):
         style=ttk.Style(parent)
         style.configure("Nav.Treeview",rowheight=34,indent=18,font=("Segoe UI",10),background=C["paper"],fieldbackground=C["paper"],foreground=C["ink"])
@@ -118,6 +118,134 @@ class NavigationTree(ttk.Treeview):
         self.tip.overrideredirect(True)
         tk.Label(self.tip,text=self.labels[identity],font=("Segoe UI",10),background=C["ivory"],foreground=C["ink"],wraplength=340,padx=9,pady=6,relief="solid",borderwidth=1).pack()
         self.tip.geometry(f"+{self.winfo_rootx()+12}+{self.winfo_rooty()+y+22}")
+
+
+class NavigationTree(ttk.Frame):
+    """Deux contrôles natifs, une sélection et des coordonnées communes.
+
+    Les pseudo-périmètres existent une seule fois ; le défilement ne concerne
+    que les projets. Les interactions de l'application utilisent cette façade.
+    """
+    def __init__(self,parent):
+        super().__init__(parent)
+        self.pinned=_NavigationBranch(self)
+        self.pinned.configure(height=2)
+        self.pinned.pack(fill='x')
+        area=ttk.Frame(self);area.pack(fill='both',expand=True)
+        self.projects=_NavigationBranch(area)
+        bar=NavigationScrollbar(area,self.projects)
+        self.projects.configure(yscrollcommand=bar.set)
+        self.projects.pack(side='left',fill='both',expand=True)
+        self.active=self.pinned
+        for branch in (self.pinned,self.projects):
+            branch.bind('<<TreeviewSelect>>',lambda e,b=branch:self.selected(b),add='+')
+            branch.bind('<FocusIn>',lambda e,b=branch:setattr(self,'active',b),add='+')
+            for event in ('<ButtonPress-1>','<ButtonPress-3>','<B1-Motion>','<B3-Motion>',
+                          '<ButtonRelease-1>','<ButtonRelease-3>'):
+                branch.bind(event,lambda e,b=branch,s=event:self.forward(b,s,e),add='+')
+        self.pinned.bind('<Down>',self.down,add='+')
+        self.projects.bind('<Up>',self.up,add='+')
+
+    def branch(self,identity):
+        return self.pinned if identity in ('all','unfiled') else self.projects
+
+    def bind(self,sequence=None,func=None,add=None):
+        if sequence in ('<Alt-Up>','<Alt-Down>','<Menu>','<App>'):
+            self.pinned.bind(sequence,func,add)
+            return self.projects.bind(sequence,func,add)
+        return super().bind(sequence,func,add)
+
+    def event_generate(self,sequence,**kwargs):
+        if sequence in ('<Alt-Up>','<Alt-Down>','<Menu>','<App>'):
+            return self.active.event_generate(sequence,**kwargs)
+        return super().event_generate(sequence,**kwargs)
+
+    def offset(self,branch):
+        return branch.winfo_rootx()-self.winfo_rootx(),branch.winfo_rooty()-self.winfo_rooty()
+
+    def forward(self,branch,sequence,event):
+        x,y=self.offset(branch)
+        self.active=branch
+        self.event_generate(sequence,x=event.x+x,y=event.y+y,
+                            rootx=event.x_root,rooty=event.y_root,state=event.state)
+        # L'événement clavier est traité par l'application, pas par le Treeview.
+        if sequence.startswith('<Alt-') or sequence=='<Menu>':return 'break'
+
+    def selected(self,branch):
+        if not branch.selection():return
+        other=self.projects if branch==self.pinned else self.pinned
+        if other.selection():other.selection_remove(other.selection())
+        self.active=branch
+        self.event_generate('<<TreeviewSelect>>')
+
+    def down(self,event):
+        children=self.projects.get_children()
+        if self.pinned.focus()=='unfiled' and children:
+            self.selection_set(children[0]);self.focus_set();self.see(children[0]);return 'break'
+
+    def up(self,event):
+        children=self.projects.get_children()
+        if children and self.projects.focus()==children[0]:
+            self.selection_set('unfiled');self.focus_set();return 'break'
+
+    def selection(self):
+        return self.pinned.selection()+self.projects.selection()
+
+    def selection_set(self,items):
+        identity=items if isinstance(items,str) else next(iter(items),None)
+        if identity is None:return
+        branch=self.branch(identity)
+        other=self.projects if branch==self.pinned else self.pinned
+        other.selection_remove(other.selection())
+        branch.selection_set(identity);branch.focus(identity);self.active=branch
+
+    def focus_set(self):self.active.focus_set()
+    def focus_force(self):self.active.focus_force()
+    def owns_focus(self):return self.focus_get() in (self,self.pinned,self.projects)
+    def exists(self,identity):return self.branch(identity).exists(identity)
+    def item(self,identity,option=None,**kwargs):return self.branch(identity).item(identity,option,**kwargs)
+    def parent(self,identity):return self.branch(identity).parent(identity)
+    def insert(self,parent,index,iid=None,**kwargs):return self.branch(iid).insert(parent,index,iid=iid,**kwargs)
+    def get_children(self,item=''):
+        return self.branch(item).get_children(item) if item else self.pinned.get_children()+self.projects.get_children()
+    def delete(self,*items):
+        for branch in (self.pinned,self.projects):
+            selected=[i for i in items if self.branch(i)==branch]
+            if selected:branch.delete(*selected)
+    def column(self,column,option=None,**kwargs):
+        self.pinned.column(column,option,**kwargs)
+        return self.projects.column(column,option,**kwargs)
+    def tag_configure(self,tag,option=None,**kwargs):
+        self.pinned.tag_configure(tag,option,**kwargs)
+        return self.projects.tag_configure(tag,option,**kwargs)
+    def bbox(self,identity,column=None):
+        branch=self.branch(identity);box=branch.bbox(identity,column)
+        if not box:return box
+        x,y=self.offset(branch);return box[0]+x,box[1]+y,*box[2:]
+    def at(self,y):
+        branch=self.pinned if y<self.pinned.winfo_height() else self.projects
+        x,offset=self.offset(branch);return branch,x,offset
+    def identify_row(self,y):
+        branch,x,offset=self.at(y);return branch.identify_row(y-offset)
+    def identify_element(self,x,y):
+        branch,offset_x,offset_y=self.at(y);return branch.identify_element(x-offset_x,y-offset_y)
+    def see(self,identity):return self.branch(identity).see(identity)
+    def yview(self,*args):return self.projects.yview(*args)
+    def move(self,*args):return self.projects.move(*args)
+    def fit(self):
+        self.pinned.fit();self.projects.fit()
+    @property
+    def labels(self):return {**self.pinned.labels,**self.projects.labels}
+    @property
+    def tip(self):return self.pinned.tip or self.projects.tip
+    def show_tip(self,identity,y):
+        branch=self.branch(identity);branch.show_tip(identity,y-self.offset(branch)[1])
+    def hide_tip(self):
+        self.pinned.hide_tip();self.projects.hide_tip()
+    def configure(self,cnf=None,**kwargs):
+        if 'cursor' in kwargs:
+            for branch in (self.pinned,self.projects):branch.configure(cursor=kwargs['cursor'])
+        return super().configure(cnf,**kwargs)
 
 
 class NavigationScrollbar(AutoScrollbar):

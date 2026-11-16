@@ -20,6 +20,7 @@ class ResultsView(MosaicRenderer,CatalogList):
         self.view,self.library,self.icons=view,library,icons
         self.mosaic_size=mosaic_size
         self.covers=OrderedDict()
+        self.card_extras={};self.max_card_extra=0
         super().__init__(parent)
         self.detail_title_font=Font(self,font=("Segoe UI",11,"bold"))
         self.bind("<Left>",lambda e:self.mosaic_navigate(-1,0) if self.view=="mosaic" else self.focus_action(False))
@@ -28,6 +29,25 @@ class ResultsView(MosaicRenderer,CatalogList):
         self.bind("<FocusOut>",lambda e:self.hide_tip() if self.view=="mosaic" else None,add="+")
         for key,dx,dy in (("Left",-1,0),("Right",1,0),("Up",0,-1),("Down",0,1)):
             self.bind(f"<Shift-{key}>",lambda e,x=dx,y=dy:self.mosaic_navigate(x,y,extend=True) if self.view=="mosaic" else self.navigate(y or x,extend=True))
+
+    @staticmethod
+    def excerpts(data):
+        return [(key,label,' '.join(data.get(key,'').split())) for key,label in (('summary','Résumé'),('notes','Note')) if data.get(key,'').strip()]
+
+    def card_extra(self,data):
+        lines=len(self.excerpts(data));badges=bool(data.get('categories') or data.get('labels'))
+        return 16*lines+26*badges+10 if lines or badges else 0
+
+    def insert(self,parent,index,iid,**kwargs):
+        result=super().insert(parent,index,iid,**kwargs)
+        old=self.card_extras.get(iid);new=self.card_extras[iid]=self.card_extra(kwargs)
+        self.max_card_extra=max(self.card_extras.values(),default=0) if old==self.max_card_extra and new<old else max(self.max_card_extra,new)
+        return result
+
+    def delete(self,*identities):
+        for identity in identities:self.card_extras.pop(identity,None)
+        self.max_card_extra=max(self.card_extras.values(),default=0)
+        return super().delete(*identities)
 
     def set_view(self,view):
         if view not in ("list","detail","mosaic"): raise ValueError("Vue inconnue")
@@ -117,7 +137,8 @@ class ResultsView(MosaicRenderer,CatalogList):
         if identity not in self.rows: return
         data=self.rows[identity]
         text=data["values"][0]
-        if data.get("summary"): text+="\n"+data["summary"]
+        for key,label in (("summary","Résumé"),("notes","Note")):
+            if data.get(key):text+="\n"+label+" : "+data[key]
         text+="\nEmplacements : "+data["values"][1]
         for label,key in (("Catégories","categories"),("Tags","labels")):
             if data.get(key): text+="\n"+label+" : "+" · ".join(data[key])
@@ -165,8 +186,13 @@ class ResultsView(MosaicRenderer,CatalogList):
             icon=self.icons.get(visual.icon if visual else None,visual.color if visual else None,20)
             self.create_image(tx+9,y+23,image=icon,tags=("identity",identity))
             self.create_text(tx+27,y+23,text=shorten(self.detail_title_font,data["values"][0],tw-31),anchor="w",font=self.detail_title_font,fill=C["ink"],tags=("title",identity))
-            for n,line in enumerate(self.summary_lines(data.get("summary",""),tw)):
-                self.create_text(tx,y+45+n*16,text=line,anchor="w",font=self.small_font,fill=C["muted"])
+            excerpts=self.excerpts(data)
+            if len(excerpts)==1:
+                key,label,text=excerpts[0]
+                lines=[(key,line) for line in self.summary_lines(label+' : '+text,tw)]
+            else:lines=[(key,shorten(self.small_font,label+' : '+text,tw)) for key,label,text in excerpts]
+            for n,(key,line) in enumerate(lines):
+                self.create_text(tx,y+45+n*16,text=line,anchor="w",font=self.small_font,fill=C["muted"],tags=(key,identity))
             self.create_text(tx,y+80,text=shorten(self.small_font,"↳ "+data["values"][1],tw),anchor="w",font=self.small_font,fill=C["pine"],tags=("context",identity))
             cats=data.get("categories",[]);tags=data.get("labels",[])
             badge_x,badge_width=(17,width-34) if width<470 else (tx,tw)

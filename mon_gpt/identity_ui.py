@@ -4,7 +4,8 @@ from tkinter import ttk, filedialog
 from PIL import Image, ImageDraw, ImageOps, ImageTk
 from .identity import COVERS, ICONS, PALETTE, DEFAULTS
 from .images import IMPORT_HINT
-from .atelier import Masthead, rounded
+from .atelier import Masthead, rounded, CatalogList, shorten
+from tkinter.font import Font
 from .inspector import InspectorScrollbar
 from .theme import COLORS as C
 from .project_icons import icon_picture
@@ -42,24 +43,51 @@ class ContextMasthead(Masthead):
     def __init__(self,parent,library):
         self.library,self.identity=library,None
         self.photo_key,self.photo=None,None
+        self.scope_info=("",(),())
         super().__init__(parent)
+        self.small_font=Font(self,font=("Segoe UI",9))
 
     def set_identity(self,identity):
         if identity!=self.identity:
             self.identity=identity
             self.draw()
 
+    def set_context(self,identity,project=None):
+        info=(project.description,tuple(project.categories),tuple(project.tags)) if project else ('',(),())
+        if identity!=self.identity or info!=self.scope_info:
+            self.identity,self.scope_info=identity,info;self.draw()
+
     def draw(self,event=None):
         super().draw(event)
         visual=self.identity
         reference=visual.image if visual and visual.image else DEFAULTS["image"]
         self.delete("landscape")
-        width,height=self.winfo_width(),self.winfo_height()
+        width,height=self.winfo_width(),80
         text_right=max((self.bbox(item)[2] for item in self.find_all() if self.type(item)=="text"),default=240)
         free_width=max(0,width-8-text_right-12)
         # Multiples 16:9 dans l’espace libre ; le gabarit de 80 px ne change pas.
         w=min(128,(free_width//16)*16,(max(0,height-8)//9)*16)
-        if w<16: return
+        description,categories,tags=self.scope_info
+        meta_width=free_width-w-36
+        has_info=bool(description or categories or tags)
+        extra=has_info and meta_width<170
+        wanted=112 if extra else 80
+        if int(float(self.cget('height')))!=wanted:self.configure(height=wanted)
+        if has_info:
+            if extra:
+                x,available=10,max(0,width-20)
+                if categories or tags:
+                    cat_width=min(available*.55,sum(self.small_font.measure(t)+21 for t in categories)+6) if categories else 0
+                    CatalogList.draw_badges(self,categories,x,96,cat_width,True)
+                    CatalogList.draw_badges(self,tags,x+cat_width,96,available-cat_width,False)
+                elif description:self.create_text(x,96,text=shorten(self.small_font,' '.join(description.split()),available),anchor='w',font=self.small_font,fill=C['muted'],tags='scope_description')
+                self.create_line(8,111,width-8,111,fill=C['line'])
+            else:
+                x=text_right+12
+                if description:self.create_text(x,18,text=shorten(self.small_font,' '.join(description.split()),meta_width),anchor='w',font=self.small_font,fill=C['muted'],tags='scope_description')
+                CatalogList.draw_badges(self,categories,x,40,meta_width,True)
+                CatalogList.draw_badges(self,tags,x,62,meta_width,False)
+        if w<16:return
         h=w*9//16
         self.cover_box=(width-w-8,(height-h)//2,w,h)
         key=(reference,w,h)

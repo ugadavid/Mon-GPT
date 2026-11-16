@@ -13,7 +13,7 @@ from .theme import COLORS, FONT, apply_theme, make_icons
 from .atelier import Masthead, Surface, PillButton, CatalogList, AutoScrollbar, skin_menu, shorten
 from .main_menu import MainMenuBar
 from .inspector import InspectorSummary, InspectorScrollbar
-from .navigation import NavigationTree, NavigationScrollbar, navigation_icons
+from .navigation import NavigationTree, navigation_icons
 from .identity import resolve_identity, inherited_identity, DEFAULTS
 from .identity_ui import ContextMasthead, ProjectVisualStrip
 from .project_icons import ProjectIconCache
@@ -119,13 +119,10 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         view.add_command(label="Afficher / masquer l'inspecteur", command=self.toggle_inspector)
         view.add_command(label="Rechercher", accelerator="Ctrl+K", command=self.focus_search)
         view.add_command(label="Retirer les filtres", command=self.clear_filters)
-        view.add_separator()
-        view.add_command(label="Fenêtre compacte · 1000 × 680", command=lambda: self.resize(1000, 680))
-        view.add_command(label="Fenêtre confortable · 1360 × 820", command=lambda: self.resize(1360, 820))
         bar.add_cascade(label="Affichage", menu=view)
         help_menu = tk.Menu(bar, tearoff=False)
         help_menu.add_command(label="Gestes et raccourcis", command=self.help)
-        help_menu.add_command(label="À propos de Mon GPT<3", command=lambda: messagebox.showinfo("Mon GPT<3", f"Version {__version__} · Atelier chaleureux\nCatalogue local, aucune modification dans ChatGPT.\nListe, Détaillée et Mosaïque disponibles. Cartes Normal / Grand.", parent=self.root))
+        help_menu.add_command(label="À propos de Mon GPT<3",command=self.about)
         bar.add_cascade(label="Aide", menu=help_menu)
         self.main_menu = MainMenuBar(self.root, [("Fichier", file), ("Édition", edit), ("Affichage", view), ("Aide", help_menu)])
         self.main_menu.pack(fill="x")
@@ -304,9 +301,6 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         self.nav_icons=navigation_icons(self.root)
         self.tree=NavigationTree(tree_box)
         self.tree.column("#0",width=194,minwidth=140)
-        sb=NavigationScrollbar(tree_box,self.tree)
-        sb.pack(side="right",fill="y")
-        self.tree.configure(yscrollcommand=sb.set)
         self.tree.pack(side="left",expand=True,fill="both")
         self.tree.bind("<<TreeviewSelect>>",self.select_scope)
         for tag,color in [("drop",COLORS["selection"]),("forbidden",COLORS["invalid"])]:
@@ -443,6 +437,9 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         self.tree.bind("<Alt-Down>", lambda e: (self.reorder(1), "break")[1])
         self.tree.bind("<Menu>", lambda e: self.context_menu(self.scope, self.tree.winfo_rootx()+40, self.tree.winfo_rooty()+80))
         self.results.bind("<Menu>", lambda e:self.results_context_menu())
+        # Tk/Windows nomme la touche de menu contextuel « App ».
+        self.tree.bind("<App>",lambda e:self.context_menu(self.scope,self.tree.winfo_rootx()+40,self.tree.winfo_rooty()+80))
+        self.results.bind("<App>",lambda e:self.results_context_menu())
 
     def open_data(self):
         self.safe(lambda: os.startfile(self.store.directory))
@@ -467,7 +464,12 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         self.root.geometry(f"{width}x{height}")
 
     def help(self):
-        messagebox.showinfo("Gestes et raccourcis", "Ligne, titre, icône ou image : sélectionner, sans ouvrir.\n↗ : ouvrir dans ChatGPT · Alt+Entrée : ↗ du fil focal.\nDouble-clic et Entrée sur une ligne : aucune ouverture.\nCtrl+clic / Maj+clic : sélection multiple · Ctrl+A : résultats visibles.\nMosaïque : flèches dans la grille.\nCtrl+K : rechercher · Ctrl+N : nouveau fil\nCtrl+Maj+P : nouveau projet · F2 : renommer\nCtrl+S : enregistrer la fiche · Échap : annuler l'édition intégrée\nAlt+↑/↓ dans l'arbre : ordre manuel\nClic droit / touche Menu : actions de classement\nGlisser gauche : déplacer · Glisser droit : choix à la dépose\nLes autres rattachements sont préservés.\nAffichage → Colonnes de la liste : visibilité, ordre et largeurs mémorisés.\nFichier : sauvegarde/restauration du catalogue.", parent=self.root)
+        from .information_ui import open_information
+        return open_information(self,'help')
+
+    def about(self):
+        from .information_ui import open_information
+        return open_information(self,'about')
 
     def focus_search(self):
         self.search_entry.focus_set()
@@ -625,11 +627,16 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         for r in rows:
             v = values(r)
             visual=resolve_identity(self.cat,r.id,self.scope)
-            self.results.insert("", "end", iid=r.id, image=self.project_icons.get(visual.icon,visual.color,20) if r.kind=="item" else self.icons[r.kind], tags=(r.kind,), categories=r.categories, labels=r.tags, summary=r.description, visual=visual, cells=v, values=(r.title, v["context"], " · ".join(v["tags"]), datetime.fromisoformat(r.modified).strftime("%d/%m/%Y")))
+            self.results.insert("", "end", iid=r.id, image=self.project_icons.get(visual.icon,visual.color,20) if r.kind=="item" else self.icons[r.kind], tags=(r.kind,), categories=r.categories, labels=r.tags, summary=r.description, notes=r.notes, visual=visual, cells=v, values=(r.title, v["context"], " · ".join(v["tags"]), datetime.fromisoformat(r.modified).strftime("%d/%m/%Y")))
         self.results.set_selection(selected,anchor,focal)
         self.results.sort_column,self.results.sort_reverse=self.sort_column,self.sort_reverse
-        self.results_label.configure(text="Discussions")
-        self.result_count.configure(text=f"{len(rows)} résultat(s) · " + (self.cat.records[scope].title if scope else ("À classer" if self.scope=="unfiled" else "Tous les fils")))
+        self.results_label.configure(text="Contenu du projet" if scope else "Discussions")
+        discussions=sum(r.kind=='item' for r in rows);projects=len(rows)-discussions
+        counts=[]
+        if discussions:counts.append(f"{discussions} discussion"+('s' if discussions!=1 else ''))
+        if projects:counts.append(f"{projects} sous-projet"+('s' if projects!=1 else ''))
+        if not counts:counts=['0 discussion']
+        self.result_count.configure(text=' · '.join(counts))
         self.empty.configure(text="" if rows else "Ajoutez un fil avec + Fil, ou changez la recherche.")
         if rows:
             self.empty.pack_forget()
@@ -682,7 +689,7 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         return True
 
     def update_identity(self):
-        self.masthead.set_identity(resolve_identity(self.cat,self.current,self.scope))
+        self.masthead.set_context(resolve_identity(self.cat,self.current,self.scope),self.cat.records.get(self.scope))
 
     def ensure_inspector(self):
         if not self.inspector_visible:
@@ -949,7 +956,7 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
 
     def rename_selected(self, identity=None):
         if not self.individual_allowed():return
-        identity = identity or (self.scope if self.root.focus_get() == self.tree else self.current)
+        identity = identity or (self.scope if self.tree.owns_focus() else self.current)
         if identity not in self.cat.records or not self.can_leave():
             return
         self.cancel_inline()

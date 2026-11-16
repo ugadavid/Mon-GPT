@@ -102,7 +102,7 @@ class MosaicTests(unittest.TestCase):
                 self.assertLessEqual(self.app.mosaic_tools.winfo_x()+self.app.mosaic_tools.winfo_width(),self.app.viewbar.winfo_width())
         self.opener.assert_not_called()
 
-    def test_images_whole_portrait_cache_visible_only_and_no_metadata_on_faces(self):
+    def test_images_whole_portrait_cache_visible_only_and_metadata_without_repeated_path(self):
         path=self.store.directory/'portrait.png';im=Image.new('RGB',(90,160),'white');d=ImageDraw.Draw(im)
         d.rectangle((0,0,89,8),fill='red');d.rectangle((0,151,89,159),fill='blue');im.save(path)
         ref=self.store.images.import_file(path);self.a.visual['image']=ref;self.app.refresh_results();self.root.update()
@@ -111,7 +111,9 @@ class MosaicTests(unittest.TestCase):
         self.assertEqual(pixels.getpixel((photo.width()//2,0))[:3],(255,0,0))
         self.assertEqual(pixels.getpixel((photo.width()//2,photo.height()-1))[:3],(0,0,255))
         texts=[self.table.itemcget(i,'text') for i in self.table.find_all() if self.table.type(i)=='text']
-        self.assertFalse(any('Récits fictifs' in t or 'Résumé fictif' in t or 'Idées' in t for t in texts))
+        self.assertFalse(any('Récits fictifs' in t for t in texts))
+        self.assertTrue(any('Résumé' in t for t in texts))
+        self.assertIn('Idées',texts)
         self.assertLess(len(self.table.find_withtag('cover')),len(self.items))
         with patch.object(self.store.images,'open',wraps=self.store.images.open) as opened:
             self.table.draw();self.table.hover(self.items[0].id);self.table.draw();opened.assert_not_called()

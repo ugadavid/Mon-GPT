@@ -79,7 +79,9 @@ class RecipeFixTests(unittest.TestCase):
             for view in ('list','detail','mosaic'):
                 self.app.set_view(view)
                 self.assertEqual(self.scope(scope),identities)
-                self.assertIn(f'{len(identities)} résultat',self.app.result_count.cget('text'))
+                self.assertEqual(self.app.results_label.cget('text'),'Contenu du projet')
+                count=sum(self.cat.records[i].kind=='item' for i in identities)
+                self.assertIn(f'{count} discussion',self.app.result_count.cget('text'))
         self.assertEqual(encode(self.cat,self.adapter),before)
         self.opener.assert_not_called()
 
