@@ -20,10 +20,12 @@ from .project_icons import ProjectIconCache
 from .results import ResultsView
 from .batch_ui import BatchActions
 from .project_choices import project_choices
+from .columns_ui import ListColumnsUI
+from .list_columns import COLUMNS, BY_KEY, defaults as default_columns, sort_value
 from . import ui_state, __version__
 
 
-class App(BatchActions,DetailEditor):
+class App(ListColumnsUI,BatchActions,DetailEditor):
     def __init__(self, root, store, cat, adapter, opener=None):
         self.root, self.store, self.cat, self.adapter = root, store, cat, adapter
         self.opener = opener
@@ -56,6 +58,10 @@ class App(BatchActions,DetailEditor):
         self.build_menus()
         self.build_shell()
         self.bind_keys()
+        config=preferences.get("list_columns",default_columns())
+        if self.view.get()=="list" and config["sort"] not in config["visible"]:
+            config=dict(config,sort="title",reverse=False)
+        self.install_columns(config)
         self.restore_workspace(preferences)
         root.protocol("WM_DELETE_WINDOW", self.close)
 
@@ -109,6 +115,7 @@ class App(BatchActions,DetailEditor):
         view.add_command(label="Détaillée", command=lambda:self.set_view("detail"))
         view.add_command(label="Mosaïque", command=lambda:self.set_view("mosaic"))
         self.update_view_menu()
+        view.add_command(label="Colonnes de la liste…",command=self.open_columns)
         view.add_command(label="Afficher / masquer l'inspecteur", command=self.toggle_inspector)
         view.add_command(label="Rechercher", accelerator="Ctrl+K", command=self.focus_search)
         view.add_command(label="Retirer les filtres", command=self.clear_filters)
@@ -145,8 +152,11 @@ class App(BatchActions,DetailEditor):
 
     def layout_view_controls(self,event=None):
         width=self.viewbar.winfo_width()
-        narrow=width<380
-        self.detail_sort_button.configure(text="Tri" if narrow else self.sort_caption,width=35 if narrow else 112)
+        date_sort=BY_KEY[self.sort_column].render=='date'
+        narrow=width<(425 if date_sort else 380)
+        sort_width=max(112,self.detail_sort_button.font.measure(self.sort_caption)+22) if date_sort else 112
+        self.detail_sort_button.configure(text="Tri" if narrow else self.sort_caption,width=35 if narrow else sort_width)
+        self.mosaic_sort_button.configure(text="Tri" if date_sort and narrow else self.sort_caption,width=35 if date_sort and narrow else sort_width)
         if self.view.get()=="mosaic":
             if width<530:
                 self.mosaic_tools.pack(side="bottom",fill="x",before=self.mode_buttons_frame,pady=(4,0))
@@ -188,7 +198,7 @@ class App(BatchActions,DetailEditor):
 
     def detail_sort_popup(self,anchor=None):
         menu=skin_menu(tk.Menu(self.root,tearoff=False))
-        for key,label in (("title","Titre"),("context","Emplacements"),("categories","Catégories"),("tags","Tags")):
+        for key,label in ((c.key,c.label) for c in COLUMNS):
             menu.add_command(label=label+(" ↓" if self.sort_reverse else " ↑") if key==self.sort_column else label,command=lambda k=key:self.sort_results(k))
         self.active_menu=menu
         button=anchor or self.detail_sort_button
@@ -199,6 +209,10 @@ class App(BatchActions,DetailEditor):
         # Une bascule de présentation ne quitte pas une fiche en cours d’édition.
         self.clear_drop()
         self.drag=None
+        if view=="list" and self.sort_column not in self.results.list_visible:
+            self.sort_column,self.sort_reverse="title",False
+            self.update_sort_caption();self.refresh_results()
+            self.status.set("Tri ramené à Titre : la colonne de tri était masquée dans la Liste.")
         self.view.set(view)
         self.results.set_view(view)
         if self.inline is not None and self.inline.master==self.results:
@@ -347,9 +361,10 @@ class App(BatchActions,DetailEditor):
         self.results=ResultsView(box,self.store.images,self.project_icons,self.view.get(),self.mosaic_size.get())
         self.results.heading("#0",text="")
         self.results.column("#0",width=32,minwidth=32,stretch=False)
-        for key,label,width in [("title","Titre",310),("context","Projet",150),("categories","Catégories",150),("tags","Tags",150)]:
-            self.results.heading(key,text=label,command=lambda k=key:self.sort_results(k))
-            self.results.column(key,width=width,minwidth=180 if key=="title" else 65,stretch=(key=="title"))
+        for c in COLUMNS:
+            self.results.heading(c.key,text=c.label,command=lambda k=c.key:self.sort_results(k))
+            self.results.column(c.key,width=c.width,minwidth=c.minimum,maxwidth=c.maximum,stretch=(c.key=='title'))
+        self.results.bind("<<ListColumnsChanged>>",self.persist_columns)
         sb=AutoScrollbar(box,orient="vertical",command=self.results.yview)
         sb.pack(side="right",fill="y")
         self.results.configure(yscrollcommand=sb.set)
@@ -452,7 +467,7 @@ class App(BatchActions,DetailEditor):
         self.root.geometry(f"{width}x{height}")
 
     def help(self):
-        messagebox.showinfo("Gestes et raccourcis", "Ligne, titre, icône ou image : sélectionner, sans ouvrir.\n↗ : ouvrir dans ChatGPT · Alt+Entrée : ↗ du fil focal.\nDouble-clic et Entrée sur une ligne : aucune ouverture.\nCtrl+clic / Maj+clic : sélection multiple · Ctrl+A : résultats visibles.\nMosaïque : flèches dans la grille.\nCtrl+K : rechercher · Ctrl+N : nouveau fil\nCtrl+Maj+P : nouveau projet · F2 : renommer\nCtrl+S : enregistrer la fiche · Échap : annuler l'édition intégrée\nAlt+↑/↓ dans l'arbre : ordre manuel\nClic droit / touche Menu : actions de classement\nGlisser gauche : déplacer · Glisser droit : choix à la dépose\nLes autres rattachements sont préservés.\nFichier : sauvegarde/restauration du catalogue.", parent=self.root)
+        messagebox.showinfo("Gestes et raccourcis", "Ligne, titre, icône ou image : sélectionner, sans ouvrir.\n↗ : ouvrir dans ChatGPT · Alt+Entrée : ↗ du fil focal.\nDouble-clic et Entrée sur une ligne : aucune ouverture.\nCtrl+clic / Maj+clic : sélection multiple · Ctrl+A : résultats visibles.\nMosaïque : flèches dans la grille.\nCtrl+K : rechercher · Ctrl+N : nouveau fil\nCtrl+Maj+P : nouveau projet · F2 : renommer\nCtrl+S : enregistrer la fiche · Échap : annuler l'édition intégrée\nAlt+↑/↓ dans l'arbre : ordre manuel\nClic droit / touche Menu : actions de classement\nGlisser gauche : déplacer · Glisser droit : choix à la dépose\nLes autres rattachements sont préservés.\nAffichage → Colonnes de la liste : visibilité, ordre et largeurs mémorisés.\nFichier : sauvegarde/restauration du catalogue.", parent=self.root)
 
     def focus_search(self):
         self.search_entry.focus_set()
@@ -605,12 +620,12 @@ class App(BatchActions,DetailEditor):
             context = self.project_label(r.parent) if r.kind == "project" and r.parent else (" · ".join(self.project_label(p) for p in r.projects) if r.kind == "item" else "À la racine")
             if r.kind == "item" and not r.projects:
                 context = "À classer"
-            return {"title": r.title, "context": context, "categories": " · ".join(r.categories), "tags": " · ".join(r.tags), "modified": r.modified}
-        rows.sort(key=lambda r: fold(values(r)[self.sort_column]), reverse=self.sort_reverse)
+            return {"title": r.title, "context": context, "categories": list(r.categories), "tags": list(r.tags), "created": r.created, "modified": r.modified}
+        rows.sort(key=lambda r: sort_value(values(r),self.sort_column), reverse=self.sort_reverse)
         for r in rows:
             v = values(r)
             visual=resolve_identity(self.cat,r.id,self.scope)
-            self.results.insert("", "end", iid=r.id, image=self.project_icons.get(visual.icon,visual.color,20) if r.kind=="item" else self.icons[r.kind], tags=(r.kind,), categories=r.categories, labels=r.tags, summary=r.description, visual=visual, values=(r.title, v["context"], v["tags"], datetime.fromisoformat(r.modified).strftime("%d/%m/%Y")))
+            self.results.insert("", "end", iid=r.id, image=self.project_icons.get(visual.icon,visual.color,20) if r.kind=="item" else self.icons[r.kind], tags=(r.kind,), categories=r.categories, labels=r.tags, summary=r.description, visual=visual, cells=v, values=(r.title, v["context"], " · ".join(v["tags"]), datetime.fromisoformat(r.modified).strftime("%d/%m/%Y")))
         self.results.set_selection(selected,anchor,focal)
         self.results.sort_column,self.results.sort_reverse=self.sort_column,self.sort_reverse
         self.results_label.configure(text="Discussions")
@@ -628,11 +643,14 @@ class App(BatchActions,DetailEditor):
     def sort_results(self, column):
         self.sort_reverse = not self.sort_reverse if self.sort_column == column else False
         self.sort_column = column
-        label={"title":"Titre","context":"Lieu","categories":"Catégories","tags":"Tags"}[column]
-        self.sort_caption="Tri · "+label+(" ↓" if self.sort_reverse else " ↑")
+        self.update_sort_caption()
+        self.refresh_results()
+        self.persist_columns()
+
+    def update_sort_caption(self):
+        self.sort_caption="Tri · "+BY_KEY[self.sort_column].label+(" ↓" if self.sort_reverse else " ↑")
         self.mosaic_sort_button.configure(text=self.sort_caption)
         self.layout_view_controls()
-        self.refresh_results()
 
     def select_record(self, event=None):
         if self.restoring_workspace: return
@@ -1219,11 +1237,7 @@ class App(BatchActions,DetailEditor):
         if not self.can_leave():
             return
         try:
-            selection=self.results.selection()
-            ui_state.save(self.preferences_path, self.inspector_visible, f"{max(1000,self.root.winfo_width())}x{max(680,self.root.winfo_height())}", self.view.get(),
-                query=self.query.get(),tag=self.tag.get(),category=self.category.get(),scope=self.scope,mosaic_size=self.mosaic_size.get(),
-                selected=selection[0] if len(selection)==1 else None,
-                expanded_projects=[r.id for r in self.cat.records.values() if r.kind=="project" and self.tree.exists(r.id) and self.tree.item(r.id,"open")])
+            self.save_preferences()
         except (OSError,ValueError) as exc:
             messagebox.showwarning("Préférences non enregistrées", f"Le catalogue reste intact.\n{exc}", parent=self.root)
         if self.search_timer:

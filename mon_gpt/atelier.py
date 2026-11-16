@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.font import Font
 from .selection import Selection
+from .list_columns import COLUMNS, BY_KEY, defaults, display_date
 from .theme import COLORS as C
 
 
@@ -234,11 +235,12 @@ def skin_menu(menu):
 class CatalogList(tk.Canvas):
     """Liste à colonnes dessinées : API limitée aux interactions déjà utilisées."""
     row_height, header_height = 42, 34
-    keys = ["#0","title","context","categories","tags","modified","open","details"]
+    keys = ["#0","title","context","categories","tags","modified","created","open","details"]
 
     def __init__(self, parent):
         super().__init__(parent, background=C["ivory"], highlightthickness=0, takefocus=1, height=60)
         self.rows, self.columns, self.headings = {}, {}, {}
+        self.list_order=list(BY_KEY);self.list_visible=defaults()["visible"]
         self.selected, self.focused, self.hovered = None, None, None
         self.pick=Selection()
         self.selection_guard=None
@@ -295,19 +297,12 @@ class CatalogList(tk.Canvas):
         """Titre et action épinglés ; seules les colonnes secondaires défilent."""
         width=max(1,self.winfo_width())
         icon,action=32,36
-        if width<440:
-            self.secondary_order=[]
-            self.secondary_start,self.secondary_visible=width-action-32,32
-            return {"#0":(0,icon),"title":(icon,max(1,width-icon-action-32)),"details":(width-action-32,32),"open":(width-action,action)}
-        order=["context","categories","tags"] if width>=900 else ["categories","tags","context"]
+        order=[k for k in self.list_order if k!='title' and k in self.list_visible]
         self.secondary_order=order
-        total=sum(self.columns.get(k,{}).get("width",150) for k in order)
-        preferred=self.columns.get("title",{}).get("width",300)
-        if self.title_resized:
-            title=max(180,min(preferred,width-icon-action-90))
-        else:
-            title=max(180,min(preferred,int(width*.44)))
-            title=max(title,width-icon-action-total)
+        total=sum(self.columns.get(k,{}).get('width',BY_KEY[k].width) for k in order)
+        preferred=self.columns.get("title",{}).get("width",BY_KEY['title'].width)
+        reserve=min(110,max(70,int((width-icon-action)*.42))) if order else 0
+        title=max(1,min(preferred,width-icon-action-reserve))
         self.secondary_start=icon+title
         self.secondary_visible=max(1,width-action-self.secondary_start)
         self.left=min(self.left,max(0,total-self.secondary_visible))
@@ -461,7 +456,7 @@ class CatalogList(tk.Canvas):
             if key:
                 layout=self.layout()
                 # Figer la largeur réellement visible, sans saut au premier pixel.
-                self.columns["title"]["width"]=layout["title"][1]
+                if key=='title':self.columns["title"]["width"]=max(BY_KEY["title"].minimum,layout["title"][1])
                 self.title_resized=True
                 self.resize_column=(key,event.x,layout[key][1])
                 self.configure(cursor="sb_h_double_arrow")
@@ -478,11 +473,11 @@ class CatalogList(tk.Canvas):
     def resize_motion(self,event):
         if self.resize_column:
             key,start,width=self.resize_column
-            self.columns[key]["width"]=max(self.columns[key].get("minwidth",44),width+event.x-start)
+            self.columns[key]["width"]=min(self.columns[key].get("maxwidth",1200),max(self.columns[key].get("minwidth",44),width+event.x-start))
             self.draw()
 
     def separator_at(self,x,y):
-        if not 0<=y<self.header_height or self.winfo_width()<440 or getattr(self,"view","list")!="list": return None
+        if not 0<=y<self.header_height or getattr(self,"view","list")!="list": return None
         layout=self.layout()
         for key in ["title"]+self.secondary_order:
             start,size=layout[key]
@@ -492,8 +487,10 @@ class CatalogList(tk.Canvas):
         return None
 
     def resize_release(self,event):
+        changed=self.resize_column is not None
         self.resize_column=None
         self.motion(event)
+        if changed:self.event_generate("<<ListColumnsChanged>>",when="tail")
 
     def leave_header(self,event=None):
         if self.separator_hover is not None:
@@ -541,7 +538,10 @@ class CatalogList(tk.Canvas):
         text=vals[0]+"\nProjet : "+vals[1]
         text+="\nCatégories : "+(" · ".join(data.get("categories",[])) or "—")
         text+="\nTags : "+(" · ".join(data.get("labels",[])) or "—")
-        if self.winfo_width()<900: text+="\nColonnes secondaires repliées ou défilantes."
+        cells=data.get("cells",{})
+        for key in ("created","modified"):
+            if cells.get(key):text+="\n"+BY_KEY[key].label+" : "+display_date(cells[key],seconds=True)
+        if self.xview()!=(0,1):text+="\nColonnes secondaires : défilement horizontal, ordre conservé."
         self.tip=tk.Label(self,text=text,font=("Segoe UI",9),background=C["ivory"],foreground=C["ink"],justify="left",anchor="w",padx=10,pady=8,wraplength=max(100,self.winfo_width()-48),highlightthickness=1,highlightbackground=C["line"])
         self.tip.update_idletasks()
         self.tip.place(x=12,y=max(self.header_height,min(y+20,self.winfo_height()-self.tip.winfo_reqheight()-8)),width=max(1,self.winfo_width()-24))
@@ -625,21 +625,26 @@ class CatalogList(tk.Canvas):
                 rounded(self,4,y+2,width-5,y+self.row_height-2,6,fill="",outline="#91A38B")
             self.create_line(10,y+self.row_height-1,width-10,y+self.row_height-1,fill="#EEE9E0")
             vals=data.get("values",("",)*4)
+            cells=data.get("cells",dict(title=vals[0],context=vals[1],categories=data.get("categories",[]),tags=data.get("labels",[])))
             project="project" in data.get("tags",())
             if not project and data.get("visual") and data.get("image"):
                 self.create_image(17,cy,image=data["image"],tags=("effective_icon",identity))
             else:
                 self.row_icon(17,cy,project,C["link"] if project else C["pine"])
             tx,tw=layout["title"]
-            self.create_text(tx+6,cy,text=shorten(self.title_font,vals[0],tw-16),font=self.title_font,fill=C["ink"],anchor="w")
+            self.create_text(tx+6,cy,text=shorten(self.title_font,cells["title"],tw-16),font=self.title_font,fill=C["ink"],anchor="w")
             for key in self.secondary_order:
                 x,size=self.visible_box(key)
                 if size<20: continue
-                if key=="context":
-                    self.create_text(x+7,cy,text=shorten(self.small_font,vals[1],size-14),font=self.small_font,fill=C["muted"],anchor="w")
+                kind=BY_KEY[key].render
+                if kind=='date':
+                    full=display_date(cells[key]);date=full.split(' ')[0]
+                    text=full if self.small_font.measure(full)<=size-14 else date if self.small_font.measure(date)<=size-14 else '…'
+                    self.create_text(x+7,cy,text=text,font=self.small_font,fill=C["muted"],anchor="w",tags=(key,identity))
+                elif kind=='text':
+                    self.create_text(x+7,cy,text=shorten(self.small_font,cells[key],size-14),font=self.small_font,fill=C["muted"],anchor="w",tags=(key,identity))
                 else:
-                    labels=data.get("categories" if key=="categories" else "labels",[])
-                    self.draw_badges(labels,x+6,cy,size-8,key=="categories")
+                    self.draw_badges(cells[key],x+6,cy,size-8,key=="categories")
             if "details" in layout:
                 x,size=layout["details"]
                 count=len(data.get("categories",[]))+len(data.get("labels",[]))

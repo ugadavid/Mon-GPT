@@ -1,0 +1,36 @@
+{
+  "donnees": "Exclusivement fictives",
+  "discussions": 1429,
+  "projets": 5,
+  "mappings": 4,
+  "tests_python": 192,
+  "tests_javascript": 43,
+  "colonnes_visibles": [
+    "Titre",
+    "Projet",
+    "Modification",
+    "Création"
+  ],
+  "largeurs_px": {
+    "Titre": 350,
+    "Projet": 180,
+    "Modification": 170,
+    "Création": 165
+  },
+  "reprise_reelle_visibilite_ordre_largeurs_tri": true,
+  "preferences_version": 1,
+  "catalogue_identique_avant_classement": true,
+  "dates_creation_toutes_conservees": true,
+  "fils_deplaces_apres_configuration": 3,
+  "autres_rattachements_conserves": 3,
+  "autres_fils_strictement_identiques": 1426,
+  "identifiants_et_personnalisations_conserves": true,
+  "mappings_inchanges": true,
+  "clones": 0,
+  "ouvertures_par_titre_tri_colonnes_et_demarrage": 0,
+  "ouverture_simulee_fleche": 1,
+  "zip_metier_sans_preferences_ui": true,
+  "zip_restaure_identique": true,
+  "image_personnelle_preservee": true,
+  "erreurs_execution": 0
+}

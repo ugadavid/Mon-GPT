@@ -1,0 +1,13 @@
+test_1429_rows_virtualized_config_sort_filter_and_preferences_write_failure (test_list_columns.ColumnTests.test_1429_rows_virtualized_config_sort_filter_and_preferences_write_failure) ... ok
+test_compact_order_scrolling_bounds_hidden_handles_and_arrow_only (test_list_columns.ColumnTests.test_compact_order_scrolling_bounds_hidden_handles_and_arrow_only) ... ok
+test_dialog_keyboard_visibility_reorder_apply_defaults_cancel_no_catalog_writes (test_list_columns.ColumnTests.test_dialog_keyboard_visibility_reorder_apply_defaults_cancel_no_catalog_writes) ... ok
+test_hidden_sort_reset_and_other_views_keep_layout (test_list_columns.ColumnTests.test_hidden_sort_reset_and_other_views_keep_layout) ... ok
+test_old_preferences_and_invalid_columns_preserve_workspace_and_catalog (test_list_columns.ColumnTests.test_old_preferences_and_invalid_columns_preserve_workspace_and_catalog) ... ok
+test_reordered_columns_keep_multi_selection_drag_left_right_and_rename (test_list_columns.ColumnTests.test_reordered_columns_keep_multi_selection_drag_left_right_and_rename) ... ok
+test_resize_four_widths_saves_once_after_release_retains_order_across_views_reopen (test_list_columns.ColumnTests.test_resize_four_widths_saves_once_after_release_retains_order_across_views_reopen) ... ok
+test_true_date_sort_minutes_offsets_local_display_and_project_dates (test_list_columns.ColumnTests.test_true_date_sort_minutes_offsets_local_display_and_project_dates) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 10.717s
+
+OK
