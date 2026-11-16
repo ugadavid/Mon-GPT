@@ -18,10 +18,11 @@ from .identity import resolve_identity, inherited_identity, DEFAULTS
 from .identity_ui import ContextMasthead, ProjectVisualStrip
 from .project_icons import ProjectIconCache
 from .results import ResultsView
+from .batch_ui import BatchActions
 from . import ui_state, __version__
 
 
-class App(DetailEditor):
+class App(BatchActions,DetailEditor):
     def __init__(self, root, store, cat, adapter, opener=None):
         self.root, self.store, self.cat, self.adapter = root, store, cat, adapter
         self.opener = opener
@@ -176,6 +177,8 @@ class App(DetailEditor):
         else: self.inline.place_forget()
 
     def results_context_menu(self):
+        if len(self.group_ids())>1:
+            return self.group_menu(self.results.winfo_rootx()+60,self.results.winfo_rooty()+40)
         box=self.results.bbox(self.current) if self.current else None
         if self.view.get()=="mosaic" and box:
             x,y,width,height=box
@@ -350,6 +353,8 @@ class App(DetailEditor):
         sb.pack(side="right",fill="y")
         self.results.configure(yscrollcommand=sb.set)
         self.results.pack(side="left",fill="both",expand=True)
+        self.results.selection_guard=lambda:self.can_leave()
+        self.build_group_bar()
         self.horizontal_scroll=AutoScrollbar(self.middle,orient="horizontal",command=self.results.xview)
         self.horizontal_scroll.pack(fill="x",padx=10)
         self.results.configure(xscrollcommand=self.horizontal_scroll.set)
@@ -577,7 +582,10 @@ class App(DetailEditor):
         self.select_identity(self.scope if self.scope in self.cat.records else None, checked=True)
 
     def refresh_results(self):
-        selected = self.current
+        selected=self.results.selection() or ((self.current,) if self.current else ())
+        anchor,focal=self.results.pick.anchor,self.results.focused
+        if getattr(self,"results_scope",self.scope)!=self.scope:selected=()
+        self.results_scope=self.scope
         self.results.delete(*self.results.get_children())
         scope = self.scope if self.scope in self.cat.records else None
         rows = self.cat.search(self.query.get().strip(), scope, self.tag.get().strip(), self.category.get().strip(), self.scope == "unfiled")
@@ -598,9 +606,7 @@ class App(DetailEditor):
             v = values(r)
             visual=resolve_identity(self.cat,r.id,self.scope)
             self.results.insert("", "end", iid=r.id, image=self.project_icons.get(visual.icon,visual.color,20) if r.kind=="item" else self.icons[r.kind], tags=(r.kind,), categories=r.categories, labels=r.tags, summary=r.description, visual=visual, values=(r.title, v["context"], v["tags"], datetime.fromisoformat(r.modified).strftime("%d/%m/%Y")))
-        if selected and self.results.exists(selected):
-            self.results.selection_set(selected)
-            self.results.focus(selected)
+        self.results.set_selection(selected,anchor,focal)
         self.results.sort_column,self.results.sort_reverse=self.sort_column,self.sort_reverse
         self.results_label.configure(text="Discussions")
         self.result_count.configure(text=f"{len(rows)} résultat(s) · " + (self.cat.records[scope].title if scope else ("À classer" if self.scope=="unfiled" else "Tous les fils")))
@@ -612,6 +618,7 @@ class App(DetailEditor):
         self.refresh_chips()
 
         self.update_identity()
+        self.sync_group()
 
     def sort_results(self, column):
         self.sort_reverse = not self.sort_reverse if self.sort_column == column else False
@@ -625,10 +632,20 @@ class App(DetailEditor):
     def select_record(self, event=None):
         if self.restoring_workspace: return
         selection = self.results.selection()
+        if len(self.group_ids())>1:
+            if self.dirty and not self.can_leave():
+                self.results.selection_set(getattr(self,"accepted_selection",(self.current,) if self.current else ()))
+                return
+            self.accepted_selection=selection
+            self.sync_group()
+            return
+        self.sync_group()
         if selection and selection[0] != self.current:
             if not self.select_identity(selection[0]):
                 if self.current and self.results.exists(self.current):
                     self.results.selection_set(self.current)
+                return
+        self.accepted_selection=self.results.selection()
 
     def select_identity(self, identity, checked=False):
         if identity == self.current:
@@ -659,10 +676,15 @@ class App(DetailEditor):
             self.inspector_visible, self.editing = False, False
         else:
             self.ensure_inspector()
-            self.show_summary(self.current, checked=True)
+            if len(self.group_ids())>1:self.show_group_summary()
+            else:self.show_summary(self.current, checked=True)
 
     def show_summary(self, identity, checked=False):
         if not checked and not self.can_leave():
+            return
+        if len(self.group_ids())>1:
+            self.current=None;self.editing=False
+            self.update_identity();self.show_group_summary()
             return
         self.current,self.dirty,self.editing=identity,False,False
         self.update_identity()
@@ -685,23 +707,27 @@ class App(DetailEditor):
 
     def show_record(self, identity):
         """Entrée explicite de l'édition, également conservée pour les tests MG-001."""
+        if not self.individual_allowed():return
         self.ensure_inspector()
         self.editing = True
         self.render_editor(identity)
         self.update_identity()
 
     def edit_selected(self, identity=None):
+        if not self.individual_allowed():return
         identity = identity or self.current
         if identity in self.cat.records and self.can_leave():
             self.show_record(identity)
 
     def save_record(self):
+        if not self.individual_allowed():return False
         if not self.editing or self.current not in self.cat.records:
             return False
         if getattr(self,"visual_layer",None): self.visual_layer.accept()
         return super().save_record()
 
     def open_thread(self, identity=None):
+        if not self.individual_allowed():return False
         identity = identity or self.current
         if identity not in self.cat.records or self.cat.records[identity].kind != "item":
             return False
@@ -716,6 +742,7 @@ class App(DetailEditor):
         return self.safe(action)
 
     def copy_link(self, identity):
+        if not self.individual_allowed():return
         def action():
             _, url = parse_url(self.adapter.conversations[identity].url)
             self.root.clipboard_clear()
@@ -736,6 +763,7 @@ class App(DetailEditor):
         self.open_thread(identity)
 
     def result_enter(self, event=None):
+        if not self.individual_allowed():return "break"
         if self.root.focus_get() == self.results:
             identity = self.results.focus()
             if identity in self.cat.records:
@@ -747,6 +775,10 @@ class App(DetailEditor):
         return "break"
 
     def result_double(self, event):
+        if getattr(event,"state",0)&5:
+            self.results.select_click(event)
+            return "break"
+        if not self.individual_allowed():return "break"
         identity = self.results.identify_at(event.x,event.y)
         if identity in self.cat.records:
             if self.cat.records[identity].kind == "item":
@@ -892,6 +924,7 @@ class App(DetailEditor):
         return "break"
 
     def rename_selected(self, identity=None):
+        if not self.individual_allowed():return
         identity = identity or (self.scope if self.root.focus_get() == self.tree else self.current)
         if identity not in self.cat.records or not self.can_leave():
             return
@@ -925,6 +958,7 @@ class App(DetailEditor):
         if self.drag:
             self.clear_drop()
             self.drag = None
+            return
         if self.inline:
             self.cancel_inline()
             self.status.set("Édition intégrée annulée.")
@@ -933,6 +967,8 @@ class App(DetailEditor):
             self.status.set("Action intégrée annulée.")
         elif self.suggestion_box.winfo_manager():
             self.hide_suggestions()
+        elif len(self.group_ids())>1 and not self.editing:
+            self.results.collapse_selection()
         elif self.inspector_visible:
             self.toggle_inspector()
 
@@ -954,6 +990,7 @@ class App(DetailEditor):
             action()
 
     def context_menu(self, identity, x, y):
+        if len(self.group_ids())>1 and identity in self.group_ids():return self.group_menu(x,y)
         menu = skin_menu(tk.Menu(self.root, tearoff=False))
         r = self.cat.records.get(identity)
         if r and r.kind == "item":
@@ -1076,6 +1113,17 @@ class App(DetailEditor):
             self.drag=None
             return
         identity = widget.identify_at(event.x,event.y) if widget==self.results else widget.identify_row(event.y)
+        if widget==self.results:
+            if self.results.gesture_blocked:
+                self.drag=None
+                return
+            modified=bool(getattr(event,"state",0)&5)
+            if button==3 and identity not in self.results.selection() and identity in self.cat.records:
+                if not self.can_leave():self.drag=None;return
+                self.results.selection_set(identity);self.select_record()
+            if modified or len(self.group_ids())>1:
+                self.drag={"id":identity,"widget":widget,"button":button,"x":event.x_root,"y":event.y_root,"active":False,"origin":self.scope,"double":False,"batch":True,"modified":modified}
+                return
         self.drag = {"id": identity, "widget": widget, "button": button, "x": event.x_root, "y": event.y_root, "active": False, "origin": self.scope, "double": False}
 
     def clear_drop(self):
@@ -1099,6 +1147,11 @@ class App(DetailEditor):
         return identity, identity in self.cat.records and self.cat.records[identity].kind == "project"
 
     def drag_motion(self, event):
+        if self.drag and self.drag.get("batch"):
+            if abs(event.x_root-self.drag["x"])+abs(event.y_root-self.drag["y"])>=9:
+                self.drag["active"]=True
+                self.status.set("Glisser de lot désactivé : utilisez Déplacer… ou Ajouter un rattachement…")
+            return
         if not self.drag or self.drag["id"] not in self.cat.records:
             return
         if abs(event.x_root-self.drag["x"])+abs(event.y_root-self.drag["y"]) < 9:
@@ -1117,6 +1170,14 @@ class App(DetailEditor):
         drag = self.drag
         if not drag:
             return
+        if drag.get("batch"):
+            self.drag=None
+            if drag["active"] or drag["modified"]:return "break"
+            if button==3:return self.group_menu(event.x_root,event.y_root)
+            self.results.finish_single()
+            self.select_record()
+            if drag["id"] in self.cat.records and self.title_hit(event,drag["id"]):self.open_click(drag["id"])
+            return "break"
         target, allowed = self.drop_target(event.x_root, event.y_root)
         self.clear_drop()
         self.drag = None
@@ -1168,7 +1229,7 @@ class App(DetailEditor):
             selection=self.results.selection()
             ui_state.save(self.preferences_path, self.inspector_visible, f"{max(1000,self.root.winfo_width())}x{max(680,self.root.winfo_height())}", self.view.get(),
                 query=self.query.get(),tag=self.tag.get(),category=self.category.get(),scope=self.scope,mosaic_size=self.mosaic_size.get(),
-                selected=selection[0] if selection else None,
+                selected=selection[0] if len(selection)==1 else None,
                 expanded_projects=[r.id for r in self.cat.records.values() if r.kind=="project" and self.tree.exists(r.id) and self.tree.item(r.id,"open")])
         except (OSError,ValueError) as exc:
             messagebox.showwarning("Préférences non enregistrées", f"Le catalogue reste intact.\n{exc}", parent=self.root)

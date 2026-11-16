@@ -1,0 +1,21 @@
+{
+  "donnees": "Exclusivement fictives",
+  "discussions": 1429,
+  "projets": 5,
+  "mappings_projets": 4,
+  "ajout": 1429,
+  "deplacement": 1427,
+  "retrait": 1429,
+  "a_classer_final": 1419,
+  "autre_emplacement_conserve": 10,
+  "clones": 0,
+  "personnalisations_et_identifiants_conserves": true,
+  "mappings_conserves": true,
+  "sauvegarde_zip_restauree_identique": true,
+  "images_personnelles_sauvegardees": 1,
+  "ouvertures_par_operations_groupees": 0,
+  "ouvertures_au_redemarrage": 0,
+  "ouverture_individuelle_simulee": 1,
+  "lot_absent_apres_relance": true,
+  "erreurs_execution": 0
+}

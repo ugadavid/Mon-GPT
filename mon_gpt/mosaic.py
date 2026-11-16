@@ -122,12 +122,12 @@ class MosaicRenderer:
             self.event_generate("<<MosaicLayout>>",when="tail")
         return self.top/total,min(1,(self.top+visible)/total)
 
-    def mosaic_navigate(self,dx=0,dy=0):
+    def mosaic_navigate(self,dx=0,dy=0,extend=False):
         identities=list(self.rows)
         if not identities: return "break"
         self.hide_tip();grid=self.grid_layout()
         index=max(0,min(len(identities)-1,identities.index(self.focused)+dx+dy*grid.columns)) if self.focused in identities else 0
-        self.focused=identities[index];self.selection_set(self.focused);self.see(self.focused)
+        self.gesture_select(identities[index],extend=extend);self.see(self.focused)
         box=self.mosaic_bbox(self.focused,"title")
         if box and " ".join(self.mosaic_lines(self.focused,box[2]))!=self.rows[self.focused]["values"][0]:
             self.tip_timer=self.after(650,lambda:self.show_tip(self.focused,box[1]))
@@ -153,9 +153,9 @@ class MosaicRenderer:
         for index in grid.visible(self.top,height,len(identities)):
             identity=identities[index];data=self.rows[identity];x,y,w,h=grid.box(index,self.top)
             if y+h<=0 or y>=height: continue
-            selected=identity==self.selected;hovered=identity==self.hovered
+            selected=identity in self.pick.ids;hovered=identity==self.hovered
             fill=C["selection"] if selected else C["paper"]
-            rounded(self,x+1,y+1,x+w-1,y+h-1,9,fill=fill,outline=C["pine"] if selected else C["muted"] if hovered else C["line"],width=2 if selected and self.focus_get()==self else 1)
+            rounded(self,x+1,y+1,x+w-1,y+h-1,9,fill=fill,outline=C["pine"] if selected else C["muted"] if hovered else C["line"],width=2 if selected and identity==self.focused and self.focus_get()==self else 1)
             visual=data.get("visual");reference=visual.image if visual and visual.image else DEFAULTS["image"]
             picture=self.cover(reference,grid.image_width)
             ix=x+(w-grid.image_width)//2;iy=y+10

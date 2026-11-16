@@ -2,6 +2,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter.font import Font
+from .selection import Selection
 from .theme import COLORS as C
 
 
@@ -239,6 +240,10 @@ class CatalogList(tk.Canvas):
         super().__init__(parent, background=C["ivory"], highlightthickness=0, takefocus=1, height=60)
         self.rows, self.columns, self.headings = {}, {}, {}
         self.selected, self.focused, self.hovered = None, None, None
+        self.pick=Selection()
+        self.selection_guard=None
+        self.pending_single=None
+        self.gesture_blocked=False
         self.top, self.left = 0, 0
         self.ycommand, self.xcommand = None, None
         self.title_font = Font(self,font=("Segoe UI",10,"bold"))
@@ -258,6 +263,9 @@ class CatalogList(tk.Canvas):
         self.tip_timer,self.tip=None,None
         self.bind("<Right>",lambda e:self.focus_action(True))
         self.bind("<Left>",lambda e:self.focus_action(False))
+        self.bind("<Control-a>",self.select_all)
+        self.bind("<Shift-Up>",lambda e:self.navigate(-1,extend=True))
+        self.bind("<Shift-Down>",lambda e:self.navigate(1,extend=True))
         self.resize_column = None
         self.title_resized = False
         self.separator_hover = None
@@ -342,6 +350,7 @@ class CatalogList(tk.Canvas):
     def delete(self,*identities):
         for identity in identities: self.rows.pop(identity,None)
         if self.selected not in self.rows: self.selected=None
+        self.pick.set(self.pick.ids,list(self.rows),self.item_ids(),self.pick.anchor,self.pick.focal)
         self.request_draw()
 
     def request_draw(self):
@@ -371,14 +380,54 @@ class CatalogList(tk.Canvas):
         return self.rows[identity].get(option) if option else self.rows[identity]
 
     def selection(self):
-        return (self.selected,) if self.selected in self.rows else ()
+        return self.pick.ids
 
     def selection_set(self,identity):
-        if isinstance(identity,(tuple,list)): identity=identity[0] if identity else None
-        if identity != self.selected:
-            self.selected=identity
+        identities=identity if isinstance(identity,(tuple,list,set)) else ([identity] if identity else [])
+        self.set_selection(identities)
+
+    def item_ids(self):
+        return {i for i,row in self.rows.items() if "project" not in row.get("tags",())}
+
+    def set_selection(self,identities,anchor=None,focal=None):
+        old=self.pick.ids
+        self.pick.set(identities,list(self.rows),self.item_ids(),anchor,focal)
+        self.selected=self.pick.focal if self.pick.focal in self.pick.ids else next(iter(self.pick.ids),None)
+        if self.pick.focal is not None: self.focused=self.pick.focal
+        if old!=self.pick.ids:
             self.event_generate("<<TreeviewSelect>>",when="tail")
         self.draw()
+
+    def gesture_select(self,identity,event=None,extend=False,control=False):
+        self.gesture_blocked=False
+        self.pending_single=None
+        state=getattr(event,"state",0)
+        control=control or bool(state&4)
+        extend=extend or bool(state&1)
+        proposed=Selection();proposed.ids=self.pick.ids;proposed.anchor=self.pick.anchor
+        proposed.gesture(identity,list(self.rows),self.item_ids(),control,extend,project_alone=(event is not None or not extend))
+        if proposed.ids!=self.pick.ids and self.selection_guard and not self.selection_guard():
+            self.gesture_blocked=True
+            return "break"
+        if not control and not extend and event is not None and len(self.pick.ids)>1 and identity in self.pick.ids:
+            self.pending_single=identity
+            return "break"
+        self.set_selection(proposed.ids,proposed.anchor,proposed.focal)
+        return "break"
+
+    def finish_single(self):
+        identity=self.pending_single
+        self.pending_single=None
+        if identity in self.rows: self.selection_set(identity)
+
+    def select_all(self,event=None):
+        if self.selection_guard and not self.selection_guard(): return "break"
+        self.set_selection(self.item_ids(),self.pick.anchor,self.focused)
+        return "break"
+
+    def collapse_selection(self):
+        self.selection_set(self.focused if self.focused in self.pick.ids else next(iter(self.pick.ids),None))
+        return "break"
 
     def focus(self,identity=None):
         if identity is not None: self.focused=identity
@@ -424,8 +473,7 @@ class CatalogList(tk.Canvas):
             return
         identity=self.identify_row(event.y)
         if identity:
-            self.focused=identity
-            self.selection_set(identity)
+            self.gesture_select(identity,event)
 
     def resize_motion(self,event):
         if self.resize_column:
@@ -453,12 +501,12 @@ class CatalogList(tk.Canvas):
             self.draw()
         if not self.resize_column: self.configure(cursor="")
 
-    def navigate(self,step):
+    def navigate(self,step,extend=False):
         identities=list(self.rows)
         if identities:
             index=identities.index(self.focused) if self.focused in identities else (-1 if step>0 else len(identities))
-            self.focused=identities[max(0,min(len(identities)-1,index+step))]
-            self.selection_set(self.focused)
+            target=identities[max(0,min(len(identities)-1,index+step))]
+            self.gesture_select(target,extend=extend)
             self.see(self.focused)
         return "break"
 
@@ -566,10 +614,10 @@ class CatalogList(tk.Canvas):
             y=self.header_height+index*self.row_height-self.top
             if y+self.row_height<=self.header_height or y>=height: continue
             cy=y+self.row_height/2
-            selected=identity==self.selected
+            selected=identity in self.pick.ids
             fill="#E3E9D8" if selected else "#F1F0E7" if identity==self.hovered else C["paper"]
             rounded(self,4,y+2,width-5,y+self.row_height-2,6,fill=fill,outline="")
-            if selected and self.focus_get()==self:
+            if selected and identity==self.focused and self.focus_get()==self:
                 rounded(self,4,y+2,width-5,y+self.row_height-2,6,fill="",outline="#91A38B")
             self.create_line(10,y+self.row_height-1,width-10,y+self.row_height-1,fill="#EEE9E0")
             vals=data.get("values",("",)*4)

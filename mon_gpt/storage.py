@@ -192,6 +192,21 @@ class Store:
         self.save(new_cat,new_adapter)
         return new_cat,new_adapter,backup
 
+    def commit_batch(self,plan,cat,adapter,expected):
+        from .batch import build_batch
+        if encode(cat,adapter)!=expected or cat.to_list()!=plan.before:
+            raise ValueError("Le catalogue a changé depuis l’aperçu. Actualisez le plan ; aucun rattachement modifié.")
+        checked=build_batch(cat,plan.ids,plan.action,plan.source,plan.destination)
+        if checked!=plan: raise ValueError("Plan périmé ou incohérent : actualisez l’aperçu.")
+        candidate,source=decode(expected)
+        for identity,projects in checked.changes.items(): candidate.attach(identity,projects)
+        data=encode(candidate,source)
+        decode(data);catalog_bytes(data);self.validate_images(candidate)
+        if not checked.changed: return cat,adapter
+        # Un seul remplacement atomique ; aucun objet actif muté en cas d’échec.
+        self.save(candidate,source)
+        return candidate,source
+
     def export(self, destination, cat, adapter):
         destination=Path(destination).resolve()
         if destination == self.path or destination.is_relative_to(self.images.directory.resolve()):

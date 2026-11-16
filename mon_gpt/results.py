@@ -26,6 +26,8 @@ class ResultsView(MosaicRenderer,CatalogList):
         self.bind("<Right>",lambda e:self.mosaic_navigate(1,0) if self.view=="mosaic" else self.focus_action(True))
         self.bind("<Configure>",self.mosaic_resize,add="+")
         self.bind("<FocusOut>",lambda e:self.hide_tip() if self.view=="mosaic" else None,add="+")
+        for key,dx,dy in (("Left",-1,0),("Right",1,0),("Up",0,-1),("Down",0,1)):
+            self.bind(f"<Shift-{key}>",lambda e,x=dx,y=dy:self.mosaic_navigate(x,y,extend=True) if self.view=="mosaic" else self.navigate(y or x,extend=True))
 
     def set_view(self,view):
         if view not in ("list","detail","mosaic"): raise ValueError("Vue inconnue")
@@ -76,13 +78,13 @@ class ResultsView(MosaicRenderer,CatalogList):
             self.hide_tip();self.focus_set()
             identity=self.identify_at(event.x,event.y)
             if identity:
-                self.focused=identity;self.selection_set(identity)
+                self.gesture_select(identity,event)
             return
         if self.view=="list": return super().select_click(event)
         self.hide_tip();self.focus_set()
         identity=self.identify_row(event.y)
         if identity:
-            self.focused=identity;self.selection_set(identity)
+            self.gesture_select(identity,event)
 
     def resize_motion(self,event):
         if self.view=="list": return super().resize_motion(event)
@@ -152,9 +154,9 @@ class ResultsView(MosaicRenderer,CatalogList):
         for index,(identity,data) in enumerate(self.rows.items()):
             y=self.header_height+index*self.row_height-self.top
             if y+self.row_height<=self.header_height or y>=height: continue
-            selected=identity==self.selected
+            selected=identity in self.pick.ids
             fill=C["selection"] if selected else C["hover"] if identity==self.hovered else C["paper"]
-            rounded(self,5,y+3,width-5,y+self.row_height-3,9,fill=fill,outline=C["pine"] if selected and self.focus_get()==self else C["line"])
+            rounded(self,5,y+3,width-5,y+self.row_height-3,9,fill=fill,outline=C["pine"] if selected and identity==self.focused and self.focus_get()==self else C["line"])
             visual=data.get("visual")
             reference=visual.image if visual and visual.image else DEFAULTS["image"]
             picture=self.cover(reference,iw)
@@ -196,9 +198,9 @@ class ResultsView(MosaicRenderer,CatalogList):
         identity=self.identify_at(event.x,event.y)
         if identity: self.tip_timer=self.after(600,lambda:self.show_tip(identity,event.y))
 
-    def navigate(self,step):
-        if self.view=="mosaic": return self.mosaic_navigate(0,step)
-        return super().navigate(step)
+    def navigate(self,step,extend=False):
+        if self.view=="mosaic": return self.mosaic_navigate(0,step,extend=extend)
+        return super().navigate(step,extend=extend)
 
     def see(self,identity):
         if self.view=="mosaic": return self.mosaic_see(identity)
