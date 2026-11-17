@@ -12,6 +12,16 @@
 
 Pour chaque production, séparer **ce que le code fait aujourd'hui**, **l'objectif applicatif à terme**, et **les choix encore à arbitrer**. Le recensement de technologies actuelles ne doit jamais être présenté comme une recommandation de pérennisation.
 
+## Public visé, modèle de diffusion et avenir technique
+
+**Orientation actuelle de l'atelier Trucabule :** créer des **applications pour Windows, gratuites pour leurs utilisateurs et destinées à être diffusées en open source**. Le site [trucabule.fr](https://www.trucabule.fr/) demeure l'unique exception non applicative : il présente la marque.
+
+**Perspective longue (sans calendrier ni engagement de migration) :** si, dans quelques années, Trucabule veut proposer une ou plusieurs applications **multiplateformes**, nous voulons éviter dès maintenant les dépendances et couplages qui rendraient le portage inutilement pénible. **Windows reste la priorité présente** ; il ne faut ni migrer préventivement tout le code ni imposer une technologie uniforme aux six produits.
+
+**Conséquence pour la revue technique :** juger chaque choix sur sa capacité à servir Windows aujourd'hui, son coût de licence et de redistribution en logiciel gratuit/open source, sa facilité de maintenance dans la famille Trucabule et son **coût de migration futur**. Bien distinguer le **code métier**, le **stockage et ses formats**, les **adaptateurs système Windows**, l'**interface** et le **packaging** ; le partage et la séparation ne sont intéressants que si leurs bénéfices sont réels.
+
+**Point de vérification juridique/éditorial :** un dépôt GitHub public n'est **pas automatiquement** distribué sous une licence open source. Lors du relevé initial du 17 novembre 2026, **aucun fichier LICENSE/LICENCE/COPYING n'a été trouvé à la racine des cinq dépôts avec code** (Mon GPT<3, Ma Médiathèque, Mon Bureau, Chrome Organizer, Mon Aise). Cela ne prouve pas qu'aucune licence ne soit définie ailleurs ; **les licences des projets, des ressources et des dépendances restent à auditer et à formaliser avant publication open source**. Ne pas décider d'une licence sans validation de l'auteur.
+
 ## Périmètre élargi : la famille d'applications Trucabule
 
 **Mon GPT<3 est notre premier terrain d'étude, pas la finalité unique.** **Phase 1 limitée à six productions Trucabule : Mon GPT<3, Ma Médiathèque, Mon Bureau, Chrome Organizer, Mon Aise et Ma Capture (encore au stade de projet).** Les cinq premières permettent un audit du code existant ; la sixième, une étude des besoins et de l'architecture envisagée. TRAME, atelier, dev-lab et réalisations du stage M2 au LIDILEM sont **reportés à une seconde phase**, après clarification des six productions Trucabule. Trucabule pourrait rapidement compter **une dizaine d'applications**. La multiplication de modules semblables, de conventions divergentes et de corrections dupliquées rendrait leur maintenance difficile.
@@ -55,6 +65,8 @@ La question importante n'est pas « quel framework utilise-t-on aujourd'hui ? »
 | Quel besoin précis couvre-t-elle ? | Fonctionnalités réellement utilisées, pas les possibilités annoncées |
 | Quelle part en utilisons-nous ? | Modules/API importés, surface d'usage, taille et poids indirect |
 | Quelle solution voisine existe ? | Simplicité, intégration, maintenance, indépendance |
+| Le projet reste-t-il gratuit et librement distribuable ? | Licence du code, des dépendances et des ressources, obligations de redistribution, coût éventuel |
+| Quel serait le coût d'un portage futur ? | Part de métier portable, dépendance Windows, UI, stockage, build, tests et données utilisateurs |
 | Et si nous la codions ? | Volume de code à écrire, cas particuliers, tests nécessaires |
 | Où serait-elle réutilisable ? | Mon GPT<3 seulement, ou plusieurs applications personnelles |
 | Que gagne-t-on réellement ? | Dépendances, performances, ergonomie, contrôle, compréhension |
