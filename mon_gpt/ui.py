@@ -10,12 +10,12 @@ from .core import fold, now
 from .chatgpt import parse_url
 from .details import DetailEditor
 from .theme import COLORS, FONT, apply_theme, make_icons
-from .atelier import Masthead, Surface, PillButton, ViewButton, CatalogList, AutoScrollbar, skin_menu, shorten
+from .atelier import Masthead, Surface, PillButton, CatalogList, AutoScrollbar, skin_menu, shorten
 from .main_menu import MainMenuBar
 from .inspector import InspectorSummary, InspectorScrollbar
 from .navigation import NavigationTree, navigation_icons
 from .identity import resolve_identity, inherited_identity, DEFAULTS
-from .identity_ui import ContextMasthead, ProjectVisualStrip, ControlTip
+from .identity_ui import ContextMasthead, ProjectVisualStrip
 from .project_icons import ProjectIconCache
 from .results import ResultsView
 from .batch_ui import BatchActions
@@ -283,9 +283,9 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         nav_surface=Surface(self.left,width=230,height=120)
         nav_surface.pack(fill="both",expand=True)
         nav=nav_surface.body
-        nav_title=ttk.Frame(nav,style="NavHeading.TFrame")
+        nav_title=ttk.Frame(nav,style="Paper.TFrame")
         nav_title.pack(fill="x",pady=(3,10))
-        ttk.Label(nav_title,text="Votre espace",style="NavHeading.TLabel",font=("Segoe UI",12,"bold")).pack(side="left",padx=(7,0))
+        ttk.Label(nav_title,text="Votre espace",style="Inspector.TLabel",font=("Segoe UI",12,"bold")).pack(side="left")
         plus=self.button(nav_title,text="+",command=lambda:None,width=31,height=29)
         plus.configure(command=lambda:self.plus.tk_popup(plus.winfo_rootx(),plus.winfo_rooty()+34))
         plus.pack(side="right")
@@ -304,7 +304,7 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         self.tree.column("#0",width=194,minwidth=140)
         self.tree.pack(side="left",expand=True,fill="both")
         self.tree.bind("<<TreeviewSelect>>",self.select_scope)
-        for tag,color in [("drop",COLORS["drop"]),("forbidden",COLORS["invalid"])]:
+        for tag,color in [("drop",COLORS["selection"]),("forbidden",COLORS["invalid"])]:
             self.tree.tag_configure(tag,background=color)
         ttk.Separator(nav).pack(fill="x",pady=8)
         self.drop_label=ttk.Label(nav,text="↳  Glissez pour classer",style="PaperMuted.TLabel",font=("Segoe UI",9),wraplength=212)
@@ -334,8 +334,7 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         self.mode_buttons_frame.pack(side="left")
         self.view_buttons={}
         for key,label in (("list","Liste"),("detail","Détaillée"),("mosaic","Mosaïque")):
-            button=ViewButton(self.mode_buttons_frame,text=label,command=lambda k=key:self.set_view(k),view=key)
-            button.tip=ControlTip(button,label)
+            button=self.button(self.mode_buttons_frame,text=label,command=lambda k=key:self.set_view(k),width=63 if key=="list" else 80 if key=="detail" else 75,height=28)
             button.pack(side="left",padx=(0,4))
             self.view_buttons[key]=button
         self.detail_sort_button=self.button(self.viewbar,text="Tri · Titre ↑",command=self.detail_sort_popup,width=112,height=28)
