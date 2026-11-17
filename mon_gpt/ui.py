@@ -10,12 +10,12 @@ from .core import fold, now
 from .chatgpt import parse_url
 from .details import DetailEditor
 from .theme import COLORS, FONT, apply_theme, make_icons
-from .atelier import Masthead, Surface, PillButton, CatalogList, AutoScrollbar, skin_menu, shorten
+from .atelier import rounded, Surface, PillButton, IconButton, AutoScrollbar, skin_menu, shorten
 from .main_menu import MainMenuBar
 from .inspector import InspectorSummary, InspectorScrollbar
 from .navigation import NavigationTree, navigation_icons
 from .identity import resolve_identity, inherited_identity, DEFAULTS
-from .identity_ui import ContextMasthead, ProjectVisualStrip
+from .identity_ui import ContextMasthead, ProjectVisualStrip, ControlTip
 from .project_icons import ProjectIconCache
 from .results import ResultsView
 from .batch_ui import BatchActions
@@ -49,6 +49,7 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         self.icons = make_icons(root)
         self.project_icons=ProjectIconCache(root)
         self.font = Font(root, font=FONT)
+        root.iconphoto(True,self.project_icons.get("feather","atelier",32))
         root.title(f"Mon GPT<3 — {__version__}" + (" · RECETTE · ouvertures simulées" if opener else ""))
         root.geometry(preferences.get("geometry", "1360x820"))
         root.minsize(1000, 680)
@@ -143,25 +144,23 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         for key,button in self.view_buttons.items():
             button.tone="chip" if self.view.get()==key else "quiet"
             button.draw()
-        if hasattr(self,"detail_sort_button"):
-            if self.view.get()=="detail": self.detail_sort_button.pack(side="right")
-            else: self.detail_sort_button.pack_forget()
-        if hasattr(self,"mosaic_tools"): self.layout_view_controls()
+        if self.view.get()=="detail":
+            self.detail_sort_button.pack(side="right")
+        else:
+            self.detail_sort_button.pack_forget()
+        if self.view.get()=="mosaic":
+            self.mosaic_tools.pack(side="right")
+        else:
+            self.mosaic_tools.pack_forget()
+        self.layout_view_controls()
 
     def layout_view_controls(self,event=None):
-        width=self.viewbar.winfo_width()
-        date_sort=BY_KEY[self.sort_column].render=='date'
-        narrow=width<(425 if date_sort else 380)
-        sort_width=max(112,self.detail_sort_button.font.measure(self.sort_caption)+22) if date_sort else 112
-        self.detail_sort_button.configure(text="Tri" if narrow else self.sort_caption,width=35 if narrow else sort_width)
-        self.mosaic_sort_button.configure(text="Tri" if date_sort and narrow else self.sort_caption,width=35 if date_sort and narrow else sort_width)
-        if self.view.get()=="mosaic":
-            if width<530:
-                self.mosaic_tools.pack(side="bottom",fill="x",before=self.mode_buttons_frame,pady=(4,0))
-            else:
-                self.mosaic_tools.pack(side="right",before=self.mode_buttons_frame,pady=0)
-            self.mosaic_size_button.configure(text="Cartes · "+("Grand" if self.mosaic_size.get()=="large" else "Normal")+" ⌄")
-        else: self.mosaic_tools.pack_forget()
+        narrow=self.viewbar.winfo_width()<410
+        caption="Tri" if narrow else self.sort_caption
+        width=42 if narrow else self.detail_sort_button.font.measure(caption)+24
+        for button in (self.detail_sort_button,self.mosaic_sort_button):
+            button.configure(text=caption,width=width)
+        self.mosaic_size_button.configure(text="Cartes · "+("Grand" if self.mosaic_size.get()=="large" else "Normal")+" ⌄")
 
     def mosaic_size_popup(self):
         menu=skin_menu(tk.Menu(self.root,tearoff=False))
@@ -226,9 +225,14 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         tone = {"Primary.TButton": "primary", "Open.TButton": "warm", "Chip.TButton": "chip"}.get(style, "quiet")
         return PillButton(parent, text, command, tone=tone, **kwargs)
 
+    def icon_button(self,parent,label,glyph,command,width=35):
+        button=IconButton(parent,label,glyph,command,width)
+        button.tip=ControlTip(button,label)
+        return button
+
     def build_shell(self):
         self.panes = ttk.Panedwindow(self.root,orient="horizontal",height=360)
-        self.panes.pack(fill="both",expand=True,padx=24,pady=(10,0))
+        self.panes.pack(fill="both",expand=True,padx=8,pady=(5,0))
         self._sash_ready = False
         self.panes.bind("<Configure>", lambda e: self.place_initial_sash())
         self.left,self.middle,self.right=(ttk.Frame(self.panes,padding=6) for _ in range(3))
@@ -264,8 +268,10 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         self.search_entry.bind("<Return>",self.search_enter)
         self.search_entry.bind("<KeyRelease>",self.search_changed)
         self.search_entry.bind("<Down>",self.focus_suggestions)
-        self.search_filters=self.button(line,text="Filtres",command=lambda:self.show_suggestions(True),width=65,height=34)
-        self.search_clear=self.button(line,text="×",command=self.clear_filters,width=30,height=34)
+        self.mode_buttons_frame=ttk.Frame(line)
+        self.mode_buttons_frame.pack(side="right",padx=(6,0))
+        self.search_filters=self.icon_button(line,"Filtres","\ue71c",lambda:self.show_suggestions(True))
+        self.search_clear=self.icon_button(line,"Effacer les filtres","\ue75c",self.clear_filters)
         self.search_clear.pack(side="right")
         self.search_filters.pack(side="right",padx=(6,4))
         search_shell.pack(side="left",expand=True,fill="x")
@@ -286,17 +292,21 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         nav_title=ttk.Frame(nav,style="Paper.TFrame")
         nav_title.pack(fill="x",pady=(3,10))
         ttk.Label(nav_title,text="Votre espace",style="Inspector.TLabel",font=("Segoe UI",12,"bold")).pack(side="left")
-        plus=self.button(nav_title,text="+",command=lambda:None,width=31,height=29)
-        plus.configure(command=lambda:self.plus.tk_popup(plus.winfo_rootx(),plus.winfo_rooty()+34))
-        plus.pack(side="right")
-        sort_row=ttk.Frame(nav,style="Paper.TFrame")
-        sort_row.pack(fill="x",pady=(0,9))
-        ttk.Label(sort_row,text="Tri",style="PaperMuted.TLabel",font=("Segoe UI",9)).pack(side="left",padx=(0,7))
-        nav_style=ttk.Style(nav)
-        nav_style.configure("Nav.TCombobox",padding=(5,3),fieldbackground=COLORS["paper"],bordercolor=COLORS["line"],arrowsize=10)
-        self.sorting=ttk.Combobox(sort_row,textvariable=self.sort,values=["Manuel","Alphabétique français"],state="readonly",width=1,style="Nav.TCombobox",font=("Segoe UI",9))
-        self.sorting.pack(side="left",fill="x",expand=True)
-        self.sorting.bind("<<ComboboxSelected>>",lambda e:self.refresh_tree())
+        plus=self.icon_button(self.masthead,"Nouveau fil ou projet","\ue710",lambda:self.plus.tk_popup(plus.winfo_rootx(),plus.winfo_rooty()+34))
+        plus.place(x=60,y=69)
+        self.preview_button=self.icon_button(self.masthead,"Afficher ou replier l’aperçu","eye",self.toggle_inspector)
+        self.preview_button.place(x=101,y=69)
+        self.sort_buttons={}
+        for mode in ("Alphabétique français","Manuel"):
+            command=lambda m=mode:self.set_navigation_sort(m)
+            if mode=="Manuel":
+                button=self.icon_button(nav_title,"Tri manuel","dots",command,width=35)
+            else:
+                button=self.button(nav_title,"A-Z",command,width=35,height=32)
+                button.tip=ControlTip(button,"Tri alphabétique français")
+            button.tone="chip" if mode==self.sort.get() else "quiet"
+            button.pack(side="right")
+            self.sort_buttons[mode]=button
         tree_box=ttk.Frame(nav,style="Paper.TFrame")
         tree_box.pack(fill="both",expand=True)
         self.nav_icons=navigation_icons(self.root)
@@ -306,36 +316,29 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         self.tree.bind("<<TreeviewSelect>>",self.select_scope)
         for tag,color in [("drop",COLORS["selection"]),("forbidden",COLORS["invalid"])]:
             self.tree.tag_configure(tag,background=color)
-        ttk.Separator(nav).pack(fill="x",pady=8)
-        self.drop_label=ttk.Label(nav,text="↳  Glissez pour classer",style="PaperMuted.TLabel",font=("Segoe UI",9),wraplength=212)
-        self.drop_label.pack(anchor="w",pady=3)
-        self.sidebar_note=ttk.Label(nav,text="Clic droit · actions",style="PaperMuted.TLabel",font=("Segoe UI",8),wraplength=212)
-        self.sidebar_note.pack(anchor="w",pady=(6,3))
-        titlebar=ttk.Frame(self.middle,padding=(10,4,6,9))
+        self.drop_label=ttk.Label(nav,style="PaperMuted.TLabel",padding=7,wraplength=195)
+        titlebar=ttk.Frame(self.middle,padding=(8,7,4,8))
         titlebar.pack(fill="x")
-        title_text=ttk.Frame(titlebar)
-        self.results_label=ttk.Label(title_text,text="Discussions",style="Heading.TLabel",font=("Segoe UI",12,"bold"))
-        self.results_label.pack(anchor="w")
-        def layout_title(event):
-            width=max(100,event.width-150)
-            self.results_label.configure(wraplength=width,font=("Segoe UI",12,"bold"))
-            self.result_count.configure(wraplength=width)
-        titlebar.bind("<Configure>",layout_title)
-        self.result_count=ttk.Label(title_text,text="",style="Muted.TLabel",font=("Segoe UI",9))
-        self.result_count.pack(anchor="w",pady=(2,0))
-        self.preview_button=self.button(titlebar,text="Aperçu",command=self.toggle_inspector,height=32)
-        self.preview_button.pack(side="right",padx=(5,0))
-        self.new_fil_button=self.button(titlebar,text="+ Fil",command=lambda:self.new("item"),height=32)
-        self.new_fil_button.pack(side="right")
-        title_text.pack(side="left",expand=True,fill="x")
-        self.viewbar=ttk.Frame(self.middle,padding=(9,0,6,5))
+        self.results_label=ttk.Label(titlebar,style="Heading.TLabel",font=("Segoe UI",13,"bold"))
+        self.results_label.pack(side="left")
+        count_pill=tk.Canvas(titlebar,background=COLORS["ivory"],height=25,highlightthickness=0)
+        count_pill.pack(side="left",padx=7)
+        self.result_count=tk.Label(count_pill,background=COLORS["selection"],foreground=COLORS["pine"],
+                                   borderwidth=0,padx=0,pady=0,font=("Segoe UI",9))
+        def size_count(event=None):
+            width=self.result_count.winfo_reqwidth()+20
+            count_pill.configure(width=width)
+            count_pill.delete("pill")
+            rounded(count_pill,0,1,width,24,12,fill=COLORS["selection"],outline="",tags="pill")
+            count_pill.tag_lower("pill")
+        count_pill.create_window(10,12,anchor="w",window=self.result_count)
+        self.result_count.bind("<Configure>",size_count)
+        self.viewbar=ttk.Frame(self.middle)
         self.viewbar.pack(fill="x")
-        self.mode_buttons_frame=ttk.Frame(self.viewbar)
-        self.mode_buttons_frame.pack(side="left")
         self.view_buttons={}
-        for key,label in (("list","Liste"),("detail","Détaillée"),("mosaic","Mosaïque")):
-            button=self.button(self.mode_buttons_frame,text=label,command=lambda k=key:self.set_view(k),width=63 if key=="list" else 80 if key=="detail" else 75,height=28)
-            button.pack(side="left",padx=(0,4))
+        for key,label,glyph in (("list","Liste","\ue8fd"),("detail","Détaillée","\ue8a9"),("mosaic","Mosaïque","\ue80a")):
+            button=self.icon_button(self.mode_buttons_frame,label,glyph,lambda k=key:self.set_view(k),width=30)
+            button.pack(side="left")
             self.view_buttons[key]=button
         self.detail_sort_button=self.button(self.viewbar,text="Tri · Titre ↑",command=self.detail_sort_popup,width=112,height=28)
         self.mosaic_tools=ttk.Frame(self.viewbar)
@@ -360,7 +363,11 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
             self.results.heading(c.key,text=c.label,command=lambda k=c.key:self.sort_results(k))
             self.results.column(c.key,width=c.width,minwidth=c.minimum,maxwidth=c.maximum,stretch=(c.key=='title'))
         self.results.bind("<<ListColumnsChanged>>",self.persist_columns)
-        sb=AutoScrollbar(box,orient="vertical",command=self.results.yview)
+        # La largeur des cartes reste stable quand apparaît la barre verticale.
+        gutter=ttk.Frame(box,width=8)
+        gutter.pack(side="right",fill="y")
+        gutter.pack_propagate(False)
+        sb=AutoScrollbar(gutter,orient="vertical",command=self.results.yview)
         sb.pack(side="right",fill="y")
         self.results.configure(yscrollcommand=sb.set)
         self.results.pack(side="left",fill="both",expand=True)
@@ -377,10 +384,19 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         self.results.bind("<Motion>",self.hover_result,add=True)
         self.empty=ttk.Label(self.middle,text="",style="Muted.TLabel",padding=(12,6),wraplength=600)
         self.empty.pack(anchor="w")
-        self.results_help=ttk.Label(self.middle,style="Muted.TLabel",font=("Segoe UI",9))
-        self.results_help.pack(fill="x",padx=12,pady=(0,4))
-        self.results_help.bind("<Configure>",lambda e:self.results_help.configure(
-            text="Ligne : sélectionner · ↗ : ouvrir\nAlt+Entrée : ↗ · F2 : renommer" if e.width<500 else "Sélectionnez une ligne · ↗ : ouvrir · Alt+Entrée : ↗ du fil focal · F2 : renommer"))
+        self.quick_bar=Surface(self.middle,height=52,padding=8)
+        self.quick_bar.pack(side="bottom",fill="x",padx=3)
+        self.new_fil_button=self.button(self.quick_bar.body,"＋   Nouveau fil",command=lambda:self.new("item"),style="Primary.TButton",height=33)
+        self.new_fil_button.pack(side="right")
+        self.quick_prompt=ttk.Entry(self.quick_bar.body,style="Quick.TEntry",cursor="xterm",font=("Segoe UI",11))
+        self.quick_prompt.insert(0,"Titre du nouveau fil…")
+        self.quick_prompt.state(["readonly"])
+        self.quick_prompt.bind("<FocusIn>",lambda e:self.new("item"))
+        self.quick_prompt.bind("<Button-1>",lambda e:self.new("item") or "break")
+        self.quick_prompt.pack(side="left",fill="x",expand=True,padx=(2,8))
+        self.quick_scope=ttk.Label(self.quick_bar.body,background=COLORS["selection"],foreground=COLORS["pine"],padding=(7,3))
+        self.quick_scope.pack(side="left",padx=4)
+        ttk.Label(self.quick_bar.body,text="Ctrl N",style="PaperMuted.TLabel").pack(side="right",padx=(0,8))
         inspector_surface=Surface(self.right,padding=8,width=330,height=120)
         inspector_surface.pack(fill="both",expand=True)
         holder=inspector_surface.body
@@ -399,22 +415,20 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
                 widget.bind(f"<ButtonPress-{button}>",lambda e,w=widget,b=button:self.drag_press(e,w,b),add=True)
                 widget.bind(f"<B{button}-Motion>",self.drag_motion,add=True)
                 widget.bind(f"<ButtonRelease-{button}>",lambda e,w=widget,b=button:self.drag_release(e,w,b),add=True)
-        footer=ttk.Frame(self.root,padding=(26,8))
+        footer=ttk.Frame(self.root,padding=(18,4))
         footer.pack(fill="x")
-        ttk.Label(footer,textvariable=self.status,style="Muted.TLabel",font=("Segoe UI",9),wraplength=1260).pack(anchor="w")
+        ttk.Label(footer,textvariable=self.status,style="Muted.TLabel",font=("Segoe UI",9),wraplength=660).pack(side="left")
         self.data_label=ttk.Label(footer,text="⌂  Catalogue local · "+str(self.store.path),style="Muted.TLabel",font=("Segoe UI",8),cursor="hand2")
-        self.data_label.pack(anchor="w",pady=(3,0))
+        self.data_label.pack(side="right")
         self.data_label.bind("<Button-1>",lambda e:self.open_data())
         self.root.after_idle(self.place_initial_sash)
-        self.root.bind("<Configure>",self.adapt_window,add=True)
 
-    def adapt_window(self,event):
-        if event.widget!=self.root:
-            return
-        if self.root.winfo_width()<1100:
-            self.sidebar_note.pack_forget()
-        elif not self.sidebar_note.winfo_manager():
-            self.sidebar_note.pack(anchor="w",pady=(6,3))
+    def set_navigation_sort(self,mode):
+        self.sort.set(mode)
+        for name,button in self.sort_buttons.items():
+            button.tone="chip" if name==mode else "quiet"
+            button.draw()
+        self.refresh_tree()
 
     def layout_search(self,event):
         width=max(1,min(760,event.width-16))
@@ -427,8 +441,8 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
     def place_initial_sash(self, force=False):
         if (force or not self._sash_ready) and self.panes.winfo_ismapped() and self.panes.winfo_width()>600:
             if len(self.panes.panes())==3:
-                self.panes.sashpos(1,max(550,self.panes.winfo_width()-370))
-            self.panes.sashpos(0,263)
+                self.panes.sashpos(1,max(550,self.panes.winfo_width()-min(340,self.panes.winfo_width()//3)))
+            self.panes.sashpos(0,min(259,self.panes.winfo_width()//5))
             self._sash_ready = self.panes.sashpos(0)>100
 
     def bind_keys(self):
@@ -648,6 +662,8 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         elif not self.empty.winfo_manager():
             self.empty.pack(anchor="w",padx=6)
         self.refresh_chips()
+        self.quick_scope.configure(text=shorten(self.font,self.cat.records[scope].title if scope else "À classer",108))
+        self.scope_discussions=sum(r.kind=="item" and scope in r.projects for r in self.cat.records.values()) if scope else 0
 
         self.update_identity()
         self.sync_group()
@@ -694,14 +710,15 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         return True
 
     def update_identity(self):
-        self.masthead.set_context(resolve_identity(self.cat,self.current,self.scope),self.cat.records.get(self.scope))
+        self.masthead.set_context(resolve_identity(self.cat,self.current,self.scope),self.cat.records.get(self.scope),
+                                  getattr(self,"scope_discussions",0),"À classer" if self.scope=="unfiled" else "Tous les fils")
 
     def ensure_inspector(self):
         if not self.inspector_visible:
             self.panes.add(self.right, weight=0)
             self.inspector_visible = True
             self.root.update_idletasks()
-            self.panes.sashpos(1, max(550, self.panes.winfo_width()-370))
+            self.panes.sashpos(1, max(550, self.panes.winfo_width()-min(340,self.panes.winfo_width()//3)))
 
     def toggle_inspector(self):
         if self.inspector_visible:
@@ -725,18 +742,19 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         self.update_identity()
         for child in self.editor.winfo_children():
             child.destroy()
-        self.summary=InspectorSummary(self.editor,self.cat.records.get(identity),self.project_label,
-            self.toggle_inspector,lambda:self.open_thread(identity),lambda:self.copy_link(identity),lambda:self.show_record(identity))
         record=self.cat.records.get(identity)
+        visual=resolve_identity(self.cat,identity,self.scope)
+        self.summary=InspectorSummary(self.editor,record,self.project_label,
+            self.toggle_inspector,lambda:self.open_thread(identity),lambda:self.copy_link(identity),lambda:self.show_record(identity),
+            self.project_icons.get(visual.icon,visual.color,24))
         if record:
-            edit=self.summary.actions["edit"]
             base=inherited_identity(self.cat,record.id,self.scope)
             inherited={"image":base.image or DEFAULTS["image"],"icon":base.icon,"color":base.color} if record.kind=="item" else None
             origin=self.cat.records[base.project].title if base.project else None
-            parent=edit.master if record.kind=="project" else self.summary
+            parent=self.summary.visual_row
             self.summary.visual_strip=ProjectVisualStrip(parent,self.store.images,record.visual,inherited=inherited,origin=origin)
-            if record.kind=="project": self.summary.visual_strip.pack(side="left",before=edit,padx=(0,5))
-            else: self.summary.visual_strip.pack(anchor="w",before=edit.master,pady=(0,5))
+            self.summary.arrange_actions()
+            parent.bind("<Configure>",self.summary.arrange_actions)
         self.summary.pack(fill="x")
         self.canvas.yview_moveto(0)
 
@@ -839,6 +857,8 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         self.work_error.set("")
         self.draft = None
         self.work.pack_forget()
+        if not self.quick_bar.winfo_manager():
+            self.quick_bar.pack(side="bottom",fill="x",padx=3)
 
     def new(self, kind):
         if not self.can_leave():
@@ -869,21 +889,30 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
             self.status.set("Nouveau projet · Entrée : créer · Échap : annuler. Aucune image à choisir.")
             return
         self.draft = {"kind": "item", "parent": parent}
-        self.work.pack(fill="x", before=self.results_box)
-        ttk.Label(self.work_content,text="Un nouveau fil à garder",style="WorkTitle.TLabel").pack(anchor="w",pady=4)
-        ttk.Label(self.work_content,text="Dans : " + (self.project_label(parent) if parent else "À classer"),style="PaperMuted.TLabel",wraplength=650).pack(anchor="w",pady=(0,6))
-        self.new_title = ttk.Entry(self.work_content)
-        self.new_title.pack(fill="x", pady=3)
-        self.new_title.insert(0, "")
-        ttk.Label(self.work_content, text="Un titre qui vous parle, puis son lien ChatGPT.", style="PaperMuted.TLabel").pack(anchor="w")
-        self.new_url = ttk.Entry(self.work_content)
-        self.new_url.pack(fill="x", pady=3)
-        row = ttk.Frame(self.work_content,style="Paper.TFrame")
-        row.pack(fill="x", pady=4)
-        self.button(row, text="Ajouter le fil", style="Primary.TButton", command=self.submit_item).pack(side="left")
-        self.button(row, text="Annuler · Échap", command=self.clear_work).pack(side="left", padx=5)
+        self.quick_bar.pack_forget()
+        self.work.pack(side="bottom",fill="x")
+        heading=ttk.Frame(self.work_content,style="Paper.TFrame")
+        heading.pack(fill="x")
+        ttk.Label(heading,text="Nouveau fil",style="WorkTitle.TLabel").pack(side="left")
+        ttk.Label(heading,text=self.project_label(parent) if parent else "À classer",
+                  style="PaperMuted.TLabel",wraplength=180).pack(side="right")
+        fields=ttk.Frame(self.work_content,style="Paper.TFrame")
+        fields.pack(fill="x",pady=(4,6))
+        fields.columnconfigure(0,weight=1,uniform="saisie")
+        fields.columnconfigure(1,weight=1,uniform="saisie")
+        for column,label in enumerate(("Titre du fil","Lien ChatGPT")):
+            ttk.Label(fields,text=label,style="PaperMuted.TLabel").grid(row=0,column=column,sticky="w")
+        self.new_title=ttk.Entry(fields)
+        self.new_url=ttk.Entry(fields)
+        self.new_title.grid(row=1,column=0,sticky="ew",padx=(0,4))
+        self.new_url.grid(row=1,column=1,sticky="ew",padx=(4,0))
+        row=ttk.Frame(self.work_content,style="Paper.TFrame")
+        row.pack(fill="x")
+        self.button(row,text="Ajouter le fil",style="Primary.TButton",command=self.submit_item).pack(side="right")
+        self.button(row,text="Annuler · Échap",command=self.clear_work).pack(side="left")
         for entry in (self.new_title, self.new_url):
             entry.bind("<Return>", self.submit_item)
+        self.root.update_idletasks()
         self.new_title.focus_set()
 
     def submit_item(self, event=None, use_existing=False, expected_identity=None):
@@ -1171,7 +1200,7 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
                 self.tree.item(identity, tags=())
         self.tree.configure(cursor="")
         self.results.configure(cursor="")
-        self.drop_label.configure(text="↳  Glissez pour classer",foreground=COLORS["muted"])
+        self.drop_label.pack_forget()
 
     def drop_target(self, x_root, y_root):
         x, y = x_root-self.tree.winfo_rootx(), y_root-self.tree.winfo_rooty()
@@ -1198,7 +1227,8 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
             self.tree.item(target, tags=("drop" if allowed else "forbidden",))
             self.tree.see(target)
         self.drag["widget"].configure(cursor="hand2" if allowed else "no")
-        self.drop_label.configure(text=("↳  Déposer dans " + (self.cat.records[target].title if target in self.cat.records else "la racine")) if allowed else "×  Cible interdite",foreground=COLORS["pine"] if allowed else COLORS["error"])
+        self.drop_label.pack(fill="x",pady=4)
+        self.drop_label.configure(background=COLORS["selection" if allowed else "invalid"],text=("↳  Déposer dans " + (self.cat.records[target].title if target in self.cat.records else "la racine")) if allowed else "×  Cible interdite",foreground=COLORS["pine"] if allowed else COLORS["error"])
         count=len(self.drag.get("ids",(self.drag["id"],)))
         subject="le projet" if self.cat.records[self.drag['id']].kind=='project' else f"{count} discussion(s)"
         self.status.set((f"Déplacer {subject} vers " + (self.project_label(target) if target in self.cat.records else "la racine")) if allowed else "Cible interdite.")

@@ -146,65 +146,90 @@ class InspectorNotes(ttk.Frame):
 
 
 class InspectorSummary(ttk.Frame):
-    def __init__(self,parent,record,project_label,close,open_thread,copy_link,edit):
+    def __init__(self,parent,record,project_label,close,open_thread,copy_link,edit,title_icon=None):
         super().__init__(parent,style="Paper.TFrame")
         self.labels=[]
         self.actions={}
         self.bind("<Configure>",self.fit)
         top=ttk.Frame(self,style="Paper.TFrame")
         top.pack(fill="x",pady=(0,10))
-        ttk.Label(top,text="Aperçu",style="PaperMuted.TLabel",font=("Segoe UI",10)).pack(side="left")
+
         InspectorAction(top,"close","Replier l’aperçu",close).pack(side="right")
         if record is None:
             self.text("Sélectionnez une fiche",font=("Segoe UI",15,"bold"),color=C["pine"])
             self.text("Choisissez une discussion ou un projet dans la Liste.",muted=True)
             return
-        title=ttk.Frame(self,style="Paper.TFrame")
-        title.pack(fill="x")
+        title=top
         icon=tk.Canvas(title,width=24,height=26,background=C["paper"],highlightthickness=0)
         icon.pack(side="left",anchor="n",padx=(0,5))
         points=[3,18,3,6,9,6,12,9,21,9,21,18,3,18] if record.kind=="project" else [3,5,21,5,21,17,12,17,7,22,7,17,3,17,3,5]
-        icon.create_line(*points,fill=C["pine"],width=1.5,joinstyle="round")
-        self.title=ttk.Label(title,text=record.title,font=("Segoe UI",16,"bold"),foreground=C["pine"],style="Paper.TLabel",wraplength=230,justify="left")
+        if title_icon:
+            icon.create_image(12,13,image=title_icon)
+        else:
+            icon.create_line(*points,fill=C["pine"],width=1.5,joinstyle="round")
+        self.title=ttk.Label(title,text=record.title,font=("Segoe UI",15,"bold"),foreground=C["ink"],style="Paper.TLabel",wraplength=230,justify="left")
         self.title.pack(side="left",fill="x",expand=True)
-        self.text("Projet" if record.kind=="project" else f"Discussion · {len(record.projects)} emplacement(s)",muted=True,pady=(4,8))
-        row=ttk.Frame(self,style="Paper.TFrame")
-        row.pack(fill="x",pady=(0,3))
+        locations=record.projects if record.kind=="item" else ([record.parent] if record.parent else [])
+        if len(locations)>1:
+            context=f"Discussion · {len(locations)} emplacement(s)"
+        elif locations:
+            context=project_label(locations[0])
+        else:
+            context="À classer" if record.kind=="item" else "À la racine"
+        self.text(context,
+                  color=C["pine"],pady=(2,8),font=("Segoe UI",11,"bold"))
+        self.visual_row=ttk.Frame(self,style="Paper.TFrame")
+        self.visual_row.pack(fill="x",pady=(0,4))
+        row=self.action_row=ttk.Frame(self.visual_row,style="Paper.TFrame")
+        row.pack(side="right")
         choices=[] if record.kind=="project" else [("open","Ouvrir le fil",open_thread),("copy","Copier le lien",copy_link)]
         choices.append(("edit","Modifier la fiche",edit))
         for kind,label,command in choices:
             button=InspectorAction(row,kind,label,command)
-            button.pack(side="left",padx=(0,7))
+            button.configure(width=33)
+            button.pack(side="left",padx=(2,0))
             self.actions[kind]=button
         self.section("Description" if record.kind=="project" else "Résumé")
         self.text(record.description or ("Pas de description" if record.kind=="project" else "Pas de résumé"),muted=not record.description)
         self.section("Emplacements")
-        locations=record.projects if record.kind=="item" else ([record.parent] if record.parent else [])
         for pid in locations: self.text("▱  "+project_label(pid),muted=True,pady=(0,3))
         if not locations: self.text("À classer" if record.kind=="item" else "À la racine",muted=True)
         for label,values,category in [("Catégories",record.categories,True),("Tags",record.tags,False)]:
             self.section(label)
-            if values: InspectorBadges(self,values,category).pack(fill="x")
+            if values: InspectorBadges(self,values,category).pack(fill="x",padx=(28,0))
             else: self.text("Aucune catégorie" if category else "Aucun tag",muted=True)
         self.section("Notes")
         self.notes=InspectorNotes(self,record.notes)
-        self.notes.pack(fill="x")
+        self.notes.pack(fill="x",padx=(28,0))
         self.section("Informations")
         for key,value in record.metadata.items(): self.text(f"{key} : {value}",pady=(0,3))
         if not record.metadata: self.text("Aucune information personnalisée",muted=True)
         fmt=lambda value:datetime.fromisoformat(value).astimezone().strftime("%d/%m/%Y à %H:%M")
         self.text(f"Créé le {fmt(record.created)}\nModifié le {fmt(record.modified)}",muted=True,pady=(10,0),font=("Segoe UI",8))
 
+    def arrange_actions(self,event=None):
+        width=self.visual_row.winfo_width()
+        stacked=width<self.visual_strip.winfo_reqwidth()+self.action_row.winfo_reqwidth()+4
+        self.visual_strip.pack(side="top" if stacked else "left",anchor="w",before=self.action_row)
+        self.action_row.pack(side="top" if stacked else "right",anchor="w")
+
     def section(self,title):
-        ttk.Separator(self).pack(fill="x",pady=(9,7))
-        ttk.Label(self,text=title,style="Paper.TLabel",font=("Segoe UI",10,"bold")).pack(anchor="w",pady=(0,4))
+        symbols={"Description":"\ue70f","Résumé":"\ue70f","Emplacements":"\ue707","Catégories":"\ue8ec","Tags":"\ue168","Notes":"\ue8a5","Informations":"\ue946"}
+        self.section_started=True
+        tk.Frame(self,height=1,background=C["line"]).pack(fill="x",pady=(9,5))
+        row=tk.Frame(self,background=C["paper"])
+        row.pack(fill="x",pady=(0,2))
+        tk.Label(row,text=symbols[title],background=C["paper"],foreground=C["pine"],
+                 font=("Segoe MDL2 Assets",11)).pack(side="left",padx=(5,8),pady=4)
+        tk.Label(row,text=title,background=C["paper"],foreground=C["ink"],
+                 font=("Segoe UI",11,"bold")).pack(side="left")
 
     def text(self,value,muted=False,pady=0,font=("Segoe UI",10),color=None):
         label=ttk.Label(self,text=value,style="Paper.TLabel",font=font,foreground=color or C["muted" if muted else "ink"],wraplength=280,justify="left")
-        label.pack(fill="x",pady=pady)
+        label.pack(fill="x",pady=pady,padx=(28,0) if getattr(self,"section_started",False) else 0)
         self.labels.append(label)
         return label
 
     def fit(self,event):
-        for label in self.labels: label.configure(wraplength=max(40,event.width))
-        if hasattr(self,"title"): self.title.configure(wraplength=max(40,event.width-29))
+        for label in self.labels: label.configure(wraplength=max(40,event.width-28))
+        if hasattr(self,"title"): self.title.configure(wraplength=max(40,event.width-72))

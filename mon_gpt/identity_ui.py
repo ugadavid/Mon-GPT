@@ -1,7 +1,9 @@
 """Trois sélecteurs partagés et illustration contextuelle, sans règle métier."""
 import tkinter as tk
 from tkinter import ttk, filedialog
-from PIL import Image, ImageDraw, ImageOps, ImageTk
+from PIL import Image, ImageDraw, ImageFilter, ImageOps, ImageTk
+from math import sin, pi
+from datetime import datetime
 from .identity import COVERS, ICONS, PALETTE, DEFAULTS
 from .images import IMPORT_HINT
 from .atelier import Masthead, rounded, CatalogList, shorten
@@ -45,65 +47,109 @@ class ContextMasthead(Masthead):
         self.photo_key,self.photo=None,None
         self.scope_info=("",(),())
         super().__init__(parent)
-        self.small_font=Font(self,font=("Segoe UI",9))
+        self.small_font=Font(self,font=("Segoe UI",10))
+        self.context_font=Font(self,font=("Segoe UI",12,"bold"))
 
     def set_identity(self,identity):
         if identity!=self.identity:
             self.identity=identity
             self.draw()
 
-    def set_context(self,identity,project=None):
+    def set_context(self,identity,project=None,count=0,scope_label="Tous les fils"):
         info=(project.description,tuple(project.categories),tuple(project.tags)) if project else ('',(),())
-        if identity!=self.identity or info!=self.scope_info:
-            self.identity,self.scope_info=identity,info;self.draw()
+        title=project.title if project else scope_label
+        date=datetime.fromisoformat(project.created).strftime("%d/%m/%Y") if project else ""
+        caption=f"{count} discussion{'s' if count!=1 else ''}  ·  Créé le {date}" if date else ""
+        context=(title,caption)
+        if identity!=self.identity or info!=self.scope_info or context!=getattr(self,"context",None):
+            self.identity,self.scope_info,self.context=identity,info,context
+            self.draw()
 
     def draw(self,event=None):
         super().draw(event)
+        width=self.winfo_width()
+        compact=width<590
+        height=104 if compact else 132
+        if int(self.cget("height"))!=height:
+            self.configure(height=height)
+        description,categories,tags=self.scope_info
+        title,caption=getattr(self,"context",("", ""))
+        info_width=min(202,max(134,width//4)) if not compact else max(80,width-235)
+        text_x=width-info_width+4
+        # La couverture occupe l’espace entre la signature et la fiche projet.
+        left=222
+        right=text_x-12 if not compact else width-5
+        art_height=height-4 if not compact else 51
+        art_width=min(520,max(0,right-left))
+        left+=max(0,(right-left-art_width)//2)
+        self.draw_cover(left,art_width,art_height)
+        if compact:
+            y=63
+        else:
+            y=24
+        self.create_line(text_x,y+6,text_x,y-7,text_x+7,y-7,text_x+10,y-4,
+                         text_x+20,y-4,text_x+20,y+6,text_x,y+6,
+                         fill=C["pine"],width=1.5,joinstyle="round")
+        self.create_text(text_x+27,y,text=shorten(self.context_font,title,info_width-36),
+                         font=self.context_font,fill=C["pine"],anchor="w")
+        if not compact and caption:
+            if self.small_font.measure(caption)>info_width-10:
+                caption=caption.replace("Créé le ","")
+            self.create_text(text_x,y+25,text=shorten(self.small_font,caption,info_width-10),
+                             font=self.small_font,fill=C["muted"],anchor="w")
+        if compact:
+            if tags or categories:
+                CatalogList.draw_badges(self,[*tags,*categories],text_x,88,info_width,False)
+            elif description:
+                self.create_text(text_x,88,text=shorten(self.small_font,description,info_width-10),
+                                 font=self.small_font,fill=C["muted"],anchor="w")
+        else:
+            y+=49
+            if description:
+                self.create_text(text_x,y,text=shorten(self.small_font,' '.join(description.split()),info_width-12),
+                                 font=self.small_font,fill=C["muted"],anchor="w",tags="scope_description")
+                y+=23
+            if categories:
+                CatalogList.draw_badges(self,categories,text_x,y,info_width,True)
+                y+=24
+            CatalogList.draw_badges(self,tags,text_x,y,info_width,False)
+
+    def draw_cover(self,left,art_width,art_height):
+        self.cover_box=(0,0,0,0)
+        if art_width<16:
+            return
         visual=self.identity
         reference=visual.image if visual and visual.image else DEFAULTS["image"]
-        self.delete("landscape")
-        width,height=self.winfo_width(),80
-        text_right=max((self.bbox(item)[2] for item in self.find_all() if self.type(item)=="text"),default=240)
-        free_width=max(0,width-8-text_right-12)
-        # Multiples 16:9 dans l’espace libre ; le gabarit de 80 px ne change pas.
-        w=min(128,(free_width//16)*16,(max(0,height-8)//9)*16)
-        description,categories,tags=self.scope_info
-        meta_width=free_width-w-36
-        has_info=bool(description or categories or tags)
-        extra=has_info and meta_width<170
-        wanted=112 if extra else 80
-        if int(float(self.cget('height')))!=wanted:self.configure(height=wanted)
-        if has_info:
-            if extra:
-                x,available=10,max(0,width-20)
-                if categories or tags:
-                    cat_width=min(available*.55,sum(self.small_font.measure(t)+21 for t in categories)+6) if categories else 0
-                    CatalogList.draw_badges(self,categories,x,96,cat_width,True)
-                    CatalogList.draw_badges(self,tags,x+cat_width,96,available-cat_width,False)
-                elif description:self.create_text(x,96,text=shorten(self.small_font,' '.join(description.split()),available),anchor='w',font=self.small_font,fill=C['muted'],tags='scope_description')
-                self.create_line(8,111,width-8,111,fill=C['line'])
-            else:
-                x=text_right+12
-                if description:self.create_text(x,18,text=shorten(self.small_font,' '.join(description.split()),meta_width),anchor='w',font=self.small_font,fill=C['muted'],tags='scope_description')
-                CatalogList.draw_badges(self,categories,x,40,meta_width,True)
-                CatalogList.draw_badges(self,tags,x,62,meta_width,False)
-        if w<16:return
-        h=w*9//16
-        self.cover_box=(width-w-8,(height-h)//2,w,h)
-        key=(reference,w,h)
-        if key!=self.photo_key:
+        key=(reference,art_width,art_height)
+        if self.photo_key!=key:
             try:
-                image=contained_picture(self.library,reference,w,h)
-                self.photo=ImageTk.PhotoImage(image,master=self)
-                self.photo_key=key
+                source=self.library.open(reference)
             except (ValueError,OSError):
                 self.photo_key=None
                 return
-        x,y,_,_=self.cover_box
+            if reference.startswith("asset:"):
+                picture=ImageOps.contain(source,(art_width,art_height),Image.Resampling.LANCZOS)
+            else:
+                picture=ImageOps.fit(source,(art_width,art_height),Image.Resampling.LANCZOS,centering=(.5,.64))
+                w,h=picture.size
+                mask=Image.new("L",(w,h))
+                edge=min(w*.16,48)
+                points=[]
+                for y in range(h):
+                    t=y/max(1,h-1)
+                    points.append((edge*(1-t)**2+edge*.18*sin(3*pi*t)+edge*.42*t**10,y))
+                for y in reversed(range(h)):
+                    t=y/max(1,h-1)
+                    points.append((w-1-edge*(1-t)**2-edge*.32*sin(pi*t)**2-edge*.48*t**10,y))
+                ImageDraw.Draw(mask).polygon(points,fill=255)
+                picture.putalpha(mask.filter(ImageFilter.GaussianBlur(3)))
+            self.photo=ImageTk.PhotoImage(picture,master=self)
+            self.photo_key=key
+        w,h=self.photo.width(),self.photo.height()
+        x=left+(art_width-w)//2
+        y=(art_height-h)//2+1
+        self.cover_box=(x,y,w,h)
         self.create_image(x,y,image=self.photo,anchor="nw",tags="context_cover")
-        if visual and (visual.project or visual.icon!="folder" or visual.color!="atelier") and free_width-w>=28:
-            self.badge=ImageTk.PhotoImage(icon_picture(visual.icon,PALETTE[visual.color][1],20),master=self)
-            self.create_image(x-17,height/2,image=self.badge,tags="context_badge")
 
 
 class ControlTip:
@@ -171,7 +217,9 @@ class ProjectVisualStrip(ttk.Frame):
         self.buttons={}
         for kind in ("image","icon","color"):
             button=IdentityControl(self,kind,(lambda k=kind:choose(k)) if choose else None)
-            button.pack(side="left",padx=(0,7))
+            if not choose:
+                button.configure(width=86 if kind=="image" else 31)
+            button.pack(side="left",padx=(0,7 if choose else 2))
             self.buttons[kind]=button
             button.tip=ControlTip(button,lambda k=kind:self.control_name(k))
         self.refresh()

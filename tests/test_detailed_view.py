@@ -5,7 +5,8 @@ import tempfile
 import tkinter as tk
 import unittest
 from unittest.mock import Mock,patch
-from PIL import Image,ImageDraw
+from PIL import Image,ImageDraw,ImageColor
+from mon_gpt.theme import COLORS
 from mon_gpt.core import Catalog
 from mon_gpt.chatgpt import ChatGPT
 from mon_gpt.storage import Store,encode
@@ -66,7 +67,7 @@ class DetailedViewTests(unittest.TestCase):
         self.assertEqual(photo.width()*9,photo.height()*16)
         self.assertEqual(pixels.getpixel((56,0))[:3],(255,0,0))
         self.assertEqual(pixels.getpixel((56,62))[:3],(0,0,255))
-        self.assertEqual(pixels.getpixel((0,30))[:3],(247,243,234))
+        self.assertEqual(pixels.getpixel((0,30))[:3],ImageColor.getrgb(COLORS["ivory"]))
         with patch.object(self.store.images,'open',wraps=self.store.images.open) as opened:
             self.table.draw();self.table.hover(self.items[0].id);self.table.draw()
             opened.assert_not_called()

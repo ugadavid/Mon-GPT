@@ -3,11 +3,12 @@ import tkinter as tk
 from tkinter import ttk
 
 COLORS = {
-    "ivory": "#F7F3EA", "sand": "#E7D9C5", "pine": "#315E4F",
-    "terracotta": "#C87A50", "ink": "#292D30", "line": "#D8CEBE",
-    "muted": "#625B53", "selection": "#DBE5D7", "hover": "#EFE7DA",
+    "ivory": "#FAF5F0", "sand": "#F4EBE2", "pine": "#326442",
+    "terracotta": "#BE7549", "ink": "#23282A", "line": "#E6DCD1",
+    "muted": "#655F58", "selection": "#E8EDD4", "hover": "#F4EBDF",
     "link": "#884320", "error": "#923C2D", "invalid": "#F3D9CE",
-    "paper": "#FFFCF7", "tag": "#E4EBDD", "category": "#F5E3D1",
+    "paper": "#FCF8F4", "tag": "#E4EBDD", "category": "#F5E3D1",
+    "stripe": "#F8F0E6", "shadow": "#EDE2D8", "leaf": "#789366",
 }
 FONT = ("Segoe UI", 11)
 
@@ -42,6 +43,8 @@ def apply_theme(root):
     style.configure("Chip.TButton", padding=(8, 3), background=c["selection"], foreground=c["pine"])
     style.configure("Open.TButton", background=c["terracotta"], foreground=c["ink"])
     style.configure("TEntry", fieldbackground=c["paper"], bordercolor=c["line"], padding=9, font=("Segoe UI",11))
+    style.configure("Quick.TEntry",padding=(10,5),bordercolor=c["line"],foreground=c["muted"])
+    style.map("Quick.TEntry",fieldbackground=[("readonly",c["paper"])])
     style.configure("Search.TEntry", background=c["paper"], fieldbackground=c["paper"], borderwidth=0, relief="flat", padding=7, font=("Segoe UI",12))
     style.layout("Search.TEntry",[("Entry.padding",{"sticky":"nswe","children":[("Entry.textarea",{"sticky":"nswe"})]})])
     style.map("TEntry", bordercolor=[("focus", c["pine"])])

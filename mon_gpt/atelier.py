@@ -61,8 +61,31 @@ class PillButton(tk.Canvas):
         if self.hovered:
             fill = "#254C3F" if self.tone == "primary" else C["hover"]
         focused = self.focus_get() == self
-        rounded(self, 1, 1, w-1, h-1, h/2 if self.tone == "chip" else 10, fill=fill, outline=C["pine"] if focused else (C["line"] if self.tone == "quiet" else fill), width=2 if focused else 1)
-        self.create_text(w/2, h/2, text=self.text, fill=C["paper"] if self.tone == "primary" else C["pine"] if self.tone == "chip" else C["ink"], font=self.font)
+        rounded(self, 1, 1, w-1, h-1, 10, fill=fill, outline=C["pine"] if focused else (C["line"] if self.tone == "quiet" else fill), width=2 if focused else 1)
+        self.draw_caption(w/2,h/2)
+
+    def draw_caption(self,x,y):
+        color=C["paper"] if self.tone=="primary" else C["pine"] if self.tone=="chip" else C["ink"]
+        self.create_text(x,y,text=self.text,fill=color,font=self.font)
+
+
+class IconButton(PillButton):
+    def __init__(self,parent,label,glyph,command,width=35):
+        super().__init__(parent,label,command,width=width,height=32)
+        self.glyph=glyph
+        self.font=Font(self,font=("Segoe MDL2 Assets",13))
+
+    def draw_caption(self,x,y):
+        color=C["pine"]
+        if self.glyph=="eye":
+            self.create_line(x-9,y,x,y-7,x+9,y,x,y+7,x-9,y,smooth=True,fill=color,width=1.5)
+            self.create_oval(x-2.5,y-2.5,x+2.5,y+2.5,outline=color,width=1.5)
+        elif self.glyph=="dots":
+            for dx in (-4,4):
+                for dy in (-6,0,6):
+                    self.create_oval(x+dx-1.7,y+dy-1.7,x+dx+1.7,y+dy+1.7,fill=color,outline="")
+        else:
+            self.create_text(x,y,text=self.glyph,fill=color,font=self.font)
 
 
 class Surface(tk.Canvas):
@@ -76,7 +99,7 @@ class Surface(tk.Canvas):
     def draw(self, event=None):
         w, h = self.winfo_width(), self.winfo_height()
         self.delete("surface")
-        rounded(self, 2, 4, w-1, h-1, 18, fill="#EAE2D5", outline="", tags="surface")
+        rounded(self, 2, 4, w-1, h-1, 18, fill=C["shadow"], outline="", tags="surface")
         rounded(self, 1, 1, w-3, h-4, 18, fill=C["paper"], outline=C["line"], tags="surface")
         self.tag_lower("surface")
         self.itemconfigure(self.window, width=max(1,w-2*self.padding), height=max(1,h-2*self.padding))
@@ -89,39 +112,13 @@ class Masthead(tk.Canvas):
 
     def draw(self, event=None):
         self.delete("all")
-        w = self.winfo_width()
-        # Le repère de marque : carnet et plume, dessinés, pas un actif binaire.
-        rounded(self, 8, 12, 46, 50, 10, fill=C["pine"], outline="")
-        self.create_line(20,40,34,22, fill=C["paper"], width=2, capstyle="round")
-        self.create_polygon(24,33,23,24,35,18,34,27, fill="#E5C9A1", outline="")
-        self.create_line(19,42,35,42, fill="#92AA8A", width=1.5, capstyle="round")
-        self.create_text(60, 23, text="Mon GPT<3", anchor="w", font=("Segoe UI",22 if w>=500 else 19,"bold"), fill=C["pine"])
-        self.create_text(61, 47, text="Votre organisation, en local.", anchor="w", font=("Segoe UI",9), fill=C["muted"])
-        self.create_text(10, 69, text="UN PEU D'ORDRE.  BEAUCOUP D'IDÉES.", anchor="w", font=("Segoe UI",7,"bold"), fill=C["link"])
-        # Paysage d'atelier : collines, soleil, pages et feuillage.
-        before=set(self.find_all())
-        available=w
-        w,start=500,0
-        self.create_oval(w-170,7,w-106,71, fill="#E9C58E", outline="")
-        self.create_polygon(start,109,start+80,62,start+175,80,start+260,37,w,82,w,114, fill="#E5E6CF", smooth=True, outline="")
-        self.create_polygon(start+40,114,start+160,73,start+260,104,w-75,64,w,88,w,114, fill="#CAD5B9", smooth=True, outline="")
-        self.create_polygon(start+155,114,start+255,91,w-120,102,w-24,81,w,94,w,114, fill="#94AF91", smooth=True, outline="")
-        bx, by = w-303, 74
-        rounded(self, bx,by-24,bx+63,by+27,6, fill=C["paper"], outline="#CEBA9C")
-        self.create_line(bx+30,by-20,bx+30,by+22, fill="#CEBA9C", width=1)
-        for y in (by-8,by,by+8):
-            self.create_line(bx+8,y,bx+23,y-2, fill="#B7B6A3", width=1)
-            self.create_line(bx+37,y-2,bx+54,y, fill="#B7B6A3", width=1)
-        for x, y, scale in [(w-76,84,1), (w-389,88,.7)]:
-            self.create_line(x,110,x,y-30*scale,fill=C["pine"],width=2)
-            for side,dy in [(-1,-23),(1,-13),(-1,-4)]:
-                self.create_oval(x if side>0 else x-17*scale,y+dy,x+17*scale if side>0 else x,y+dy+13*scale, fill=C["pine"] if side>0 else "#6F9275", outline="")
-        for item in set(self.find_all())-before:
-            self.addtag_withtag("landscape",item)
-        scale=.45 if available>=560 else .25 if available>=420 else .15
-        self.scale("landscape",0,0,scale,scale)
-        self.move("landscape",available-500*scale-8,78-114*scale)
-        self.create_line(8,79,available-8,79,fill=C["line"])
+        rounded(self, 5, 17, 47, 59, 9, fill=C["pine"], outline="")
+        self.create_polygon(15,47,16,36,22,28,36,23,33,35,26,43,
+                            smooth=True,fill=C["paper"],outline="")
+        self.create_line(14,48,29,33,fill=C["leaf"],width=1.4)
+        self.create_line(14,49,34,49,fill=C["paper"])
+        self.create_text(59,29,text="Mon GPT<3",anchor="w",font=("Segoe UI",20,"bold"),fill=C["pine"])
+        self.create_text(60,55,text="Des idées plein les poches.",anchor="w",font=("Segoe UI",10),fill=C["ink"])
 
 
 class AutoScrollbar(ttk.Scrollbar):
@@ -248,8 +245,8 @@ class CatalogList(tk.Canvas):
         self.gesture_blocked=False
         self.top, self.left = 0, 0
         self.ycommand, self.xcommand = None, None
-        self.title_font = Font(self,font=("Segoe UI",10,"bold"))
-        self.small_font = Font(self,font=("Segoe UI",9))
+        self.title_font = Font(self,font=("Segoe UI",11,"bold"))
+        self.small_font = Font(self,font=("Segoe UI",10))
         self.body_font = Font(self,font=("Segoe UI",10))
         self.bind("<Configure>",lambda e:self.draw())
         self.bind("<Button-1>",self.select_click)
@@ -619,11 +616,11 @@ class CatalogList(tk.Canvas):
             if y+self.row_height<=self.header_height or y>=height: continue
             cy=y+self.row_height/2
             selected=identity in self.pick.ids
-            fill="#E3E9D8" if selected else "#F1F0E7" if identity==self.hovered else C["paper"]
+            fill=C["selection"] if selected else C["hover"] if identity==self.hovered else C["stripe"] if index%2 else C["paper"]
             rounded(self,4,y+2,width-5,y+self.row_height-2,6,fill=fill,outline="")
             if selected and identity==self.focused and self.focus_get()==self:
                 rounded(self,4,y+2,width-5,y+self.row_height-2,6,fill="",outline="#91A38B")
-            self.create_line(10,y+self.row_height-1,width-10,y+self.row_height-1,fill="#EEE9E0")
+
             vals=data.get("values",("",)*4)
             cells=data.get("cells",dict(title=vals[0],context=vals[1],categories=data.get("categories",[]),tags=data.get("labels",[])))
             project="project" in data.get("tags",())
@@ -632,7 +629,7 @@ class CatalogList(tk.Canvas):
             else:
                 self.row_icon(17,cy,project,C["link"] if project else C["pine"])
             tx,tw=layout["title"]
-            self.create_text(tx+6,cy,text=shorten(self.title_font,cells["title"],tw-16),font=self.title_font,fill=C["ink"],anchor="w")
+            self.create_text(tx+6,cy,text=shorten(self.title_font,cells["title"],tw-16),font=self.title_font,fill=C["pine"] if selected else C["ink"],anchor="w")
             for key in self.secondary_order:
                 x,size=self.visible_box(key)
                 if size<20: continue
@@ -641,6 +638,9 @@ class CatalogList(tk.Canvas):
                     full=display_date(cells[key]);date=full.split(' ')[0]
                     text=full if self.small_font.measure(full)<=size-14 else date if self.small_font.measure(date)<=size-14 else '…'
                     self.create_text(x+7,cy,text=text,font=self.small_font,fill=C["muted"],anchor="w",tags=(key,identity))
+                elif key=='categories':
+                    label=' · '.join(cells[key])
+                    self.create_text(x+7,cy,text=shorten(self.small_font,label,size-14),font=self.small_font,fill=C['muted'],anchor='w')
                 elif kind=='text':
                     self.create_text(x+7,cy,text=shorten(self.small_font,cells[key],size-14),font=self.small_font,fill=C["muted"],anchor="w",tags=(key,identity))
                 else:
@@ -657,7 +657,7 @@ class CatalogList(tk.Canvas):
                 self.create_line(x+15,cy+2,x+24,cy-7,x+18,cy-7,fill=C["pine"],width=1.3)
                 self.create_line(x+24,cy-7,x+24,cy-1,fill=C["pine"],width=1.3)
         # En-tête fixe, au-dessus du défilement des lignes.
-        self.create_rectangle(4,3,width-4,self.header_height,fill="#F0EBE2",outline="")
+        self.create_rectangle(4,3,width-4,self.header_height,fill=C["sand"],outline="")
         for key in ["#0","title"]+self.secondary_order+["details","open"]:
             x,size=self.visible_box(key)
             if size<20: continue

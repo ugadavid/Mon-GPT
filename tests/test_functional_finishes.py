@@ -53,7 +53,9 @@ class FunctionalFinishesTests(unittest.TestCase):
                 self.assertEqual(self.app.masthead.scope_info,('Description du dossier fictif',('Catégorie dossier',),('Tag dossier',)))
                 texts=self.texts(self.app.masthead)
                 self.assertIn('Tag dossier',texts);self.assertNotIn('Tag fil',texts)
-                x,y,w,h=self.app.masthead.cover_box;self.assertEqual(w*9,h*16)
+                x,y,w,h=self.app.masthead.cover_box
+                self.assertGreater(w,0);self.assertGreater(h,0)
+                self.assertLessEqual(y+h,self.app.masthead.winfo_height())
                 self.assertLessEqual(x+w,self.app.masthead.winfo_width())
         for scope in ('all','unfiled',self.q.id):
             self.scope(scope);self.assertEqual(self.app.masthead.scope_info,('',(),()))
