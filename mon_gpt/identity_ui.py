@@ -80,11 +80,11 @@ class ContextMasthead(Masthead):
                     cat_width=min(available*.55,sum(self.small_font.measure(t)+21 for t in categories)+6) if categories else 0
                     CatalogList.draw_badges(self,categories,x,96,cat_width,True)
                     CatalogList.draw_badges(self,tags,x+cat_width,96,available-cat_width,False)
-                elif description:self.create_text(x,96,text=shorten(self.small_font,' '.join(description.split()),available),anchor='w',font=self.small_font,fill=C['muted'],tags='scope_description')
-                self.create_line(8,111,width-8,111,fill=C['line'])
+                elif description:self.create_text(x,96,text=shorten(self.small_font,' '.join(description.split()),available),anchor='w',font=self.small_font,fill=C['paper'],tags='scope_description')
+                self.create_line(8,111,width-8,111,fill=C['header_line'])
             else:
                 x=text_right+12
-                if description:self.create_text(x,18,text=shorten(self.small_font,' '.join(description.split()),meta_width),anchor='w',font=self.small_font,fill=C['muted'],tags='scope_description')
+                if description:self.create_text(x,18,text=shorten(self.small_font,' '.join(description.split()),meta_width),anchor='w',font=self.small_font,fill=C['paper'],tags='scope_description')
                 CatalogList.draw_badges(self,categories,x,40,meta_width,True)
                 CatalogList.draw_badges(self,tags,x,62,meta_width,False)
         if w<16:return
@@ -103,6 +103,7 @@ class ContextMasthead(Masthead):
         self.create_image(x,y,image=self.photo,anchor="nw",tags="context_cover")
         if visual and (visual.project or visual.icon!="folder" or visual.color!="atelier") and free_width-w>=28:
             self.badge=ImageTk.PhotoImage(icon_picture(visual.icon,PALETTE[visual.color][1],20),master=self)
+            self.create_oval(x-30,height/2-13,x-4,height/2+13,fill=C["paper"],outline="",tags="context_badge")
             self.create_image(x-17,height/2,image=self.badge,tags="context_badge")
 
 

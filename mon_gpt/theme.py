@@ -3,22 +3,28 @@ import tkinter as tk
 from tkinter import ttk
 
 COLORS = {
-    "ivory": "#F7F3EA", "sand": "#E7D9C5", "pine": "#315E4F",
+    "ivory": "#EFE6D6", "sand": "#E7D9C5", "pine": "#315E4F",
     "terracotta": "#C87A50", "ink": "#292D30", "line": "#D8CEBE",
-    "muted": "#625B53", "selection": "#DBE5D7", "hover": "#EFE7DA",
+    "muted": "#615D4F", "selection": "#D5E3C3", "hover": "#E9EBD8",
     "link": "#884320", "error": "#923C2D", "invalid": "#F3D9CE",
-    "paper": "#FFFFFF", "tag": "#E4EBDD", "category": "#F5E3D1",
-    "edge": "#DED8CC", "rule": "#EAE4D9", "shadow": "#EDE7DD",
-    "heading": "#E8EDE3", "badge_edge": "#C8CDBA",
+    "paper": "#FCF7EC", "tag": "#E4EBDD", "category": "#F5E3D1",
+    "edge": "#D4C7AD", "rule": "#E6DCC8", "shadow": "#D9CCB5",
+    "heading": "#315E4F", "badge_edge": "#C2B48F",
+    "stripe": "#F5EEDC", "header_line": "#658675", "drop": "#BFD7A8",
 }
 FONT = ("Segoe UI", 11)
-CATEGORY_COLORS = ("#E7E4C6", "#F2D7C6", "#F0E0B5", "#D6E6D9")
-TAG_COLORS = ("#F1E8D9", "#E6DDF0", "#DCE9DE", "#F0DDD2")
+CATEGORY_COLORS = ("#E5D5A4", "#EAC8AF", "#EDD3A0", "#CDDCB8")
+TAG_COLORS = ("#EADCC4", "#DDD4E7", "#D4E2C4", "#E9D0BD")
 
 
 def apply_theme(root):
     c = COLORS
     root.configure(background=c["ivory"])
+    root.option_add("*background", c["paper"])
+    root.option_add("*TCombobox*Listbox.background", c["paper"])
+    root.option_add("*TCombobox*Listbox.foreground", c["ink"])
+    root.option_add("*TCombobox*Listbox.selectBackground", c["selection"])
+    root.option_add("*TCombobox*Listbox.selectForeground", c["pine"])
     root.option_add("*Menu.background", c["ivory"])
     root.option_add("*Menu.foreground", c["ink"])
     root.option_add("*Menu.activeBackground", c["selection"])
@@ -29,6 +35,8 @@ def apply_theme(root):
     style.configure(".", font=FONT, background=c["ivory"], foreground=c["ink"])
     style.configure("TFrame", background=c["ivory"])
     style.configure("Paper.TFrame", background=c["paper"])
+    style.configure("NavHeading.TFrame", background=c["pine"])
+    style.configure("NavHeading.TLabel", background=c["pine"], foreground=c["paper"])
     style.configure("TLabel", background=c["ivory"], foreground=c["ink"])
     style.configure("Title.TLabel", font=("Segoe UI", 23, "bold"), foreground=c["pine"])
     style.configure("Heading.TLabel", font=("Segoe UI", 14, "bold"), foreground=c["pine"])
@@ -53,8 +61,8 @@ def apply_theme(root):
     style.map("TCombobox",fieldbackground=[("readonly",c["paper"])],background=[("readonly",c["paper"])],foreground=[("readonly",c["ink"])])
     style.configure("Treeview", background=c["ivory"], fieldbackground=c["ivory"], rowheight=39, borderwidth=0, font=FONT)
     style.map("Treeview", background=[("selected", c["selection"])], foreground=[("selected", c["pine"])], bordercolor=[("focus", c["pine"])])
-    style.configure("Treeview.Heading", background=c["heading"], foreground=c["pine"], padding=(7, 9), relief="flat", font=("Segoe UI", 10, "bold"))
-    style.map("Treeview.Heading", background=[("active", c["hover"])])
+    style.configure("Treeview.Heading", background=c["heading"], foreground=c["paper"], padding=(7, 9), relief="flat", font=("Segoe UI", 10, "bold"))
+    style.map("Treeview.Heading", background=[("active", c["pine"])])
     style.configure("Nav.Treeview", rowheight=40, background=c["paper"], fieldbackground=c["paper"], borderwidth=0, font=("Segoe UI",11))
     style.map("Nav.Treeview", background=[("selected",c["pine"])], foreground=[("selected",c["paper"])])
     style.layout("Nav.Treeview",[("Treeview.treearea",{"sticky":"nswe"})])
