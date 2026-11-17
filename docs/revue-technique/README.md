@@ -6,13 +6,15 @@
 
 ## Périmètre élargi : la famille d'applications Trucabule
 
-**Mon GPT<3 est notre premier terrain d'étude, pas la finalité unique.** **Phase 1 limitée à quatre productions Trucabule : Mon GPT<3, Ma Médiathèque, Mon Bureau et Ma Capture (encore au stade de projet).** Les trois premières permettent un audit de code ; la quatrième, une étude des besoins et de l'architecture envisagée. TRAME, atelier, dev-lab et réalisations du stage M2 au LIDILEM sont **reportés à une seconde phase**, après clarification des quatre premières. Trucabule pourrait rapidement compter **une dizaine d'applications**. La multiplication de modules semblables, de conventions divergentes et de corrections dupliquées rendrait leur maintenance difficile.
+**Mon GPT<3 est notre premier terrain d'étude, pas la finalité unique.** **Phase 1 limitée à six productions Trucabule : Mon GPT<3, Ma Médiathèque, Mon Bureau, Chrome Organizer, Mon Aise et Ma Capture (encore au stade de projet).** Les cinq premières permettent un audit du code existant ; la sixième, une étude des besoins et de l'architecture envisagée. TRAME, atelier, dev-lab et réalisations du stage M2 au LIDILEM sont **reportés à une seconde phase**, après clarification des quatre premières. Trucabule pourrait rapidement compter **une dizaine d'applications**. La multiplication de modules semblables, de conventions divergentes et de corrections dupliquées rendrait leur maintenance difficile.
 
-**Notre véritable enjeu : construire progressivement une cohérence d'ensemble et du code réutilisable là où cela apporte un gain démontré**, sans forcer une bibliothèque unique pour Python/Tk, .NET et le Web. L'objectif est de comparer le **temps de développement, d'intégration et de maintenance à l'échelle de plusieurs applications**, pas seulement la taille du code de Mon GPT<3.
+**Notre véritable enjeu : construire progressivement une cohérence d'ensemble et du code réutilisable là où cela apporte un gain démontré**, sans forcer une bibliothèque unique pour Python/Tk, .NET/WinForms et React/Web. L'objectif est de comparer le **temps de développement, d'intégration et de maintenance à l'échelle de plusieurs applications**, pas seulement la taille du code de Mon GPT<3.
 
 **Pour l'instant : exploration uniquement.** L'alpha de chaque application peut avancer avec son code propre ; nous étudierons les extractions possibles avant d'en décider la réalisation. La démarche est menée **d'abord à deux**, puis des audits factuels pourront être confiés à Codex et une comparaison multi-dépôts à Work en lecture seule.
 
 **[Lire la vision multi-applications et notre méthode d'estimation des coûts →](02-vision-trucabule-et-mutualisation.md)**
+
+**Piles déjà identifiées pour la comparaison :** Mon GPT<3 / Ma Médiathèque / Chrome Organizer : **Python + Tkinter** ; Mon Bureau : **.NET / WinForms** ; Mon Aise : **React / TypeScript / Vinext, données JSON sur R2** ; Ma Capture : **conception seulement**. Les comparaisons détaillées attendent l'inventaire du code. **Textothèque et Iconothèque restent hors Trucabule** tant que leur galaxie n'est pas choisie.
 
 
 ## Notre philosophie
@@ -35,7 +37,7 @@ La question importante n'est pas « quel framework utilise-t-on aujourd'hui ? »
 
 - **[01 — Inventaire des technologies et bibliothèques](01-inventaire-technologies.md)** : tableau simple, rôles, alternatives, liens officiels, premières hypothèses.
 - **[02 — Vision Trucabule et mutualisation](02-vision-trucabule-et-mutualisation.md)** : plusieurs applications, code et conventions communs, méthode d'étude, estimation en temps et répartition GPT / Codex / Work.
-- **[03 — Première cartographie fonctionnelle des quatre produits](03-cartographie-fonctionnelle-trucabule.md)** : tableau des besoins présents/prévus, candidats possibles à la mutualisation et ordre d'étude, sans écrire de code.
+- **[03 — Première cartographie fonctionnelle des six produits](03-cartographie-fonctionnelle-trucabule.md)** : tableau des besoins présents/prévus, candidats possibles à la mutualisation et ordre d'étude, sans écrire de code.
 - Les études suivantes pourront examiner le **graphe des dépendances**, les **API vraiment utilisées**, la taille des composants maison et la **pertinence d'une extraction/réécriture ciblée**.
 
 ## Questions pour chaque brique
