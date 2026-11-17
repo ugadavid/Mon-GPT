@@ -7,9 +7,13 @@ COLORS = {
     "terracotta": "#C87A50", "ink": "#292D30", "line": "#D8CEBE",
     "muted": "#625B53", "selection": "#DBE5D7", "hover": "#EFE7DA",
     "link": "#884320", "error": "#923C2D", "invalid": "#F3D9CE",
-    "paper": "#FFFCF7", "tag": "#E4EBDD", "category": "#F5E3D1",
+    "paper": "#FFFFFF", "tag": "#E4EBDD", "category": "#F5E3D1",
+    "edge": "#DED8CC", "rule": "#EAE4D9", "shadow": "#EDE7DD",
+    "heading": "#E8EDE3", "badge_edge": "#C8CDBA",
 }
 FONT = ("Segoe UI", 11)
+CATEGORY_COLORS = ("#E7E4C6", "#F2D7C6", "#F0E0B5", "#D6E6D9")
+TAG_COLORS = ("#F1E8D9", "#E6DDF0", "#DCE9DE", "#F0DDD2")
 
 
 def apply_theme(root):
@@ -35,7 +39,7 @@ def apply_theme(root):
     style.configure("Inspector.TLabel", background=c["paper"], foreground=c["pine"], font=("Segoe UI",18,"bold"))
     style.configure("WorkTitle.TLabel",background=c["paper"],foreground=c["pine"],font=("Segoe UI",14,"bold"))
     style.configure("Error.TLabel", foreground=c["error"])
-    style.configure("TButton", padding=(11, 7), borderwidth=1, relief="flat", bordercolor=c["line"], background=c["ivory"])
+    style.configure("TButton", padding=(11, 7), borderwidth=1, relief="flat", bordercolor=c["edge"], background=c["paper"])
     style.map("TButton", background=[("pressed", c["selection"]), ("active", c["hover"])], bordercolor=[("focus", c["pine"])])
     style.configure("Primary.TButton", background=c["pine"], foreground=c["ivory"], bordercolor=c["pine"])
     style.map("Primary.TButton", background=[("active", "#234B3E"), ("pressed", "#234B3E")], foreground=[("active", c["ivory"])])
@@ -49,13 +53,16 @@ def apply_theme(root):
     style.map("TCombobox",fieldbackground=[("readonly",c["paper"])],background=[("readonly",c["paper"])],foreground=[("readonly",c["ink"])])
     style.configure("Treeview", background=c["ivory"], fieldbackground=c["ivory"], rowheight=39, borderwidth=0, font=FONT)
     style.map("Treeview", background=[("selected", c["selection"])], foreground=[("selected", c["pine"])], bordercolor=[("focus", c["pine"])])
-    style.configure("Treeview.Heading", background=c["sand"], foreground=c["ink"], padding=(7, 9), relief="flat", font=("Segoe UI", 10, "bold"))
+    style.configure("Treeview.Heading", background=c["heading"], foreground=c["pine"], padding=(7, 9), relief="flat", font=("Segoe UI", 10, "bold"))
     style.map("Treeview.Heading", background=[("active", c["hover"])])
     style.configure("Nav.Treeview", rowheight=40, background=c["paper"], fieldbackground=c["paper"], borderwidth=0, font=("Segoe UI",11))
     style.map("Nav.Treeview", background=[("selected",c["pine"])], foreground=[("selected",c["paper"])])
     style.layout("Nav.Treeview",[("Treeview.treearea",{"sticky":"nswe"})])
     style.configure("TPanedwindow", background=c["ivory"])
-    style.configure("TSeparator", background=c["line"])
+    style.configure("TSeparator", background=c["rule"], bordercolor=c["rule"], lightcolor=c["rule"], darkcolor=c["rule"])
+    style.configure("TNotebook", background=c["ivory"], bordercolor=c["edge"], lightcolor=c["edge"], darkcolor=c["edge"])
+    style.configure("TNotebook.Tab", background=c["ivory"], foreground=c["muted"], bordercolor=c["edge"], lightcolor=c["edge"])
+    style.map("TNotebook.Tab", background=[("selected",c["paper"]),("active",c["hover"])], foreground=[("selected",c["pine"])])
     style.configure("Vertical.TScrollbar", background=c["line"], troughcolor=c["paper"], arrowsize=9, borderwidth=0)
     for orientation,sticky in [("Vertical","ns"),("Horizontal","we")]:
         style.layout(orientation+".TScrollbar",[(orientation+".Scrollbar.trough",{"sticky":sticky,"children":[(orientation+".Scrollbar.thumb",{"expand":1,"sticky":"nswe"})]})])

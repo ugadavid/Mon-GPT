@@ -176,16 +176,16 @@ class ResultsView(MosaicRenderer,CatalogList):
             if y+self.row_height<=self.header_height or y>=height: continue
             selected=identity in self.pick.ids
             fill=C["selection"] if selected else C["hover"] if identity==self.hovered else C["paper"]
-            rounded(self,5,y+3,width-5,y+self.row_height-3,9,fill=fill,outline=C["pine"] if selected and identity==self.focused and self.focus_get()==self else C["line"])
+            rounded(self,5,y+3,width-5,y+self.row_height-3,9,fill=fill,outline=C["pine"] if selected and identity==self.focused and self.focus_get()==self else C["edge"])
             visual=data.get("visual")
             reference=visual.image if visual and visual.image else DEFAULTS["image"]
             picture=self.cover(reference,iw)
             iy=y+25
-            rounded(self,15,iy-2,19+iw,iy+iw*9//16+2,5,fill=C["ivory"],outline=C["line"])
+            rounded(self,15,iy-2,19+iw,iy+iw*9//16+2,5,fill=C["ivory"],outline=C["edge"])
             self.create_image(17,iy,image=picture,anchor="nw",tags=("cover",identity))
             icon=self.icons.get(visual.icon if visual else None,visual.color if visual else None,20)
             self.create_image(tx+9,y+23,image=icon,tags=("identity",identity))
-            self.create_text(tx+27,y+23,text=shorten(self.detail_title_font,data["values"][0],tw-31),anchor="w",font=self.detail_title_font,fill=C["ink"],tags=("title",identity))
+            self.create_text(tx+27,y+23,text=shorten(self.detail_title_font,data["values"][0],tw-31),anchor="w",font=self.detail_title_font,fill=C["pine"],tags=("title",identity))
             excerpts=self.excerpts(data)
             if len(excerpts)==1:
                 key,label,text=excerpts[0]

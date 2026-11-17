@@ -4,7 +4,7 @@ from tkinter import ttk
 from tkinter.font import Font
 from datetime import datetime
 from .atelier import PillButton, AutoScrollbar, rounded
-from .theme import COLORS as C
+from .theme import COLORS as C, CATEGORY_COLORS, TAG_COLORS
 
 
 class InspectorScrollbar(AutoScrollbar):
@@ -107,9 +107,9 @@ class InspectorBadges(tk.Canvas):
                 x,y,row_height=0,y+row_height+5,0
             item=self.create_text(x+8,y+4,text=value,font=self.font,anchor="nw",width=max(8,bw-16),fill=C["ink"])
             height=self.bbox(item)[3]-self.bbox(item)[1]+8
-            palette=["#DDE4CF","#EDD4C6","#E8DEBF","#D6E2D8"] if self.category else ["#F0E7DA","#E7DDE7","#E4E9DC","#EBDFD8"]
+            palette=CATEGORY_COLORS if self.category else TAG_COLORS
             color=palette[sum((i+1)*ord(c) for i,c in enumerate(value.casefold()))%len(palette)]
-            shape=rounded(self,x,y,x+bw,y+height,10,fill=color,outline="#C6CBB7" if self.category else "")
+            shape=rounded(self,x,y,x+bw,y+height,10,fill=color,outline=C["badge_edge"] if self.category else "")
             self.tag_lower(shape,item)
             row_height=max(row_height,height)
             x+=bw+5
@@ -197,7 +197,7 @@ class InspectorSummary(ttk.Frame):
 
     def section(self,title):
         ttk.Separator(self).pack(fill="x",pady=(9,7))
-        ttk.Label(self,text=title,style="Paper.TLabel",font=("Segoe UI",10,"bold")).pack(anchor="w",pady=(0,4))
+        ttk.Label(self,text=title,style="Paper.TLabel",font=("Segoe UI",10,"bold"),foreground=C["pine"]).pack(anchor="w",pady=(0,4))
 
     def text(self,value,muted=False,pady=0,font=("Segoe UI",10),color=None):
         label=ttk.Label(self,text=value,style="Paper.TLabel",font=font,foreground=color or C["muted" if muted else "ink"],wraplength=280,justify="left")

@@ -4,7 +4,7 @@ from tkinter import ttk
 from tkinter.font import Font
 from .core import fold
 from .atelier import PillButton, rounded
-from .theme import COLORS as C
+from .theme import COLORS as C, CATEGORY_COLORS, TAG_COLORS
 
 
 def editor_styles(parent):
@@ -29,10 +29,10 @@ class EditorChip(PillButton):
     def draw(self,event=None):
         self.delete("all")
         w,h=self.winfo_width(),self.winfo_height()
-        palette=["#DDE4CF","#EDD4C6","#E8DEBF","#D6E2D8"] if self.category else ["#F0E7DA","#E7DDE7","#E4E9DC","#EBDFD8"]
+        palette=CATEGORY_COLORS if self.category else TAG_COLORS
         fill=palette[sum((i+1)*ord(c) for i,c in enumerate(self.value.casefold()))%len(palette)]
         focused=self.focus_get()==self
-        rounded(self,1,1,w-1,h-1,11,fill=C["hover"] if self.hovered else fill,outline=C["pine"] if focused else "#C6CBB7" if self.category else "",width=2 if focused else 1)
+        rounded(self,1,1,w-1,h-1,11,fill=C["hover"] if self.hovered else fill,outline=C["pine"] if focused else C["badge_edge"] if self.category else "",width=2 if focused else 1)
         self.create_text(8,h/2,text=self.value,font=self.font,fill=C["ink"],width=max(10,w-34),anchor="w")
         self.create_text(w-12,h/2,text="×",font=("Segoe UI",11),fill=C["muted"])
 

@@ -4,7 +4,7 @@ from tkinter import ttk
 from tkinter.font import Font
 from .selection import Selection
 from .list_columns import COLUMNS, BY_KEY, defaults, display_date
-from .theme import COLORS as C
+from .theme import COLORS as C, CATEGORY_COLORS, TAG_COLORS
 
 
 def rounded(canvas, x1, y1, x2, y2, radius=14, **kwargs):
@@ -61,7 +61,7 @@ class PillButton(tk.Canvas):
         if self.hovered:
             fill = "#254C3F" if self.tone == "primary" else C["hover"]
         focused = self.focus_get() == self
-        rounded(self, 1, 1, w-1, h-1, h/2 if self.tone == "chip" else 10, fill=fill, outline=C["pine"] if focused else (C["line"] if self.tone == "quiet" else fill), width=2 if focused else 1)
+        rounded(self, 1, 1, w-1, h-1, h/2 if self.tone == "chip" else 10, fill=fill, outline=C["pine"] if focused else (C["edge"] if self.tone == "quiet" else fill), width=2 if focused else 1)
         self.create_text(w/2, h/2, text=self.text, fill=C["paper"] if self.tone == "primary" else C["pine"] if self.tone == "chip" else C["ink"], font=self.font)
 
 
@@ -76,8 +76,8 @@ class Surface(tk.Canvas):
     def draw(self, event=None):
         w, h = self.winfo_width(), self.winfo_height()
         self.delete("surface")
-        rounded(self, 2, 4, w-1, h-1, 18, fill="#EAE2D5", outline="", tags="surface")
-        rounded(self, 1, 1, w-3, h-4, 18, fill=C["paper"], outline=C["line"], tags="surface")
+        rounded(self, 2, 4, w-1, h-1, 18, fill=C["shadow"], outline="", tags="surface")
+        rounded(self, 1, 1, w-3, h-4, 18, fill=C["paper"], outline=C["edge"], tags="surface")
         self.tag_lower("surface")
         self.itemconfigure(self.window, width=max(1,w-2*self.padding), height=max(1,h-2*self.padding))
 
@@ -602,9 +602,9 @@ class CatalogList(tk.Canvas):
             if x+bw+reserve>end:
                 self.create_text(x,y,text="+"+str(len(labels)-n),anchor="w",font=self.small_font,fill=C["muted"])
                 return
-            palette=["#DDE4CF","#EDD4C6","#E8DEBF","#D6E2D8"] if category else ["#F0E7DA","#E7DDE7","#E4E9DC","#EBDFD8"]
+            palette=CATEGORY_COLORS if category else TAG_COLORS
             color=palette[sum((i+1)*ord(c) for i,c in enumerate(label.casefold()))%len(palette)]
-            rounded(self,x,y-11,x+bw,y+11,11,fill=color,outline="#C6CBB7" if category else "")
+            rounded(self,x,y-11,x+bw,y+11,11,fill=color,outline=C["badge_edge"] if category else "")
             self.create_text(x+8,y,text=label,anchor="w",font=self.small_font,fill=C["ink"])
             x+=bw+5
 
@@ -612,18 +612,18 @@ class CatalogList(tk.Canvas):
         self.delete_canvas()
         width,height=self.winfo_width(),self.winfo_height()
         layout=self.layout()
-        rounded(self,1,1,width-1,height-1,12,fill=C["paper"],outline=C["line"])
+        rounded(self,1,1,width-1,height-1,12,fill=C["paper"],outline=C["edge"])
         self.top=max(0,min(self.top,max(0,len(self.rows)*self.row_height-(height-self.header_height))))
         for index,(identity,data) in enumerate(self.rows.items()):
             y=self.header_height+index*self.row_height-self.top
             if y+self.row_height<=self.header_height or y>=height: continue
             cy=y+self.row_height/2
             selected=identity in self.pick.ids
-            fill="#E3E9D8" if selected else "#F1F0E7" if identity==self.hovered else C["paper"]
+            fill=C["selection"] if selected else C["hover"] if identity==self.hovered else C["paper"]
             rounded(self,4,y+2,width-5,y+self.row_height-2,6,fill=fill,outline="")
             if selected and identity==self.focused and self.focus_get()==self:
-                rounded(self,4,y+2,width-5,y+self.row_height-2,6,fill="",outline="#91A38B")
-            self.create_line(10,y+self.row_height-1,width-10,y+self.row_height-1,fill="#EEE9E0")
+                rounded(self,4,y+2,width-5,y+self.row_height-2,6,fill="",outline=C["pine"])
+            self.create_line(10,y+self.row_height-1,width-10,y+self.row_height-1,fill=C["rule"])
             vals=data.get("values",("",)*4)
             cells=data.get("cells",dict(title=vals[0],context=vals[1],categories=data.get("categories",[]),tags=data.get("labels",[])))
             project="project" in data.get("tags",())
@@ -632,7 +632,7 @@ class CatalogList(tk.Canvas):
             else:
                 self.row_icon(17,cy,project,C["link"] if project else C["pine"])
             tx,tw=layout["title"]
-            self.create_text(tx+6,cy,text=shorten(self.title_font,cells["title"],tw-16),font=self.title_font,fill=C["ink"],anchor="w")
+            self.create_text(tx+6,cy,text=shorten(self.title_font,cells["title"],tw-16),font=self.title_font,fill=C["pine"],anchor="w")
             for key in self.secondary_order:
                 x,size=self.visible_box(key)
                 if size<20: continue
@@ -657,7 +657,7 @@ class CatalogList(tk.Canvas):
                 self.create_line(x+15,cy+2,x+24,cy-7,x+18,cy-7,fill=C["pine"],width=1.3)
                 self.create_line(x+24,cy-7,x+24,cy-1,fill=C["pine"],width=1.3)
         # En-tête fixe, au-dessus du défilement des lignes.
-        self.create_rectangle(4,3,width-4,self.header_height,fill="#F0EBE2",outline="")
+        self.create_rectangle(4,3,width-4,self.header_height,fill=C["heading"],outline="")
         for key in ["#0","title"]+self.secondary_order+["details","open"]:
             x,size=self.visible_box(key)
             if size<20: continue
@@ -665,8 +665,8 @@ class CatalogList(tk.Canvas):
             if key=="details": text="⋯"
             if key=="open": text="↗"
             if key==self.sort_column: text+=(" ↓" if self.sort_reverse else " ↑")
-            self.create_text(x+7,18,text=shorten(self.small_font,text,size-12),anchor="w",font=self.small_font,fill=C["muted"])
-        self.create_line(6,self.header_height-1,width-6,self.header_height-1,fill=C["line"])
+            self.create_text(x+7,18,text=shorten(self.small_font,text,size-12),anchor="w",font=self.small_font,fill=C["pine"])
+        self.create_line(6,self.header_height-1,width-6,self.header_height-1,fill=C["edge"])
         grip=self.resize_column[0] if self.resize_column else self.separator_hover
         if grip and grip in layout:
             edge=sum(layout[grip])
