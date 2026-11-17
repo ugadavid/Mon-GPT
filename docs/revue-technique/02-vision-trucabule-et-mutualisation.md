@@ -23,11 +23,33 @@ Le risque n'est pas seulement une dépendance externe trop lourde : c'est de **r
 
 **Distinction capitale :** une application Python/Tk, une application .NET et une application Web peuvent partager **principes, conventions, schémas et design tokens**, mais pas forcément une même bibliothèque de widgets. La réutilisation effective doit être évaluée **par environnement technique**.
 
-## Portefeuille : point de départ, pas inventaire certifié
+## Périmètre décidé — phase 1 : les quatre productions Trucabule
 
-L'étude ne se limite **pas** au dépôt Mon GPT<3. Nous souhaitons progressivement confronter ses briques à d'autres applications Trucabule (par exemple **Ma Médiathèque, Mon Bureau, Chrome Organizer, TRAME, Mon Aise**, etc., selon les dépôts réellement accessibles et leur état). **La liste exacte des produits, technologies, versions et fonctions communes reste à vérifier avant toute recommandation.**
+**Décision de cadrage du 17 novembre 2026 : limiter la première comparaison à QUATRE produits Trucabule.** Ne pas élargir l'audit à d'autres dépôts sans nouvelle décision.
 
-En particulier, **ne pas déduire qu'un élément est réutilisable simplement parce que deux applications possèdent un bouton ou une sauvegarde** : inspecter leurs règles et contraintes.
+| Produit | État à étudier | Source / constat vérifié | Question pour la mutualisation |
+| --- | --- | --- | --- |
+| **Mon GPT<3** | Application Windows opérationnelle, version **0.9.4**, plus extension **Mon GPT Collector 0.8.2** | [Mon GPT<3](https://github.com/ugadavid/Mon-GPT) ; Python/Tkinter, Canvas et Pillow, catalogue JSON ; extension JavaScript/Chrome MV3 | Que peut-on réutiliser dans d'autres logiciels : composants Canvas, préférences, fiches, images, classement, sauvegardes, menus, tests ? |
+| **Ma Médiathèque** | Application Windows déjà distribuée en version alpha, avec installateur et ZIP | [Ma Médiathèque](https://github.com/ugadavid/ma-librarie) ; README consulté : Python/Tkinter, SQLite, Pillow, pypdf et emballage Windows | Quels composants Python/Tk/Pillow, comportements d'interface, sauvegardes, métadonnées et scripts de distribution sont similaires ou divergents de Mon GPT<3 ? |
+| **Mon Bureau** | Application Windows existante et distribuable | [Mon Bureau](https://github.com/ugadavid/mon-bureau) ; README consulté : **.NET** et installateur Windows, configuration JSON | Quels principes et contrats peuvent être communs **entre Python et .NET**, et quels composants doivent rester spécifiques à chaque technologie ? |
+| **Ma Capture** | **Projet de produit, pas application codée/achevée à ce stade** | Cahier de besoins et choix d'architecture **à retrouver et examiner avant toute affirmation technique** | Opportunité d'**anticiper** des composants communs, sans imposer une architecture définitive ni compter de code inexistant comme réutilisable |
+
+**Important : comparer ce qui existe à ce qui est prévu sans les confondre.** Pour Ma Capture, recenser les choix et exigences documentés (capture, annotation, édition immédiate, fiches documentaires, archive, ergonomie), puis seulement dégager des besoins communs ; aucune estimation de réemploi de code tant qu'il n'existe pas.
+
+**Constat majeur de la phase 1 :** deux produits actuels partagent Python/Tkinter, tandis que Mon Bureau utilise .NET. Le socle de Trucabule ne peut donc pas se réduire à une bibliothèque graphique unique. Il faudra distinguer **code réutilisable dans une même pile**, **conventions transversales**, **contrats de données**, **design tokens**, **outillage**, et **bonnes pratiques de maintenance**. Ne pas traiter toutes ces couches comme si elles nécessitaient un framework commun.
+
+### Phase 2 — comparaison élargie, explicitement différée
+
+**Après la clarification du périmètre Trucabule**, envisager à titre de comparaison les projets plus conséquents et les briques déjà produites :
+
+- **TRAME** ;
+- **atelier** (conserver ce terme sans présumer qu'il correspond à un dépôt unique) ;
+- les fragments et fonctionnalités du **dev-lab** ;
+- les développements et prototypes réalisés au cours du **mémoire de M2 et du stage au LIDILEM**.
+
+Ces sources pourraient contenir des composants réutilisables, des idées d'architecture ou des solutions techniques déjà explorées. **Elles ne font pas partie de l'audit initial.** Ne pas les étudier ni préconiser leur intégration dans la phase 1.
+
+**Ordre voulu :** d'abord la carte des **quatre** productions Trucabule, puis un regard vers le reste du patrimoine logiciel pour éventuellement enrichir cette carte.
 
 ## Méthode de revue envisagée
 
@@ -42,15 +64,15 @@ En particulier, **ne pas déduire qu'un élément est réutilisable simplement p
 
 **Lecture et recommandations uniquement, pas de code nouveau :**
 
-- Cartographier les modules et dépendances directs/indirects, et **les fonctions concrètement utilisées** des bibliothèques tierces et standard.
+- Cartographier les modules et dépendances directs/indirects des **trois applications existantes** de la phase 1, et **les fonctions concrètement utilisées** des bibliothèques tierces et standard ; relever séparément le cahier des charges de **Ma Capture**, sans inventer son implémentation.
 - Localiser les composants déjà maison (UI, sélection, identité, stockage, import, tests) ; distinguer les règles génériques du spécifique à ChatGPT.
-- Identifier les ressemblances possibles avec d'autres applications, en précisant **« non vérifié ailleurs »** jusqu'à audit des autres dépôts.
+- Comparer explicitement **Mon GPT<3, Ma Médiathèque et Mon Bureau** ; pour **Ma Capture**, confronter uniquement les besoins et décisions documentés. Les autres projets (TRAME, atelier, dev-lab, LIDILEM) restent hors phase 1.
 - Estimer **l'effort d'extraction, la réécriture maison, l'intégration et la maintenance** en *fourchettes indicatives*, avec hypothèses et incertitude.
 - Proposer **Conserver / Encapsuler / Extraire / Écrire maison / Reporter**, avec avantages et risques. **Pas de refactorisation, publication de package ou changement d'architecture**.
 
 ### Étape C — Vue multi-dépôts éventuellement confiée à Work
 
-Utiliser une revue **en lecture seule**, éventuellement dans **Work sur l'environnement local** si les dépôts sont réellement accessibles : comparer plusieurs applications Trucabule, leurs besoins, technologies, interfaces, patterns et processus de livraison.
+Utiliser une revue **en lecture seule**, éventuellement dans **Work sur l'environnement local** si les dépôts sont réellement accessibles : comparer les **quatre productions Trucabule décidées pour la phase 1**, leurs besoins, technologies, interfaces, patterns et processus de livraison, en distinguant les trois codes existants du projet Ma Capture.
 
 **Work complète l'inventaire de Codex :** Codex peut approfondir le code d'un dépôt ; Work peut aider à rassembler les constats transversaux et une synthèse. L'accès aux projets locaux/VM doit être **vérifié dans le contexte d'exécution choisi**, pas supposé à partir de cette discussion.
 
@@ -77,7 +99,7 @@ Pour **chaque candidat** demander une fourchette argumentée (heures ou jours-pe
 - *Avec mutualisation* ≈ coût initial (étude + développement + tests) + **N × coût d'intégration** + maintenance commune.
 - *Sans mutualisation* ≈ somme des réalisations par application + maintenance de chacune.
 
-**Demander des scénarios pour 2, 5 et 10 applications**, et une indication du *point de rentabilité* éventuel. Les estimations doivent venir **après inspection réelle du code** : **ne pas inventer de délais** maintenant.
+**Demander d'abord un scénario chiffré sur les trois applications existantes et le projet Ma Capture, puis des projections pour 5 et 10 applications**, et une indication du *point de rentabilité* éventuel. Les estimations doivent venir **après inspection réelle du code** : **ne pas inventer de délais** maintenant.
 
 ## Premières pistes, ouvertes
 
