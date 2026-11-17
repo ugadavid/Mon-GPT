@@ -4,6 +4,14 @@
 **Nature : dossier de réflexion, pas une mission de développement.** Aucun changement de code ni migration n'est décidé ici.
 
 
+## Règle fondatrice de la marque Trucabule
+
+**Trucabule produit exclusivement des APPLICATIONS.** La **seule exception** est **son propre site Internet** ([trucabule.fr](https://www.trucabule.fr/)), qui présente la marque et ses applications ; ce site n'est pas à compter parmi les produits applicatifs.
+
+**Attention aux premiers prototypes :** une application peut être **hébergée provisoirement sur le Web**, développée avec React, Tkinter ou .NET, ou distribuée d'abord comme une alpha. **Cela ne définit ni sa nature de produit ni son architecture définitive.** Notamment, **Mon Aise** est un embryon d'application actuellement hébergé via Sites ; sa vocation n'est pas de rester un simple site Internet. La plateforme et la distribution futures sont **des questions ouvertes**, non des décisions implicites.
+
+Pour chaque production, séparer **ce que le code fait aujourd'hui**, **l'objectif applicatif à terme**, et **les choix encore à arbitrer**. Le recensement de technologies actuelles ne doit jamais être présenté comme une recommandation de pérennisation.
+
 ## Périmètre élargi : la famille d'applications Trucabule
 
 **Mon GPT<3 est notre premier terrain d'étude, pas la finalité unique.** **Phase 1 limitée à six productions Trucabule : Mon GPT<3, Ma Médiathèque, Mon Bureau, Chrome Organizer, Mon Aise et Ma Capture (encore au stade de projet).** Les cinq premières permettent un audit du code existant ; la sixième, une étude des besoins et de l'architecture envisagée. TRAME, atelier, dev-lab et réalisations du stage M2 au LIDILEM sont **reportés à une seconde phase**, après clarification des six productions Trucabule. Trucabule pourrait rapidement compter **une dizaine d'applications**. La multiplication de modules semblables, de conventions divergentes et de corrections dupliquées rendrait leur maintenance difficile.
@@ -14,7 +22,7 @@
 
 **[Lire la vision multi-applications et notre méthode d'estimation des coûts →](02-vision-trucabule-et-mutualisation.md)**
 
-**Piles déjà identifiées pour la comparaison :** Mon GPT<3 / Ma Médiathèque / Chrome Organizer : **Python + Tkinter** ; Mon Bureau : **.NET / WinForms** ; Mon Aise : **React / TypeScript / Vinext, données JSON sur R2** ; Ma Capture : **conception seulement**. Les comparaisons détaillées attendent l'inventaire du code. **Textothèque et Iconothèque restent hors Trucabule** tant que leur galaxie n'est pas choisie.
+**Piles actuellement observées pour la comparaison (pas nécessairement définitives) :** Mon GPT<3 / Ma Médiathèque / Chrome Organizer : **Python + Tkinter** ; Mon Bureau : **.NET / WinForms** ; Mon Aise : **React / TypeScript / Vinext, données JSON sur R2** ; Ma Capture : **conception seulement**. Les comparaisons détaillées attendent l'inventaire du code **et la clarification des objectifs produits**, sans favoriser prématurément Tkinter, .NET ou une plateforme Web. **Textothèque et Iconothèque restent hors Trucabule** tant que leur galaxie n'est pas choisie.
 
 
 ## Notre philosophie
