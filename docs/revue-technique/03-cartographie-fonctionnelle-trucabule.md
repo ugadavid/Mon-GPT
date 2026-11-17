@@ -15,6 +15,8 @@ Cette cartographie part de **besoins fonctionnels**, pas d'une préférence pour
 
 **Légende :** **Présent** = documenté pour l'application actuelle ; **Prévu** = besoin de conception, non développé ; **À vérifier** = non suffisamment établi par les sources examinées ; **—** = pas de besoin retenu à ce stade, pas une preuve d'absence. Les technologies et modes de diffusion indiquent **uniquement l'implémentation actuelle** ; les objectifs et options futures doivent être établis séparément.
 
+**Critères transversaux de Trucabule :** nous visons **des applications Windows gratuites et open source** ; la multiplateforme est une **possibilité future**, sans échéance ni migration décidée. Cette matrice n'impose donc pas de changer la pile des alphas. Pour chaque famille de fonctionnalités, l'audit devra distinguer **code portable**, **adaptateur Windows**, **interface spécifique**, **format des données**, **licences/droits de redistribution** et **coût de portage éventuel**. La présence publique du code ne prouve pas à elle seule une licence open source.
+
 ## Matrice initiale
 
 | Famille / fonction | Mon GPT<3 | Ma Médiathèque | Mon Bureau | Chrome Organizer | Mon Aise | Ma Capture | Mutualisation à étudier |
@@ -34,6 +36,18 @@ Cette cartographie part de **besoins fonctionnels**, pas d'une préférence pour
 | **Tests / recette** | unittest Python et tests JS Collector | Recettes/build documentés | Rapports et builds documentés | unittest, contrôles Tk et témoins synthétiques | TypeScript/build et recette de l'aperçu ; couverture automatisée à auditer | À prévoir | Gabarits de rapports, fixtures, critères de recette et traces fiables |
 
 Les états ne sont **pas** des pourcentages de code réutilisable. Ils décrivent seulement le premier niveau de besoin, **pas des technologies ou formats de produits arrêtés pour les versions futures**.
+
+### Lecture complémentaire de la matrice : Windows et éventuelle migration
+
+| Axe à vérifier | Aujourd'hui (Windows) | Si un portage devient pertinent plus tard |
+| --- | --- | --- |
+| **Cœur et règles métier** | Conserver le comportement validé et la séparation des préoccupations | Mesurer la part qui pourra être reprise indépendamment de l'interface |
+| **Interface graphique** | Utiliser la pile qui répond aux besoins présents, sans dogme | Comparer coût de portage/remplacement des vues et gestes, et intérêt d'une couche commune |
+| **Accès au système** | Exploiter Windows là où c'est utile | Identifier les dépendances Win32, chemins, shell, processus et autres adaptateurs à remplacer |
+| **Données, import/export et sauvegardes** | Formats documentés, validations, migrations et préservation des données | Évaluer la lecture et la migration de ces mêmes données sur une autre plateforme |
+| **Distribution et licences** | Application gratuite et destinée à l'open source ; vérifier droits sur code, dépendances et assets | Étudier packaging, runtimes, distribution et compatibilité de licences selon la future plateforme |
+
+**Il s'agit de questions pour l'audit, pas de résultats déjà prouvés.**
 
 ## Premières pistes à examiner (hypothèses, pas des conclusions)
 
