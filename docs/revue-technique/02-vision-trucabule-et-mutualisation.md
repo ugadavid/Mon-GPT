@@ -36,6 +36,8 @@ Le risque n'est pas seulement une dépendance externe trop lourde : c'est de **r
 
 **Important : comparer ce qui existe à ce qui est prévu sans les confondre.** Pour Ma Capture, recenser les choix et exigences documentés (capture, annotation, édition immédiate, fiches documentaires, archive, ergonomie), puis seulement dégager des besoins communs ; aucune estimation de réemploi de code tant qu'il n'existe pas.
 
+**Statut de Textothèque et Iconothèque :** ces deux projets existent, mais **leur rattachement à la galaxie Trucabule (ou à une autre) n'est pas décidé**. Ils **ne sont pas comptés comme productions Trucabule** et **ne font pas partie de la phase 1**. Leur éventuelle inclusion dans une comparaison future demandera une décision explicite ; ne pas les classer d'office en phase 2.
+
 **Constat majeur de la phase 1 :** deux produits actuels partagent Python/Tkinter, tandis que Mon Bureau utilise .NET. Le socle de Trucabule ne peut donc pas se réduire à une bibliothèque graphique unique. Il faudra distinguer **code réutilisable dans une même pile**, **conventions transversales**, **contrats de données**, **design tokens**, **outillage**, et **bonnes pratiques de maintenance**. Ne pas traiter toutes ces couches comme si elles nécessitaient un framework commun.
 
 ### Phase 2 — comparaison élargie, explicitement différée
