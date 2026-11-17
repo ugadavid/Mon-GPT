@@ -1,0 +1,2 @@
+# Conserver les textes officiels et leurs espaces finaux, sans conversion Git.
+*.txt -text whitespace=-blank-at-eol,-blank-at-eof

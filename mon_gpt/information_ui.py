@@ -1,4 +1,4 @@
-"""Deux fenêtres d'information de l'application ; aucune mutation métier."""
+"""Fenêtres d'information de l'application ; aucune mutation métier."""
 import tkinter as tk
 from tkinter import ttk
 import webbrowser
@@ -76,9 +76,13 @@ class AboutWindow(InformationWindow):
 
 
 def open_information(app,kind):
-    attribute='help_window' if kind=='help' else 'about_window'
+    if kind=='credits':
+        from .credits_ui import CreditsWindow
+        factory=CreditsWindow
+    else:factory={'help':HelpWindow,'about':AboutWindow}[kind]
+    attribute={'help':'help_window','about':'about_window','credits':'credits_window'}[kind]
     window=getattr(app,attribute,None)
     if window is not None and window.winfo_exists():window.lift();window.focus_set();return window
-    window=HelpWindow(app) if kind=='help' else AboutWindow(app)
+    window=factory(app)
     setattr(app,attribute,window)
     return window

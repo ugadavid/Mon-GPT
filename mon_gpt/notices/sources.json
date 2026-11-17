@@ -1,0 +1,29 @@
+{
+  "verification": "2026-11-17",
+  "notices": [
+    {
+      "file": "python-3.13.17-windows.txt",
+      "provenance": "CPython 3.13.17 Windows : LICENSE.txt intégral ; licence source vérifiée comme préfixe.",
+      "source": "https://github.com/python/cpython/blob/v3.13.17/LICENSE",
+      "sha256_lf_utf8": "123fd50096f8b1fb09a3cc36c432f6edb75b2a052b457ff5ecf871fc77335077"
+    },
+    {
+      "file": "tcl-8.6.15.txt",
+      "provenance": "Tcl core-8-6-15 : license.terms intégral.",
+      "source": "https://github.com/tcltk/tcl/blob/core-8-6-15/license.terms",
+      "sha256_lf_utf8": "c0a69a2bfd757361ec7e6143973b103c90409316b49e9c88db26ad6388e79f16"
+    },
+    {
+      "file": "tk-8.6.15.txt",
+      "provenance": "Tk core-8-6-15 : license.terms intégral ; identique au texte installé.",
+      "source": "https://github.com/tcltk/tk/blob/core-8-6-15/license.terms",
+      "sha256_lf_utf8": "2cde822b93ca16ae535c954b7dfe658b4ad10df2a193628d1b358f1765e8b198"
+    },
+    {
+      "file": "pillow-13.0.0-windows.txt",
+      "provenance": "Pillow 13.0.0 Windows x64 CPython 3.13 : fichier de notices intégral de la wheel installée ; licence source vérifiée comme préfixe.",
+      "source": "https://github.com/python-pillow/Pillow/blob/13.0.0/LICENSE",
+      "sha256_lf_utf8": "6644596ba12c005c174b7a03d86c2ffe5f3fa7ecdf37d9aa8f71f3516e57c7a2"
+    }
+  ]
+}

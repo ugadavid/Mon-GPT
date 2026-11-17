@@ -122,6 +122,7 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         bar.add_cascade(label="Affichage", menu=view)
         help_menu = tk.Menu(bar, tearoff=False)
         help_menu.add_command(label="Gestes et raccourcis", command=self.help)
+        help_menu.add_command(label="Licences et crédits…",command=self.credits)
         help_menu.add_command(label="À propos de Mon GPT<3",command=self.about)
         bar.add_cascade(label="Aide", menu=help_menu)
         self.main_menu = MainMenuBar(self.root, [("Fichier", file), ("Édition", edit), ("Affichage", view), ("Aide", help_menu)])
@@ -470,6 +471,10 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
     def about(self):
         from .information_ui import open_information
         return open_information(self,'about')
+
+    def credits(self):
+        from .information_ui import open_information
+        return open_information(self,'credits')
 
     def focus_search(self):
         self.search_entry.focus_set()
