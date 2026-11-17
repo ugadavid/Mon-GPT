@@ -51,6 +51,12 @@ La question importante n'est pas « quel framework utilise-t-on aujourd'hui ? »
 6. **Conserver le découpage existant** entre cœur générique, adaptateur ChatGPT, stockage, interface Windows et extension Chrome. Pas de refonte prématurée ni de nouvelle couche de plugins.
 7. **Valider progressivement** toute éventuelle extraction/remplacement avec des tests et une recette, après une décision explicite. Ce dossier ne donne pas à Codex un GO pour modifier le code.
 
+## Première mission de revue — RT-001 (audit sans implémentation)
+
+**[RT-001 — Audit des licences et organisation d'un suivi permanent Trucabule](../../missions/RT-001_audit_licences_et_suivi_permanent_trucabule.md)** : examen des cinq dépôts codés, préparation des conventions pour Ma Capture, droits des sources/actifs/dépendances, comparaison des licences possibles, coûts et processus quotidien de vérification.
+
+**Aucune licence n'a encore été choisie ni appliquée aux six applications.** Le dossier d'audit ne donne pas de GO pour modifier leur code, leur visibilité, leurs dépendances ou leurs fichiers `LICENSE`. Les choix sont réservés à une décision ultérieure de l'auteur.
+
 ## Documents
 
 - **[01 — Inventaire des technologies et bibliothèques](01-inventaire-technologies.md)** : tableau simple, rôles, alternatives, liens officiels, premières hypothèses.
