@@ -170,7 +170,7 @@ class MosaicRenderer:
             if y+h<=0 or y>=height: continue
             selected=identity in self.pick.ids;hovered=identity==self.hovered
             fill=C["selection"] if selected else C["paper"]
-            rounded(self,x+1,y+1,x+w-1,y+h-1,9,fill=fill,outline=C["pine"] if selected or hovered else C["edge"],width=2 if selected and identity==self.focused and self.focus_get()==self else 1)
+            rounded(self,x+1,y+1,x+w-1,y+h-1,9,fill=fill,outline=C["pine"] if selected else C["muted"] if hovered else C["line"],width=2 if selected and identity==self.focused and self.focus_get()==self else 1)
             visual=data.get("visual");reference=visual.image if visual and visual.image else DEFAULTS["image"]
             picture=self.cover(reference,grid.image_width)
             ix=x+(w-grid.image_width)//2;iy=y+10
@@ -179,7 +179,7 @@ class MosaicRenderer:
             icon=self.icons.get(visual.icon if visual else None,visual.color if visual else None,20)
             self.create_image(x+22,ty+10,image=icon,tags=("identity",identity))
             for line_number,line in enumerate(self.mosaic_lines(identity,tw)):
-                self.create_text(tx,ty+line_number*20,text=line,anchor="nw",font=self.detail_title_font,fill=C["pine"],tags=("title",identity))
+                self.create_text(tx,ty+line_number*20,text=line,anchor="nw",font=self.detail_title_font,fill=C["ink"],tags=("title",identity))
             excerpts=self.excerpts(data)
             from .atelier import shorten
             for n,(key,label,text) in enumerate(excerpts):
