@@ -6,7 +6,7 @@
 
 ## Périmètre élargi : la famille d'applications Trucabule
 
-**Mon GPT<3 est notre premier terrain d'étude, pas la finalité unique.** Trucabule produit déjà plusieurs applications et pourrait rapidement en compter **une dizaine**. La multiplication de modules semblables, de conventions divergentes et de corrections dupliquées rendrait leur maintenance difficile.
+**Mon GPT<3 est notre premier terrain d'étude, pas la finalité unique.** **Phase 1 limitée à quatre productions Trucabule : Mon GPT<3, Ma Médiathèque, Mon Bureau et Ma Capture (encore au stade de projet).** Les trois premières permettent un audit de code ; la quatrième, une étude des besoins et de l'architecture envisagée. TRAME, atelier, dev-lab et réalisations du stage M2 au LIDILEM sont **reportés à une seconde phase**, après clarification des quatre premières. Trucabule pourrait rapidement compter **une dizaine d'applications**. La multiplication de modules semblables, de conventions divergentes et de corrections dupliquées rendrait leur maintenance difficile.
 
 **Notre véritable enjeu : construire progressivement une cohérence d'ensemble et du code réutilisable là où cela apporte un gain démontré**, sans forcer une bibliothèque unique pour Python/Tk, .NET et le Web. L'objectif est de comparer le **temps de développement, d'intégration et de maintenance à l'échelle de plusieurs applications**, pas seulement la taille du code de Mon GPT<3.
 
