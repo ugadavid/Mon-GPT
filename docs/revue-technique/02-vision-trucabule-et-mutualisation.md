@@ -23,9 +23,9 @@ Le risque n'est pas seulement une dépendance externe trop lourde : c'est de **r
 
 **Distinction capitale :** une application Python/Tk, une application .NET et une application Web peuvent partager **principes, conventions, schémas et design tokens**, mais pas forcément une même bibliothèque de widgets. La réutilisation effective doit être évaluée **par environnement technique**.
 
-## Périmètre décidé — phase 1 : les quatre productions Trucabule
+## Périmètre décidé — phase 1 : les six productions Trucabule
 
-**Décision de cadrage du 17 novembre 2026 : limiter la première comparaison à QUATRE produits Trucabule.** Ne pas élargir l'audit à d'autres dépôts sans nouvelle décision.
+**Décision de cadrage actualisée le 17 novembre 2026 : limiter la première comparaison à SIX productions Trucabule** — cinq applications avec code existant et Ma Capture, encore en conception. Ne pas élargir l'audit à d'autres dépôts sans nouvelle décision.
 
 | Produit | État à étudier | Source / constat vérifié | Question pour la mutualisation |
 | --- | --- | --- | --- |
@@ -33,12 +33,14 @@ Le risque n'est pas seulement une dépendance externe trop lourde : c'est de **r
 | **Ma Médiathèque** | Application Windows déjà distribuée en version alpha, avec installateur et ZIP | [Ma Médiathèque](https://github.com/ugadavid/ma-librarie) ; README consulté : Python/Tkinter, SQLite, Pillow, pypdf et emballage Windows | Quels composants Python/Tk/Pillow, comportements d'interface, sauvegardes, métadonnées et scripts de distribution sont similaires ou divergents de Mon GPT<3 ? |
 | **Mon Bureau** | Application Windows existante et distribuable | [Mon Bureau](https://github.com/ugadavid/mon-bureau) ; README consulté : **.NET** et installateur Windows, configuration JSON | Quels principes et contrats peuvent être communs **entre Python et .NET**, et quels composants doivent rester spécifiques à chaque technologie ? |
 | **Ma Capture** | **Projet de produit, pas application codée/achevée à ce stade** | Cahier de besoins et choix d'architecture **à retrouver et examiner avant toute affirmation technique** | Opportunité d'**anticiper** des composants communs, sans imposer une architecture définitive ni compter de code inexistant comme réutilisable |
+| **Chrome Organizer** | Application Windows en alpha, explorateur/sauvegarde et préparation de restauration ciblée | [Chrome Organizer](https://github.com/ugadavid/chrome-organizer) ; README et code consultés : **Python 3.13 + Tkinter**, lecture des sessions/favoris/profils Chrome, archives avec manifestes, empreintes SHA-256, exports JSON/HTML ; préparation de restauration sans restauration réelle validée | **Troisième application Python/Tk** : widgets, navigation, représentations arborescentes, export, validations et outillage de recette ; comparer sans généraliser ses contraintes propres à Chrome |
+| **Mon Aise** | Application Web privée existante, fiches personnelles et classement | [Mon Aise](https://github.com/ugadavid/mon-aise) ; README et `package.json` consultés : **React, TypeScript, Vinext**, hébergement Sites, données JSON serveur sur **R2**, versions ETag ; recherche par nom/surnom/catégories | Comparer les **contrats de fiches, formulaires, tags/catégories selon présence réelle, préférences, validations**, ainsi que les conventions d'UX sans prétendre partager du code Tk/React |
 
 **Important : comparer ce qui existe à ce qui est prévu sans les confondre.** Pour Ma Capture, recenser les choix et exigences documentés (capture, annotation, édition immédiate, fiches documentaires, archive, ergonomie), puis seulement dégager des besoins communs ; aucune estimation de réemploi de code tant qu'il n'existe pas.
 
 **Statut de Textothèque et Iconothèque :** ces deux projets existent, mais **leur rattachement à la galaxie Trucabule (ou à une autre) n'est pas décidé**. Ils **ne sont pas comptés comme productions Trucabule** et **ne font pas partie de la phase 1**. Leur éventuelle inclusion dans une comparaison future demandera une décision explicite ; ne pas les classer d'office en phase 2.
 
-**Constat majeur de la phase 1 :** deux produits actuels partagent Python/Tkinter, tandis que Mon Bureau utilise .NET. Le socle de Trucabule ne peut donc pas se réduire à une bibliothèque graphique unique. Il faudra distinguer **code réutilisable dans une même pile**, **conventions transversales**, **contrats de données**, **design tokens**, **outillage**, et **bonnes pratiques de maintenance**. Ne pas traiter toutes ces couches comme si elles nécessitaient un framework commun.
+**Constat majeur de la phase 1 :** **trois** applications existantes utilisent Python/Tkinter (Mon GPT<3, Ma Médiathèque, Chrome Organizer), **Mon Bureau** utilise .NET/WinForms, **Mon Aise** utilise React/TypeScript/Vinext sur le Web, et **Ma Capture** est en conception. Le socle de Trucabule ne peut donc pas se réduire à une bibliothèque graphique unique. Il faudra distinguer **code réutilisable dans une même pile**, **conventions transversales**, **contrats de données**, **design tokens**, **outillage**, et **bonnes pratiques de maintenance**. Ne pas traiter toutes ces couches comme si elles nécessitaient un framework commun.
 
 ### Phase 2 — comparaison élargie, explicitement différée
 
@@ -51,7 +53,7 @@ Le risque n'est pas seulement une dépendance externe trop lourde : c'est de **r
 
 Ces sources pourraient contenir des composants réutilisables, des idées d'architecture ou des solutions techniques déjà explorées. **Elles ne font pas partie de l'audit initial.** Ne pas les étudier ni préconiser leur intégration dans la phase 1.
 
-**Ordre voulu :** d'abord la carte des **quatre** productions Trucabule, puis un regard vers le reste du patrimoine logiciel pour éventuellement enrichir cette carte.
+**Ordre voulu :** d'abord la carte des **six** productions Trucabule, puis un regard vers le reste du patrimoine logiciel pour éventuellement enrichir cette carte.
 
 ## Méthode de revue envisagée
 
@@ -66,15 +68,15 @@ Ces sources pourraient contenir des composants réutilisables, des idées d'arch
 
 **Lecture et recommandations uniquement, pas de code nouveau :**
 
-- Cartographier les modules et dépendances directs/indirects des **trois applications existantes** de la phase 1, et **les fonctions concrètement utilisées** des bibliothèques tierces et standard ; relever séparément le cahier des charges de **Ma Capture**, sans inventer son implémentation.
+- Cartographier les modules et dépendances directs/indirects des **cinq applications existantes** de la phase 1, et **les fonctions concrètement utilisées** des bibliothèques tierces et standard ; relever séparément le cahier des charges de **Ma Capture**, sans inventer son implémentation.
 - Localiser les composants déjà maison (UI, sélection, identité, stockage, import, tests) ; distinguer les règles génériques du spécifique à ChatGPT.
-- Comparer explicitement **Mon GPT<3, Ma Médiathèque et Mon Bureau** ; pour **Ma Capture**, confronter uniquement les besoins et décisions documentés. Les autres projets (TRAME, atelier, dev-lab, LIDILEM) restent hors phase 1.
+- Comparer explicitement **Mon GPT<3, Ma Médiathèque, Mon Bureau, Chrome Organizer et Mon Aise** ; pour **Ma Capture**, confronter uniquement les besoins et décisions documentés. Les autres projets (TRAME, atelier, dev-lab, LIDILEM, Textothèque, Iconothèque) restent hors phase 1.
 - Estimer **l'effort d'extraction, la réécriture maison, l'intégration et la maintenance** en *fourchettes indicatives*, avec hypothèses et incertitude.
 - Proposer **Conserver / Encapsuler / Extraire / Écrire maison / Reporter**, avec avantages et risques. **Pas de refactorisation, publication de package ou changement d'architecture**.
 
 ### Étape C — Vue multi-dépôts éventuellement confiée à Work
 
-Utiliser une revue **en lecture seule**, éventuellement dans **Work sur l'environnement local** si les dépôts sont réellement accessibles : comparer les **quatre productions Trucabule décidées pour la phase 1**, leurs besoins, technologies, interfaces, patterns et processus de livraison, en distinguant les trois codes existants du projet Ma Capture.
+Utiliser une revue **en lecture seule**, éventuellement dans **Work sur l'environnement local** si les dépôts sont réellement accessibles : comparer les **six productions Trucabule décidées pour la phase 1**, leurs besoins, technologies, interfaces, patterns et processus de livraison, en distinguant les **cinq applications codées** du projet Ma Capture.
 
 **Work complète l'inventaire de Codex :** Codex peut approfondir le code d'un dépôt ; Work peut aider à rassembler les constats transversaux et une synthèse. L'accès aux projets locaux/VM doit être **vérifié dans le contexte d'exécution choisi**, pas supposé à partir de cette discussion.
 
@@ -101,15 +103,16 @@ Pour **chaque candidat** demander une fourchette argumentée (heures ou jours-pe
 - *Avec mutualisation* ≈ coût initial (étude + développement + tests) + **N × coût d'intégration** + maintenance commune.
 - *Sans mutualisation* ≈ somme des réalisations par application + maintenance de chacune.
 
-**Demander d'abord un scénario chiffré sur les trois applications existantes et le projet Ma Capture, puis des projections pour 5 et 10 applications**, et une indication du *point de rentabilité* éventuel. Les estimations doivent venir **après inspection réelle du code** : **ne pas inventer de délais** maintenant.
+**Demander d'abord un scénario chiffré sur les cinq applications existantes et les besoins prévus de Ma Capture, puis une projection pour 10 applications**, et une indication du *point de rentabilité* éventuel. Les estimations doivent venir **après inspection réelle du code** : **ne pas inventer de délais** maintenant.
 
 ## Premières pistes, ouvertes
 
-1. **Composants Tk maison** : il existe déjà dans Mon GPT<3 une interface complexe utilisant Canvas et ttk. Comparer ce qui pourrait servir à **d'autres applications Python/Tk** ; distinguer les dépendances graphiques et les modèles métier.
+1. **Composants Tk maison** : il existe déjà dans Mon GPT<3 une interface complexe utilisant Canvas et ttk. Comparer ce qui pourrait servir à **Ma Médiathèque et Chrome Organizer**, puis éventuellement à d'autres applications Python/Tk ; distinguer les dépendances graphiques et les modèles métier.
 2. **Services locaux** : préférences JSON, sauvegardes, contrôle de fichiers et galerie d'images pourraient partager des conventions ou modules. Examiner d'abord leurs contraintes de données et de compatibilité.
 3. **Contrats communs** : conventions de version, noms, documentation, rapports de recette et scripts de distribution pourraient fournir un fort réemploi même entre **technologies différentes**.
 4. **Pillow et autres bibliothèques** : mesurer le coût réel avant de proposer leur remplacement. *Trois appels publics à une bibliothèque ne signifient pas trois fonctions faciles à réécrire*, notamment pour les codecs d'images, métadonnées et erreurs.
-5. **Collecteur Chrome** : JavaScript natif et quelques modules déjà séparés. Étudier s'ils pourraient servir à d'autres collecteurs sans mélanger les particularités de chaque site.
+5. **Outils autour de Chrome** : Mon GPT Collector observe le DOM du navigateur, alors que Chrome Organizer lit et sauvegarde des profils locaux. Comparer les **contrats d'export, métadonnées de sessions et tests**, sans prétendre que les deux moteurs font la même chose.
+6. **Web et données côté serveur** : Mon Aise ouvre une piste de **conventions documentaires communes** avec les applications Windows (fiches, catégories, identifiants, versions), mais son runtime React/Vinext/R2 doit rester étudié comme une pile distincte.
 
 ## Principes de décision et état actuel
 
