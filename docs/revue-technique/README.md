@@ -3,6 +3,18 @@
 **Ouverture : 17 novembre 2026** · Application Windows **0.9.4** et Collector Chrome **0.8.2**.  
 **Nature : dossier de réflexion, pas une mission de développement.** Aucun changement de code ni migration n'est décidé ici.
 
+
+## Périmètre élargi : la famille d'applications Trucabule
+
+**Mon GPT<3 est notre premier terrain d'étude, pas la finalité unique.** Trucabule produit déjà plusieurs applications et pourrait rapidement en compter **une dizaine**. La multiplication de modules semblables, de conventions divergentes et de corrections dupliquées rendrait leur maintenance difficile.
+
+**Notre véritable enjeu : construire progressivement une cohérence d'ensemble et du code réutilisable là où cela apporte un gain démontré**, sans forcer une bibliothèque unique pour Python/Tk, .NET et le Web. L'objectif est de comparer le **temps de développement, d'intégration et de maintenance à l'échelle de plusieurs applications**, pas seulement la taille du code de Mon GPT<3.
+
+**Pour l'instant : exploration uniquement.** L'alpha de chaque application peut avancer avec son code propre ; nous étudierons les extractions possibles avant d'en décider la réalisation. La démarche est menée **d'abord à deux**, puis des audits factuels pourront être confiés à Codex et une comparaison multi-dépôts à Work en lecture seule.
+
+**[Lire la vision multi-applications et notre méthode d'estimation des coûts →](02-vision-trucabule-et-mutualisation.md)**
+
+
 ## Notre philosophie
 
 > La mode et la popularité d'une technologie ne constituent pas des critères de choix. Nous regardons d'abord ce dont **notre application** a besoin.
@@ -22,6 +34,7 @@ La question importante n'est pas « quel framework utilise-t-on aujourd'hui ? »
 ## Documents
 
 - **[01 — Inventaire des technologies et bibliothèques](01-inventaire-technologies.md)** : tableau simple, rôles, alternatives, liens officiels, premières hypothèses.
+- **[02 — Vision Trucabule et mutualisation](02-vision-trucabule-et-mutualisation.md)** : plusieurs applications, code et conventions communs, méthode d'étude, estimation en temps et répartition GPT / Codex / Work.
 - Les études suivantes pourront examiner le **graphe des dépendances**, les **API vraiment utilisées**, la taille des composants maison et la **pertinence d'une extraction/réécriture ciblée**.
 
 ## Questions pour chaque brique
