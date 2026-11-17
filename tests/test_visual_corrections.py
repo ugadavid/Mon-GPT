@@ -7,12 +7,11 @@ import tempfile
 import tkinter as tk
 import unittest
 from unittest.mock import Mock,patch
-from PIL import Image,ImageDraw,ImageTk,ImageColor
+from PIL import Image,ImageDraw,ImageTk
 from mon_gpt.chatgpt import ChatGPT
 from mon_gpt.core import Catalog
 from mon_gpt.identity import COVERS,ICONS,PALETTE,DEFAULTS,resolve_identity
 from mon_gpt.identity_ui import contained_picture
-from mon_gpt.theme import COLORS
 from mon_gpt.project_icons import icon_picture
 from mon_gpt.storage import Store,encode,decode,read_backup
 from mon_gpt.ui import App
@@ -139,7 +138,7 @@ class VisualCorrectionsTests(unittest.TestCase):
         portrait=contained_picture(self.store.images,refs[1],128,72)
         self.assertEqual(portrait.getpixel((64,0)),(255,0,0,255))
         self.assertEqual(portrait.getpixel((64,71)),(0,0,255,255))
-        self.assertEqual(portrait.getpixel((0,36)),(*ImageColor.getrgb(COLORS['ivory']),255))
+        self.assertEqual(portrait.getpixel((0,36)),(247,243,234,255))
         for dimensions in ((1360,820),(1000,680),(1800,900)):
             self.app.resize(*dimensions);self.app.ensure_inspector();self.root.update()
             header=self.app.masthead
