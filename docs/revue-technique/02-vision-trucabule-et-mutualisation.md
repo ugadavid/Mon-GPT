@@ -2,6 +2,14 @@
 
 **17 novembre 2026 — cadrage d'une étude, pas un développement.**
 
+## Règle de périmètre : des applications, pas des sites Internet
+
+**Trucabule ne produit que des applications. Sa seule exception est son propre site de présentation, trucabule.fr.** Un prototype temporairement servi par un Site, une URL ou un navigateur reste **un prototype d'application**, non un « produit site Web » de Trucabule.
+
+**Règle méthodologique :** pour chaque produit, documenter séparément **(1) l'implémentation constatée aujourd'hui**, **(2) la vocation applicative et les usages visés**, **(3) les choix techniques et la distribution encore ouverts**. Ne pas prendre une pile actuelle (Tkinter, .NET/Windows Forms, React/Vinext, etc.) pour un choix définitif sans décision explicite. La première revue compare des **besoins** ; elle ne conclut pas trop tôt à l'avenir des produits.
+
+**Mon Aise** est un prototype très précoce de l'application envisagée. **Aujourd'hui**, il utilise React/TypeScript/Vinext, un hébergement privé via Sites et des données JSON serveur R2. **À terme**, il est destiné à être une **application** ; le choix de sa forme, de sa plateforme et de sa distribution reste à étudier, sans présumer qu'il restera un site.
+
 ## Pourquoi nous faisons cette revue
 
 **Mon GPT<3 n'est pas un produit isolé : c'est une application d'un ensemble d'applications personnelles publiées sous la marque Trucabule.** D'autres applications existent déjà ou sont envisagées ; la famille pourrait atteindre rapidement **une dizaine d'applications**.
@@ -34,13 +42,13 @@ Le risque n'est pas seulement une dépendance externe trop lourde : c'est de **r
 | **Mon Bureau** | Application Windows existante et distribuable | [Mon Bureau](https://github.com/ugadavid/mon-bureau) ; README consulté : **.NET** et installateur Windows, configuration JSON | Quels principes et contrats peuvent être communs **entre Python et .NET**, et quels composants doivent rester spécifiques à chaque technologie ? |
 | **Ma Capture** | **Projet de produit, pas application codée/achevée à ce stade** | Cahier de besoins et choix d'architecture **à retrouver et examiner avant toute affirmation technique** | Opportunité d'**anticiper** des composants communs, sans imposer une architecture définitive ni compter de code inexistant comme réutilisable |
 | **Chrome Organizer** | Application Windows en alpha, explorateur/sauvegarde et préparation de restauration ciblée | [Chrome Organizer](https://github.com/ugadavid/chrome-organizer) ; README et code consultés : **Python 3.13 + Tkinter**, lecture des sessions/favoris/profils Chrome, archives avec manifestes, empreintes SHA-256, exports JSON/HTML ; préparation de restauration sans restauration réelle validée | **Troisième application Python/Tk** : widgets, navigation, représentations arborescentes, export, validations et outillage de recette ; comparer sans généraliser ses contraintes propres à Chrome |
-| **Mon Aise** | Application Web privée existante, fiches personnelles et classement | [Mon Aise](https://github.com/ugadavid/mon-aise) ; README et `package.json` consultés : **React, TypeScript, Vinext**, hébergement Sites, données JSON serveur sur **R2**, versions ETag ; recherche par nom/surnom/catégories | Comparer les **contrats de fiches, formulaires, tags/catégories selon présence réelle, préférences, validations**, ainsi que les conventions d'UX sans prétendre partager du code Tk/React |
+| **Mon Aise** | **Prototype applicatif très précoce**, actuellement accessible via un hébergement Web privé ; plateforme cible et distribution non définies | [Mon Aise](https://github.com/ugadavid/mon-aise) ; README et `package.json` consultés : **React, TypeScript, Vinext**, hébergement Sites, données JSON serveur sur **R2**, versions ETag ; recherche par nom/surnom/catégories | Comparer les **contrats de fiches, formulaires, tags/catégories selon présence réelle, préférences, validations**, ainsi que les conventions d'UX sans prétendre partager du code Tk/React |
 
 **Important : comparer ce qui existe à ce qui est prévu sans les confondre.** Pour Ma Capture, recenser les choix et exigences documentés (capture, annotation, édition immédiate, fiches documentaires, archive, ergonomie), puis seulement dégager des besoins communs ; aucune estimation de réemploi de code tant qu'il n'existe pas.
 
 **Statut de Textothèque et Iconothèque :** ces deux projets existent, mais **leur rattachement à la galaxie Trucabule (ou à une autre) n'est pas décidé**. Ils **ne sont pas comptés comme productions Trucabule** et **ne font pas partie de la phase 1**. Leur éventuelle inclusion dans une comparaison future demandera une décision explicite ; ne pas les classer d'office en phase 2.
 
-**Constat majeur de la phase 1 :** **trois** applications existantes utilisent Python/Tkinter (Mon GPT<3, Ma Médiathèque, Chrome Organizer), **Mon Bureau** utilise .NET/WinForms, **Mon Aise** utilise React/TypeScript/Vinext sur le Web, et **Ma Capture** est en conception. Le socle de Trucabule ne peut donc pas se réduire à une bibliothèque graphique unique. Il faudra distinguer **code réutilisable dans une même pile**, **conventions transversales**, **contrats de données**, **design tokens**, **outillage**, et **bonnes pratiques de maintenance**. Ne pas traiter toutes ces couches comme si elles nécessitaient un framework commun.
+**Photographie des technologies actuelles (pas des architectures définitives) :** **trois** applications existantes utilisent Python/Tkinter (Mon GPT<3, Ma Médiathèque, Chrome Organizer), **Mon Bureau** utilise .NET/WinForms, **Mon Aise** utilise React/TypeScript/Vinext sur le Web, et **Ma Capture** est en conception. Le socle de Trucabule ne peut donc pas se réduire à une bibliothèque graphique unique. Il faudra distinguer **code réutilisable dans une même pile**, **conventions transversales**, **contrats de données**, **design tokens**, **outillage**, et **bonnes pratiques de maintenance**. Ne pas traiter toutes ces couches comme si elles nécessitaient un framework commun.
 
 ### Phase 2 — comparaison élargie, explicitement différée
 
@@ -59,6 +67,7 @@ Ces sources pourraient contenir des composants réutilisables, des idées d'arch
 
 ### Étape A — Cadrage à deux (utilisateur + GPT)
 
+- Pour chaque production Trucabule, distinguer **réalisation actuelle / usage voulu / options techniques et distribution ouvertes**. L'état d'une alpha n'est pas le plan de la version finale.
 - Maintenir un tableau simple de ce qu'utilise réellement Mon GPT<3 : **technologie, modules, API appelées, raison du choix, alternatives, documentation**.
 - Définir les critères : **simplicité, autonomie, réemploi inter-applications, temps de développement, temps d'intégration, maintenance, capacité d'évolution**.
 - Distinguer **ce qui est certain**, **ce qui est une hypothèse**, **ce qui demande des mesures**.
@@ -112,7 +121,7 @@ Pour **chaque candidat** demander une fourchette argumentée (heures ou jours-pe
 3. **Contrats communs** : conventions de version, noms, documentation, rapports de recette et scripts de distribution pourraient fournir un fort réemploi même entre **technologies différentes**.
 4. **Pillow et autres bibliothèques** : mesurer le coût réel avant de proposer leur remplacement. *Trois appels publics à une bibliothèque ne signifient pas trois fonctions faciles à réécrire*, notamment pour les codecs d'images, métadonnées et erreurs.
 5. **Outils autour de Chrome** : Mon GPT Collector observe le DOM du navigateur, alors que Chrome Organizer lit et sauvegarde des profils locaux. Comparer les **contrats d'export, métadonnées de sessions et tests**, sans prétendre que les deux moteurs font la même chose.
-6. **Web et données côté serveur** : Mon Aise ouvre une piste de **conventions documentaires communes** avec les applications Windows (fiches, catégories, identifiants, versions), mais son runtime React/Vinext/R2 doit rester étudié comme une pile distincte.
+6. **Prototype Mon Aise et données côté serveur** : son code actuel ouvre une piste de **conventions documentaires communes** aux autres applications (fiches, catégories, identifiants, versions). React/Vinext/R2 n'est **qu'une implémentation à analyser**, pas une décision d'architecture finale. Son hébergement actuel ne transforme pas ce produit Trucabule en site Internet.
 
 ## Principes de décision et état actuel
 
