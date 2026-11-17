@@ -35,6 +35,7 @@ La question importante n'est pas « quel framework utilise-t-on aujourd'hui ? »
 
 - **[01 — Inventaire des technologies et bibliothèques](01-inventaire-technologies.md)** : tableau simple, rôles, alternatives, liens officiels, premières hypothèses.
 - **[02 — Vision Trucabule et mutualisation](02-vision-trucabule-et-mutualisation.md)** : plusieurs applications, code et conventions communs, méthode d'étude, estimation en temps et répartition GPT / Codex / Work.
+- **[03 — Première cartographie fonctionnelle des quatre produits](03-cartographie-fonctionnelle-trucabule.md)** : tableau des besoins présents/prévus, candidats possibles à la mutualisation et ordre d'étude, sans écrire de code.
 - Les études suivantes pourront examiner le **graphe des dépendances**, les **API vraiment utilisées**, la taille des composants maison et la **pertinence d'une extraction/réécriture ciblée**.
 
 ## Questions pour chaque brique
