@@ -1,0 +1,65 @@
+# MG-013a-01 — Addendum : habillage de l'application existante
+
+**17 novembre 2026 · Mon GPT<3 0.9.4 · Document soumis à David.**
+
+**MG-013a est reçu mais NON validé.** Sa proposition dépassait l'ambition souhaitée : recomposition des rangées, géométrie des cartes et plan de 7–11 jours. Ces pistes et les quatre lots associés sont retirés du périmètre proposé. Le présent addendum conserve le diagnostic et les références, mais remplace le plan par une passe courte de peinture. La [mission corrective](../../missions/MG-013a-01_relecture_graphique_strictement_cosmetique.md) prime en cas de divergence avec le [rapport initial](../MG-013a/rapport.md), conservé comme historique.
+
+**Le cap : embellir les composants à leur place actuelle.** Palette Atelier chaleureux, polices disponibles, pictogrammes, bordures, marges internes mesurées et états visuels. Les fonctions, leur emplacement, les données et les gestes sont acquis. Une idée exigeant une nouvelle structure, une nouvelle géométrie interactive ou une réécriture sera abandonnée dans cette passe.
+
+## 1. Ancien projet → objection → correction
+
+| Projet MG-013a | Objection retenue | Proposition corrigée |
+|---|---|---|
+| Recomposer les rangées du centre pour gagner de la hauteur | Déplace l'organisation validée. | Garder bandeau, recherche, filtres, commandes et résultats dans leurs zones et dans leur ordre. Affiner leurs styles sur place. |
+| Revoir le rapport image/texte et le rythme des cartes | Risque de reconstruire Détaillée/Mosaïque. | Peindre fonds, filets, textes et pictogrammes dans les gabarits actuels. Images, hauteurs, grille, extraits et zones cliquables conservés. |
+| Deux lignes de titre en Détaillée avec recalcul de hauteur/hit-tests | Transformation disproportionnée. | Retirer cette exigence. Conserver le titre actuel ; aucune modification des hauteurs ou hit-tests pour obtenir deux lignes. |
+| Corriger le compact par une nouvelle répartition de largeur | Les captures de stress ne justifient pas un nouvel automatisme. | Commencer la comparaison future par le réglage manuel des séparateurs et le repli existants. Aucun seuil, largeur automatique ou changement de Panedwindow. |
+| Rapprocher et restructurer l'ensemble des informations de fiche | Risque de confondre projet courant et élément sélectionné. | Préserver exactement leurs sources. Seul l'en-tête du panneau droit fait l'objet de la petite proposition décrite ci-dessous ; sections et actions restent acquises. |
+| Conserver trois boutons textuels de vues | Occasion manquée d'alléger la présentation. | Proposer trois icônes groupées au même emplacement, branchées sur les trois commandes actuelles. |
+| Quatre lots dépendants, campagnes multi-DPI et régressions larges | Coût sans rapport avec la peinture demandée. | Trois petits lots indépendants et réversibles, avec quelques interactions voisines et un arrêt humain chacun. Aucun chantier global de géométrie ou d'accessibilité. |
+
+## 2. Deux zones d'information, deux rôles conservés
+
+**Bandeau central : informations du projet courant sélectionné à gauche.** `App.update_identity()` transmet séparément `resolve_identity(...current, scope)` et le projet `scope` à `ContextMasthead.set_context()`. Ainsi, la couverture peut suivre un fil sélectionné tandis que description, catégories et tags restent ceux du projet. Cette subtilité est conservée ; aucun changement de priorité ou d'héritage dans `identity.py`.
+
+Le dessin actuel utilise une hauteur de 80 px, ou 112 px dans son cas compact avec informations. **Conserver les hauteurs et leur règle actuelle, sans aucune augmentation**, sans rangée supplémentaire ni décalage des résultats. Proposer des contrastes plus nets, libellés/pastilles moins encombrants et marges internes affinées dans l'espace existant, pour y rendre le maximum d'informations utiles lisibles. L'ellipse et `+N`, déjà employés par les composants, peuvent inspirer un traitement compact à soumettre ; aucun nouveau masquage ni perte d'accès aux valeurs complètes. Le projet reste consultable avec ses données complètes dans son inspecteur/éditeur existant. Si davantage d'informations ne tient pas dans cette enveloppe, conserver le comportement actuel.
+
+**Panneau droit : élément sélectionné.** `show_summary(identity)` fournit son enregistrement à `InspectorSummary` : projet si projet, discussion si discussion. `ProjectVisualStrip` conserve les visuels effectifs et l'héritage existants. La sélection multiple conserve son résumé de lot ; aucun élément conserve artificiellement la fiche d'une sélection précédente.
+
+Proposition locale : remplacer les deux étages « Aperçu / fermeture », puis titre réel, par **un en-tête portant directement le titre réel et sa fermeture discrète à droite**. Retirer seulement le libellé statique « Aperçu » et son espace superflu. La commande centrale qui affiche/masque le panneau reste à sa place ; fermeture, focus, actions, titre long, état sans sélection, notes et sections conservent leurs comportements. L'éditeur et ses emplacements restent organisés comme aujourd'hui. Si cette retouche exige de refaire le panneau, elle est abandonnée.
+
+Les captures 06–08 de MG-013a montrent surtout des proportions initiales contraignantes à 1000×680. Le code expose déjà les séparateurs manuels et le repli : les examiner dans la prochaine comparaison avant de conclure à un défaut de carte. **Aucun nouveau réglage automatique ni nouvelle persistance de proportions.** Aucun essai manuel supplémentaire n'est revendiqué dans cet addendum documentaire.
+
+## 3. Peinture proposée et références retenues
+
+Conserver ivoire `#F7F3EA`, sable `#E7D9C5`, sapin `#315E4F`, terracotta `#C87A50` et encre `#292D30`, via les tokens de `theme.py`. Renforcer la différence papier/fond, alléger les contours empilés, harmoniser l'épaisseur des pictogrammes et des filets. Garder Segoe UI ; privilégier graisse et contraste avant un agrandissement qui changerait les retours à la ligne. Marges et tailles de contrôles s'ajustent dans leurs zones actuelles, sans modifier les gabarits interactifs des résultats.
+
+La première maquette apporte la finesse des menus ; la troisième, les icônes et la sélection douce de la Liste. La deuxième apporte le confort des surfaces et surtout le langage du déplacement. Ces références servent au dessin, sans importer Favoris, Récents, boutons ou gestes supplémentaires.
+
+**Vues :** recommandation minimale, trois icônes groupées dans la zone actuelle : lignes pour Liste, vignette accompagnée de lignes pour Détaillée, grille pour Mosaïque. Mode courant marqué par un fond sauge et un contour distinct. Conserver `set_view`, les valeurs `list/detail/mosaic`, sélection, filtres, tri, raccourcis, persistance et accès clavier. Chaque icône conserve son nom français accessible et une infobulle disponible au survol/focus. Le menu Affichage garde ses libellés. Un choix déroulant unique reste une variante à arbitrer ; il n'est pas retenu par défaut car les trois contrôles existants demandent moins de changement. Si les icônes ne restent pas explicites/accessibles, garder les commandes textuelles habillées.
+
+**Glisser-déposer :** dans la maquette bibliothèque `11_51_54-2`, le cartouche suit visuellement le fil et la cible possède un contour pointillé, avec un petit signe de dépôt. Le code actuel possède déjà surbrillance de cible `drop/forbidden`, curseur, aide « Déposer dans… », statut avec quantité et menu de dépose droit. Peindre ces signaux existants : sauge/sapin pour autorisé, signe d'interdiction et contraste lisible pour refusé, menu papier fin et pictogrammes cohérents. Le « + » de la maquette ne doit jamais suggérer un ajout pendant un glisser gauche qui déplace. **Ne pas créer un fantôme mobile, une surcouche ou un nouvel état de drag pour imiter l'image.** Si le pointillé demande une nouvelle couche sur l'arbre Tk, conserver le surlignage actuel et en affiner les couleurs.
+
+Un fil ou un lot garde les mêmes gestes : gauche déplace, droite propose Déplacer/Ajouter/Annuler ; ajout = rattachement, aucun clone. `drop_target`, seuil de départ, choix de source, transactions, zones de dépôt et refus restent identiques. Aucun nouveau dialogue ni étape.
+
+## 4. Trois lots courts proposés, aucun lancé
+
+Ordre de présentation conseillé, **sans dépendance technique obligatoire**. Chaque lot peut être accepté, refusé ou annulé séparément. Estimations indicatives, recette ciblée comprise : environ deux à trois journées au total, sans engagement de réalisation. Si une retouche déborde vers une réécriture, réduire le lot plutôt qu'étendre le chantier.
+
+| Lot | Présentation seulement / zones à préserver | Avant → après envisagé | Vérification voisine et arrêt |
+|---|---|---|---|
+| **A — Surfaces et dessin**, ½–1 j | Retouches locales de tokens/styles/dessins existants : papier, filets, pastilles, pictogrammes, contraste et hover/focus. Réemploi de `theme.py`, `Surface`, `PillButton` et styles dédiés. Ne pas changer hauteurs/grille/colonnes des résultats, arborescence, commandes ni logique de fiche. Pas de nettoyage transversal des modules. | Mêmes écrans et mêmes proportions, contours plus fins, titres/repères mieux distingués ; menus et fenêtres Aide/Crédits raccordés par quelques styles, textes intacts. | Comparer un cadrage confortable des trois vues et une fiche ; cliquer titre puis ↗ simulé, vérifier focus et une fenêtre d'information si son style est touché. Une courte planche avant/après, puis validation David. |
+| **B — Présentation des commandes et informations**, ½–1 j | Trois icônes à la place des textes de vues ; seul en-tête de l'inspecteur simplifié ; finesse du bandeau dans sa hauteur actuelle. Points locaux de `ui.py`, `inspector.py`, `identity_ui.py`, sans réécrire `build_shell`, `set_view`, `show_summary`, résolution d'identité ou Panedwindow. | Dans leurs zones actuelles : vues immédiatement reconnaissables ; titre réel directement en tête à droite ; informations du projet mieux lisibles au centre. | Basculer les trois vues au clavier/souris avec une sélection et un filtre, relancer une fois pour la vue mémorisée ; sélectionner projet puis fil pour contrôler les deux sources d'information ; fermer/réafficher le panneau et retrouver le focus. Capture avant/après, hauteur du bandeau identique, puis arrêt. |
+| **C — Habillage du classement**, ½ j | Couleurs/signaux existants de dépôt et dessin du menu contextuel. Styles de `navigation.py`, `MenuSkin` et présentation des retours existants ; ne pas changer les branches fonctionnelles de `drag_press/motion/release`, `drop_target`, `batch.py` ou stockage. | Même geste et mêmes cibles, retour de destination plus agréable et menu papier inspiré de la deuxième maquette. | Sur jeu fictif : gauche d'un fil, droite d'un petit lot avec Ajouter, cible interdite et annulation ; vérifier les rattachements attendus sans clone. Capturer cible et menu, puis validation David. Distinguer tout geste physique non exercé d'un contrôle Tk. |
+
+Ces contrôles sont ciblés sur les surfaces touchées. Réutiliser un test existant de vue, d'inspecteur ou de geste si nécessaire ; **aucun nouveau test applicatif ou campagne générale n'est demandé ici**. Pas de répétition systématique des imports, sauvegardes, Collector ou matrice DPI. Un format compact reste un contrôle visuel de stress, après réglage manuel des volets, sans devenir une mission ergonomique.
+
+## 5. Sources relues, vérifications documentaires et arrêt
+
+Relus : `AGENTS.md`, [MG-011](../../docs/MG-011-navigation-et-informations.md), [mission Gestes MG-010b-01](../../missions/MG-010b-01_gestes_naturels_et_libelles.md), [rapport associé](../MG-010b-01/rapport.md), [MG-012](../MG-012/rapport.md), modules réels de thème, bandeau, inspecteur, navigation, commandes de vues et déplacement. Les trois maquettes et les neuf captures du [dossier MG-013a](../MG-013a/rapport.md) ont été réexaminées localement, sans copie ni modification. Les captures utilisateur complémentaires, dont « BHE - Semaine 3 », ne sont pas revendiquées comme vues : leurs descriptions dans la mission orientent cette correction.
+
+État initial propre à `1732196`, synchronisation en avance rapide vers `ab4db50` contenant la mission corrective. Seul le présent fichier est ajouté. Aucun lancement de l'application, modification de données, de code, de tests, d'images ou de `AGENTS.md`. Contrôles de publication : liens locaux, `git diff --check`, périmètre du commit, SHA distant et état propre.
+
+La consigne générale de tests avant publication d'`AGENTS.md` est connue. Cette mission documentaire demande explicitement **aucune batterie de tests et aucun nouveau test applicatif** : aucune suite Python/JS ni recette Windows n'est donc relancée. Les vérifications futures proposées ci-dessus restent limitées aux interactions voisines de la peinture.
+
+**MG-013a-01 documentaire — NO-GO refonte fonctionnelle et structurelle.** Les choix esthétiques de cet addendum restent soumis à David. Publication de ce seul addendum, puis STOP : aucun lot exécuté, aucune mission MG-013b créée ou lancée.
