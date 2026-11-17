@@ -4,6 +4,8 @@
 
 **Méthode :** faits relevés dans `requirements.txt`, `package.json`, `manifest.json` et le code ; les justifications comparatives sont **nos hypothèses d'analyse**, non des motivations historiques vérifiées. Ce tableau est volontairement simple et sera complété par une étude des API réellement appelées.
 
+**Portée de ce chapitre : Mon GPT<3 seulement.** L'étude Trucabule porte désormais sur **six produits** : Mon GPT<3, Ma Médiathèque, Mon Bureau, Chrome Organizer, Mon Aise et Ma Capture (en conception). Voir la [vision du portefeuille](02-vision-trucabule-et-mutualisation.md) et la [matrice fonctionnelle des six produits](03-cartographie-fonctionnelle-trucabule.md). Les dépendances des autres applications ne sont pas confondues avec celles de Mon GPT<3.
+
 ## Vue d'ensemble
 
 | Technologie | Usage constaté dans Mon GPT<3 | Pourquoi ce choix peut être pertinent plutôt que son voisin (à confirmer) | Alternative / question à examiner | Documentation officielle |
