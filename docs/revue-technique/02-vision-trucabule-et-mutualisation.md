@@ -10,6 +10,34 @@
 
 **Mon Aise** est un prototype très précoce de l'application envisagée. **Aujourd'hui**, il utilise React/TypeScript/Vinext, un hébergement privé via Sites et des données JSON serveur R2. **À terme**, il est destiné à être une **application** ; le choix de sa forme, de sa plateforme et de sa distribution reste à étudier, sans présumer qu'il restera un site.
 
+## Orientations de diffusion et réversibilité des choix techniques
+
+**Trucabule est un atelier de création d'applications Windows gratuites et open source.** Cette orientation désigne le **public visé et le modèle de diffusion souhaité** ; elle **ne doit pas être confondue avec la présence déjà vérifiée d'une licence libre dans chaque dépôt**. Seul le site institutionnel de Trucabule fait exception à la règle « uniquement des applications ».
+
+### Aujourd'hui : Windows d'abord
+
+- Fonctionner correctement sur Windows, avec installation, mise à jour, données locales et désinstallation maîtrisées ; mesurer les coûts réels de build et de support.
+- **Aucune dépendance payante imposée à l'utilisateur** ; examiner les licences des bibliothèques, composants graphiques, polices, icônes, assets, outils de build et leurs conditions de redistribution dans un produit gratuit/open source.
+- Les différences de technologies actuelles (Python/Tk, .NET/WinForms, React/Vinext) sont **des faits à étudier**, pas des normes Trucabule ni des décisions irréversibles.
+
+### Éventuellement demain : rendre le multiplateforme envisageable, pas obligatoire
+
+La référence de projets pouvant viser plusieurs plateformes (par exemple TRAME) motive **une vigilance à long terme**, pas l'entrée de leurs dépôts dans l'audit Trucabule initial. **Aucune date ni décision de portage n'est prise.**
+
+Pour chaque application et chaque brique candidate, relever les **dépendances explicites à Windows** et les distinguer du cœur fonctionnel : chemins, registre, API Win32/COM, shell, lancement de processus, interfaces natives, raccourcis, installation, chemins de données et formats d'échange. Ce sont des **points d'inventaire**, pas une exigence de les remplacer aujourd'hui.
+
+**Principe pragmatique :** garder autant que possible **les modèles métier, formats d'export, validations, tests et services indépendants de la plateforme** ; mettre les interactions système derrière des frontières claires lorsqu'elles existent réellement ; accepter du code Windows spécifique là où Windows est le besoin actuel. Éviter les abstractions artificielles et les portages préventifs.
+
+### Licences : point de vigilance à instruire
+
+Vérification GitHub de surface du **17 novembre 2026** : les racines des cinq dépôts comportant du code (**Mon GPT<3, Ma Médiathèque, Mon Bureau, Chrome Organizer, Mon Aise**) ne présentaient **aucun fichier nommé LICENSE, LICENCE ou COPYING**. Il faut examiner **les autres emplacements et les déclarations de licence éventuelles**, puis décider explicitement comment formaliser la publication open source. **Ne pas écrire dans le rapport que le code est juridiquement open source uniquement parce que le dépôt est public.** Les licences du code, des dépendances et des ressources doivent être vérifiées **au cas par cas**, sans inventer leurs obligations.
+
+**Pour toute technologie candidate, ajouter à l'analyse :**
+- **Licence et redistribution** : usage, modification, publication des sources/binaires, attribution, éventuelles obligations de publication et coût.
+- **Dépendances et packaging Windows** : exécutable autonome ou runtime, taille, mise à jour, contraintes de déploiement.
+- **Portabilité future** : parties réutilisables telles quelles, couches à remplacer, formats de données à conserver, effort indicatif pour une cible non-Windows encore inconnue.
+- **Coût actuel d'une préparation au portage** : ne faire ce travail aujourd'hui que s'il apporte aussi de la clarté, de la fiabilité ou du réemploi. Aucune architecture multiplateforme imposée aux versions alpha.
+
 ## Pourquoi nous faisons cette revue
 
 **Mon GPT<3 n'est pas un produit isolé : c'est une application d'un ensemble d'applications personnelles publiées sous la marque Trucabule.** D'autres applications existent déjà ou sont envisagées ; la famille pourrait atteindre rapidement **une dizaine d'applications**.
@@ -70,6 +98,7 @@ Ces sources pourraient contenir des composants réutilisables, des idées d'arch
 - Pour chaque production Trucabule, distinguer **réalisation actuelle / usage voulu / options techniques et distribution ouvertes**. L'état d'une alpha n'est pas le plan de la version finale.
 - Maintenir un tableau simple de ce qu'utilise réellement Mon GPT<3 : **technologie, modules, API appelées, raison du choix, alternatives, documentation**.
 - Définir les critères : **simplicité, autonomie, réemploi inter-applications, temps de développement, temps d'intégration, maintenance, capacité d'évolution**.
+- Intégrer **Windows prioritaire aujourd'hui**, **gratuité**, **licences open source vérifiables**, **distribution licite des composants**, et **préservation raisonnable d'une possibilité de portage futur** ; sans imposer le multiplateforme aujourd'hui.
 - Distinguer **ce qui est certain**, **ce qui est une hypothèse**, **ce qui demande des mesures**.
 - Conserver la règle : **aucune décision de migration ou de bibliothèque maison avant l'analyse**.
 
@@ -81,6 +110,7 @@ Ces sources pourraient contenir des composants réutilisables, des idées d'arch
 - Localiser les composants déjà maison (UI, sélection, identité, stockage, import, tests) ; distinguer les règles génériques du spécifique à ChatGPT.
 - Comparer explicitement **Mon GPT<3, Ma Médiathèque, Mon Bureau, Chrome Organizer et Mon Aise** ; pour **Ma Capture**, confronter uniquement les besoins et décisions documentés. Les autres projets (TRAME, atelier, dev-lab, LIDILEM, Textothèque, Iconothèque) restent hors phase 1.
 - Estimer **l'effort d'extraction, la réécriture maison, l'intégration et la maintenance** en *fourchettes indicatives*, avec hypothèses et incertitude.
+- Pour les dépendances trouvées, documenter leur **licence et modalités de redistribution**, les éventuelles obligations pour les paquets Windows/open source, les couplages Windows réels et le **coût supplémentaire probable d'un portage hypothétique** ; signaler toute vérification juridique ou technique encore impossible.
 - Proposer **Conserver / Encapsuler / Extraire / Écrire maison / Reporter**, avec avantages et risques. **Pas de refactorisation, publication de package ou changement d'architecture**.
 
 ### Étape C — Vue multi-dépôts éventuellement confiée à Work
@@ -105,6 +135,8 @@ Pour **chaque candidat** demander une fourchette argumentée (heures ou jours-pe
 | **Intégration par application** | adapter Mon GPT<3 puis chacune des autres applications concernées |
 | **Maintenance récurrente** | mises à jour, problèmes de compatibilité, corrections à répercuter |
 | **Coût évité** | ce qui n'aurait plus besoin d'être recopié, retesté ou corrigé N fois |
+| **Licence et conformité de diffusion** | vérification des licences, mentions, ressources incluses, conditions de redistribution gratuite/open source |
+| **Préparation raisonnable à un futur portage** | frontière code métier/système/GUI, effort de découplage maintenant comparé au coût de migration ultérieur |
 | **Incertitude** | hypothèses non vérifiées, difficulté de portage entre langages ou plateformes |
 
 **Formule de réflexion (pas une prévision chiffrée) :**
