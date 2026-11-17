@@ -31,7 +31,7 @@ class _NavigationBranch(ttk.Treeview):
     def __init__(self,parent):
         style=ttk.Style(parent)
         style.configure("Nav.Treeview",rowheight=34,indent=18,font=("Segoe UI",10),background=C["paper"],fieldbackground=C["paper"],foreground=C["ink"])
-        style.map("Nav.Treeview",background=[("selected","focus",C["selection"]),("selected",C["hover"])],foreground=[("selected",C["pine"])])
+        style.map("Nav.Treeview",background=[("selected","focus","#E0E7D5"),("selected","#E7ECDD")],foreground=[("selected",C["pine"])])
         super().__init__(parent,show="tree",selectmode="browse",style="Nav.Treeview",height=1)
         self.labels={}
         self.font=Font(self,font=("Segoe UI",10))
@@ -39,7 +39,7 @@ class _NavigationBranch(ttk.Treeview):
         self.tip_timer,self.tip=None,None
         self.hovered=None
         self.tag_configure("nav_root",font=("Segoe UI",10,"bold"))
-        self.tag_configure("nav_hover",background=C["hover"])
+        self.tag_configure("nav_hover",background="#F1F1E8")
         self.bind("<Configure>",lambda e:self.fit())
         self.bind("<<TreeviewOpen>>",lambda e:self.after_idle(self.fit),add="+")
         self.bind("<Motion>",self.motion)
