@@ -4,7 +4,7 @@ from tkinter import ttk
 from tkinter.font import Font
 from datetime import datetime
 from .atelier import PillButton, AutoScrollbar, rounded
-from .theme import COLORS as C, CATEGORY_COLORS, TAG_COLORS
+from .theme import COLORS as C
 
 
 class InspectorScrollbar(AutoScrollbar):
@@ -107,9 +107,9 @@ class InspectorBadges(tk.Canvas):
                 x,y,row_height=0,y+row_height+5,0
             item=self.create_text(x+8,y+4,text=value,font=self.font,anchor="nw",width=max(8,bw-16),fill=C["ink"])
             height=self.bbox(item)[3]-self.bbox(item)[1]+8
-            palette=CATEGORY_COLORS if self.category else TAG_COLORS
+            palette=["#DDE4CF","#EDD4C6","#E8DEBF","#D6E2D8"] if self.category else ["#F0E7DA","#E7DDE7","#E4E9DC","#EBDFD8"]
             color=palette[sum((i+1)*ord(c) for i,c in enumerate(value.casefold()))%len(palette)]
-            shape=rounded(self,x,y,x+bw,y+height,10,fill=color,outline=C["badge_edge"] if self.category else "")
+            shape=rounded(self,x,y,x+bw,y+height,10,fill=color,outline="#C6CBB7" if self.category else "")
             self.tag_lower(shape,item)
             row_height=max(row_height,height)
             x+=bw+5
@@ -152,15 +152,15 @@ class InspectorSummary(ttk.Frame):
         self.actions={}
         self.bind("<Configure>",self.fit)
         top=ttk.Frame(self,style="Paper.TFrame")
-        top.pack(fill="x",pady=(0,8))
+        top.pack(fill="x",pady=(0,10))
+        ttk.Label(top,text="Aperçu",style="PaperMuted.TLabel",font=("Segoe UI",10)).pack(side="left")
         InspectorAction(top,"close","Replier l’aperçu",close).pack(side="right")
         if record is None:
-            self.title=ttk.Label(top,text="Sélectionnez une fiche",style="Inspector.TLabel",font=("Segoe UI",15,"bold"),wraplength=220)
-            self.title.pack(side="left",fill="x",expand=True)
+            self.text("Sélectionnez une fiche",font=("Segoe UI",15,"bold"),color=C["pine"])
             self.text("Choisissez une discussion ou un projet dans la Liste.",muted=True)
             return
-        title=ttk.Frame(top,style="Paper.TFrame")
-        title.pack(side="left",fill="x",expand=True,padx=(0,8))
+        title=ttk.Frame(self,style="Paper.TFrame")
+        title.pack(fill="x")
         icon=tk.Canvas(title,width=24,height=26,background=C["paper"],highlightthickness=0)
         icon.pack(side="left",anchor="n",padx=(0,5))
         points=[3,18,3,6,9,6,12,9,21,9,21,18,3,18] if record.kind=="project" else [3,5,21,5,21,17,12,17,7,22,7,17,3,17,3,5]
@@ -196,7 +196,8 @@ class InspectorSummary(ttk.Frame):
         self.text(f"Créé le {fmt(record.created)}\nModifié le {fmt(record.modified)}",muted=True,pady=(10,0),font=("Segoe UI",8))
 
     def section(self,title):
-        ttk.Label(self,text=title,style="Caption.TLabel",font=("Segoe UI",10,"bold"),foreground=C["pine"],padding=(7,4),background=C["stripe"]).pack(fill="x",pady=(12,6))
+        ttk.Separator(self).pack(fill="x",pady=(9,7))
+        ttk.Label(self,text=title,style="Paper.TLabel",font=("Segoe UI",10,"bold")).pack(anchor="w",pady=(0,4))
 
     def text(self,value,muted=False,pady=0,font=("Segoe UI",10),color=None):
         label=ttk.Label(self,text=value,style="Paper.TLabel",font=font,foreground=color or C["muted" if muted else "ink"],wraplength=280,justify="left")
@@ -206,4 +207,4 @@ class InspectorSummary(ttk.Frame):
 
     def fit(self,event):
         for label in self.labels: label.configure(wraplength=max(40,event.width))
-        if hasattr(self,"title"): self.title.configure(wraplength=max(40,event.width-85))
+        if hasattr(self,"title"): self.title.configure(wraplength=max(40,event.width-29))
