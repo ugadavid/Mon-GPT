@@ -39,11 +39,11 @@ Les états ne sont **pas** des pourcentages de code réutilisable. Ils décriven
 
 ### Hypothèse 1 — Un socle d'interaction et d'interface Python/Tk
 
-**Mon GPT<3, Ma Médiathèque et Chrome Organizer** sont trois candidats à un rapprochement technique réel : navigation, tables, mosaïques, barres de filtres, panneaux de détails, galeries et dialogues. Il faudra examiner les **classes et appels existants**, la ressemblance exacte et les différences ergonomiques. Le bénéfice possible est une maintenance commune de composants déjà réalisés ; le risque est d'extraire prématurément un composant couplé aux besoins d'une seule application.
+**Mon GPT<3, Ma Médiathèque et Chrome Organizer** sont trois candidats à un rapprochement technique réel : navigation, listes, panneaux de détails et dialogues ; **les mosaïques et galeries sont à comparer uniquement là où elles existent effectivement**. Il faudra examiner les **classes et appels existants**, la ressemblance exacte et les différences ergonomiques. Le bénéfice possible est une maintenance commune de composants déjà réalisés ; le risque est d'extraire prématurément un composant couplé aux besoins d'une seule application.
 
 ### Hypothèse 2 — Services transversaux, sans bibliothèque unique
 
-**Mon GPT<3, Mon Bureau, Ma Médiathèque et Chrome Organizer** ont des besoins de persistance et de configuration, mais avec des stratégies variées (JSON, SQLite, archives locales). **Mon Aise** apporte le cas du JSON serveur R2 avec gestion des versions ETag. Une **convention commune** de versions, sauvegarde, export, restauration, emplacement des données et politique de mise à jour pourrait être plus utile qu'une bibliothèque exécutée par les trois technologies.
+**Mon GPT<3, Mon Bureau, Ma Médiathèque et Chrome Organizer** ont des besoins de persistance et de configuration, mais avec des stratégies variées (JSON, SQLite, archives locales). **Mon Aise** apporte le cas du JSON serveur R2 avec gestion des versions ETag. Une **convention commune** de versions, sauvegarde, export, restauration, emplacement des données et politique de mise à jour pourrait être plus utile qu'une bibliothèque exécutable commune à toutes ces piles.
 
 ### Hypothèse 3 — La distribution comme terrain de réemploi rapide
 
