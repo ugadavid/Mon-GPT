@@ -2,7 +2,7 @@
 
 **17 novembre 2026 — phase A, premier passage utilisateur + GPT. Lecture seule ; ce document ne lance aucune implémentation.**
 
-Cette cartographie part de **besoins fonctionnels**, pas d'une préférence pour Python, .NET ou un framework. Elle sert à repérer ce qu'il faudra **mesurer dans le code**, sans prétendre avoir déjà prouvé que des modules sont identiques.
+Cette cartographie part de **besoins fonctionnels**, pas d'une préférence pour Python, .NET ou un framework. **Règle de marque : Trucabule produit exclusivement des applications ; son propre site de présentation est la seule exception.** L'accès Web temporaire de Mon Aise n'en fait pas un « site » à la place d'une application. **Aucune pile observée dans une première alpha ne vaut choix de plateforme définitif.** Elle sert à repérer ce qu'il faudra **mesurer dans le code**, sans prétendre avoir déjà prouvé que des modules sont identiques.
 
 ## Sources et méthode
 
@@ -13,13 +13,13 @@ Cette cartographie part de **besoins fonctionnels**, pas d'une préférence pour
 - [Mon Aise — README](https://github.com/ugadavid/mon-aise/blob/main/README.md) et [package.json](https://github.com/ugadavid/mon-aise/blob/main/package.json), consultés pour les fiches Web, la persistance R2/JSON et la pile React/TypeScript/Vinext.
 - **Ma Capture** : projet en conception, **pas de code livré établi** à ce stade. Les exigences décrites dans les échanges (capture, annotation immédiate, fiche et classement documentaire) sont traitées comme des **besoins prévus**, à confronter ensuite au cahier des charges écrit.
 
-**Légende :** **Présent** = documenté pour l'application actuelle ; **Prévu** = besoin de conception, non développé ; **À vérifier** = non suffisamment établi par les sources examinées ; **—** = pas de besoin retenu à ce stade, pas une preuve d'absence.
+**Légende :** **Présent** = documenté pour l'application actuelle ; **Prévu** = besoin de conception, non développé ; **À vérifier** = non suffisamment établi par les sources examinées ; **—** = pas de besoin retenu à ce stade, pas une preuve d'absence. Les technologies et modes de diffusion indiquent **uniquement l'implémentation actuelle** ; les objectifs et options futures doivent être établis séparément.
 
 ## Matrice initiale
 
 | Famille / fonction | Mon GPT<3 | Ma Médiathèque | Mon Bureau | Chrome Organizer | Mon Aise | Ma Capture | Mutualisation à étudier |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| **Interface / plateforme** | Présent : Windows Python/Tk | Présent : Windows Python/Tk | Présent : Windows .NET/WinForms | Présent : Windows Python/Tk | Présent : Web privé React/TypeScript/Vinext | Prévu : Windows | Conventions communes ; widgets mutualisables surtout **dans la même pile** |
+| **Interface / plateforme** | Présent : Windows Python/Tk | Présent : Windows Python/Tk | Présent : Windows .NET/WinForms | Présent : Windows Python/Tk | Prototype actuel : React/TypeScript/Vinext via Sites ; **application cible, plateforme ouverte** | Prévu : Windows | Conventions communes ; widgets mutualisables surtout **dans la même pile** |
 | **Navigation et regroupement** | Arbre projets et périmètres | Bibliothèques, collections, dossiers sources | Épinglés, catégories, administration | Profils, fenêtres, sessions, favoris | Fiches et catégories | Prévu : bibliothèque de captures | Hiérarchie, focus, sélection, navigation, vocabulaire |
 | **Liste / grille / aperçu** | Liste, Détaillée, Mosaïque | Liste, Mosaïque, détails | Tuiles de lanceurs | Explorateur Tk de profils, favoris et sessions | Fiches consultables ; forme exacte à auditer | Prévu : archive et éditeur/aperçu | Composants Tk entre **trois** apps ; principes transversaux pour le Web |
 | **Fiches et métadonnées** | Résumé, notes, catégories, tags, rattachements | Titres, auteurs, formats, collections | Lanceurs, chemins, catégories, arguments | Profils, fenêtres, onglets, URL, groupes, provenance | Nom, surnoms 1/2, catégories multiples, dates nommées | Prévu : titre, description, tags, annotations | Formulaires, champs optionnels, identifiants, provenance et validation |
@@ -30,10 +30,10 @@ Cette cartographie part de **besoins fonctionnels**, pas d'une préférence pour
 | **Préférences / état UI** | `interface.json` | Modes et filtres mémorisés | Configuration JSON des lanceurs | Choix de sauvegardes et d'exploration ; détails à auditer | Catalogue JSON R2 ; préférences UI à vérifier | Prévu : besoins UX à documenter | Conventions d'état et de version, propres à chaque environnement |
 | **Import / export** | Collector JSON, sauvegarde ZIP | Inventaires et métadonnées ; exports à détailler | Configuration JSON, lanceurs | Export **JSON / HTML**, lecture d'archives, sélection de profils | **Export JSON** du catalogue | Prévu : archivage d'images et fiches | Contrats export, métadonnées, ergonomie ; chaque domaine garde son adaptateur |
 | **Sauvegarde / restauration** | ZIP du catalogue | À documenter précisément | À documenter précisément | Sauvegarde exhaustive vérifiable ; **préparation** de restauration, pas restauration réelle prouvée | Export de données ; restauration structurée à vérifier | À concevoir | Manifestes, vérification, séparer copie, intégrité et restauration |
-| **Distribution** | Pas encore d'installateur | ZIP portable + installateur Windows | Installateur Windows .NET | Archive de sources portable ; **Python/Tk requis**, pas exe autonome | Application Web privée hébergée sur Sites | Non construite | Modèles build et publication par plateforme ; convention de version |
+| **Distribution** | Pas encore d'installateur | ZIP portable + installateur Windows | Installateur Windows .NET | Archive de sources portable ; **Python/Tk requis**, pas exe autonome | Prototype hébergé actuellement via Sites ; **distribution applicative future à définir** | Non construite | Modèles build et publication par plateforme ; convention de version |
 | **Tests / recette** | unittest Python et tests JS Collector | Recettes/build documentés | Rapports et builds documentés | unittest, contrôles Tk et témoins synthétiques | TypeScript/build et recette de l'aperçu ; couverture automatisée à auditer | À prévoir | Gabarits de rapports, fixtures, critères de recette et traces fiables |
 
-Les états ne sont **pas** des pourcentages de code réutilisable. Ils décrivent seulement le premier niveau de besoin.
+Les états ne sont **pas** des pourcentages de code réutilisable. Ils décrivent seulement le premier niveau de besoin, **pas des technologies ou formats de produits arrêtés pour les versions futures**.
 
 ## Premières pistes à examiner (hypothèses, pas des conclusions)
 
@@ -47,15 +47,15 @@ Les états ne sont **pas** des pourcentages de code réutilisable. Ils décriven
 
 ### Hypothèse 3 — La distribution comme terrain de réemploi rapide
 
-Les solutions **ZIP portable et installateur** sont déjà documentées pour Ma Médiathèque ; Mon Bureau possède un installateur ; Chrome Organizer distribue une **archive portable de sources nécessitant Python/Tk**. Mon Aise est **hébergé sur le Web** et n'implique pas d'installateur Windows. Comparer leurs scripts et les besoins de Mon GPT<3 avant toute nouvelle fabrication. Un **modèle de build/recette** commun par pile est peut-être plus rentable qu'une abstraction de code.
+Les solutions **ZIP portable et installateur** sont déjà documentées pour Ma Médiathèque ; Mon Bureau possède un installateur ; Chrome Organizer distribue une **archive portable de sources nécessitant Python/Tk**. Le prototype de Mon Aise est **actuellement hébergé via Sites**, mais son mode de distribution applicatif à terme **n'est pas décidé**. Comparer leurs scripts et les besoins de Mon GPT<3 avant toute nouvelle fabrication. Un **modèle de build/recette** commun par pile est peut-être plus rentable qu'une abstraction de code.
 
 ### Hypothèse 4 — Ma Capture comme banc d'essai de conception
 
 Comme son architecture n'est pas encore figée, **Ma Capture** permet d'interroger le réemploi *avant* le développement (formulaires, galerie, annotations, métadonnées, sauvegardes). **Ne rien lui imposer** tant que les briques réelles des autres produits ne sont pas étudiées.
 
-### Hypothèse 5 — Contrats inter-piles et composants Web
+### Hypothèse 5 — Contrats inter-piles à partir du prototype actuel de Mon Aise
 
-**Mon Aise** permet d'étudier les correspondances entre fiches, catégories et recherche dans une application React/TypeScript/Vinext, face aux interfaces Windows. Le partage de **code graphique direct** avec Tk ou WinForms n'est pas acquis ; examiner plutôt les contrats de données, conventions d'interface et composants réutilisables au sein de la pile Web.
+**La réalisation actuelle de Mon Aise** permet d'étudier les fiches, catégories et la recherche implémentées en React/TypeScript/Vinext, en comparaison avec les applications Windows. Son ambition reste **une application**, sans engagement sur la plateforme ni le mode de distribution futurs. Le partage direct de code graphique avec Tk/WinForms n'est pas acquis ; comparer d'abord les **besoins et les contrats**, puis mesurer les possibilités réelles.
 
 ### Hypothèse 6 — Gestion de Chrome et des archives
 
