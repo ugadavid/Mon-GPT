@@ -149,27 +149,14 @@ class InspectorNotes(ttk.Frame):
         if self.button: self.button.configure(width=max(40,min(245,event.width)))
 
 
-class InspectorBlock(tk.Canvas):
-    """Un fond arrondi qui suit la largeur du volet et la hauteur du contenu."""
+class InspectorSection(tk.Frame):
+    """Une bande de papier avec un filet supérieur commun aux rubriques."""
     def __init__(self,parent,color):
-        super().__init__(parent,background=C["paper"],highlightthickness=0,width=1,height=52)
+        super().__init__(parent,background=color)
         self.color=color
+        tk.Frame(self,height=1,background=C["inspector_rule"]).pack(fill="x")
         self.body=tk.Frame(self,background=color)
-        self.window=self.create_window(9,6,anchor="nw",window=self.body)
-        self.bind("<Configure>",self.fit)
-        self.body.bind("<Configure>",self.fit_height)
-
-    def fit_height(self,event):
-        height=event.height+12
-        if int(self.cget("height"))!=height:
-            self.configure(height=height)
-
-    def fit(self,event):
-        self.itemconfigure(self.window,width=max(1,event.width-18))
-        self.delete("fond")
-        rounded(self,1,1,event.width-1,event.height-1,10,fill=self.color,
-                outline=C["inspector_rule"],tags="fond")
-        self.tag_lower("fond")
+        self.body.pack(fill="x",padx=7,pady=7)
 
 
 class InspectorSummary(ttk.Frame):
@@ -181,22 +168,26 @@ class InspectorSummary(ttk.Frame):
         self.section_index=0
         self.bind("<Configure>",self.fit)
         top=ttk.Frame(self,style="Paper.TFrame")
-        top.pack(fill="x",pady=(0,10))
+        top.pack(fill="x")
 
-        InspectorAction(top,"close","Replier l’aperçu",close).pack(side="right")
+        InspectorAction(top,"close","Replier l’aperçu",close).pack(side="right",anchor="n")
         if record is None:
             self.text("Sélectionnez une fiche",font=("Segoe UI",15,"bold"),color=C["pine"])
             self.text("Choisissez une discussion ou un projet dans la Liste.",muted=True)
             return
-        title=top
-        icon=tk.Canvas(title,width=24,height=26,background=C["paper"],highlightthickness=0)
+        title=ttk.Frame(top,style="Paper.TFrame")
+        title.pack(side="left",fill="x",expand=True)
+        title_font=("Segoe UI",15,"bold")
+        line_height=Font(title,font=title_font).metrics("linespace")+2
+        icon=tk.Canvas(title,width=24,height=line_height,background=C["paper"],highlightthickness=0)
         icon.pack(side="left",anchor="n",padx=(0,5))
         points=[3,18,3,6,9,6,12,9,21,9,21,18,3,18] if record.kind=="project" else [3,5,21,5,21,17,12,17,7,22,7,17,3,17,3,5]
         if title_icon:
-            icon.create_image(12,13,image=title_icon)
+            icon.create_image(12,line_height/2,image=title_icon)
         else:
-            icon.create_line(*points,fill=C["pine"],width=1.5,joinstyle="round")
-        self.title=ttk.Label(title,text=record.title,font=("Segoe UI",15,"bold"),foreground=C["ink"],style="Paper.TLabel",wraplength=230,justify="left")
+            mark=icon.create_line(*points,fill=C["pine"],width=1.5,joinstyle="round")
+            icon.move(mark,0,line_height/2-13)
+        self.title=ttk.Label(title,text=record.title,font=title_font,foreground=C["ink"],style="Paper.TLabel",wraplength=230,justify="left")
         self.title.pack(side="left",fill="x",expand=True)
         locations=record.projects if record.kind=="item" else ([record.parent] if record.parent else [])
         if len(locations)>1:
@@ -205,10 +196,11 @@ class InspectorSummary(ttk.Frame):
             context=project_label(locations[0])
         else:
             context="À classer" if record.kind=="item" else "À la racine"
-        self.text(context,
-                  color=C["pine"],pady=(2,8),font=("Segoe UI",11,"bold"))
+        context_label=self.text(context,muted=True,pady=(1,9))
+        context_label.pack_configure(padx=(29,0))
+        self.context_label=context_label
         self.visual_row=ttk.Frame(self,style="Paper.TFrame")
-        self.visual_row.pack(fill="x",pady=(0,4))
+        self.visual_row.pack(fill="x",pady=(0,9))
         row=self.action_row=ttk.Frame(self.visual_row,style="Paper.TFrame")
         row.pack(side="right")
         choices=[] if record.kind=="project" else [("open","Ouvrir le fil",open_thread),("copy","Copier le lien",copy_link)]
@@ -245,8 +237,8 @@ class InspectorSummary(ttk.Frame):
     def section(self,title):
         color=C["inspector_sage" if self.section_index%2 else "inspector_ivory"]
         self.section_index+=1
-        self.block=InspectorBlock(self,color)
-        self.block.pack(fill="x",pady=(4,0))
+        self.block=InspectorSection(self,color)
+        self.block.pack(fill="x")
         row=tk.Frame(self.block.body,background=color)
         row.pack(fill="x",pady=(0,1))
         icon=tk.Canvas(row,width=22,height=24,highlightthickness=0,background=color)
@@ -298,5 +290,5 @@ class InspectorSummary(ttk.Frame):
 
     def fit(self,event):
         for label in self.labels:
-            label.configure(wraplength=max(40,event.width-(48 if label.master!=self else 4)))
+            label.configure(wraplength=max(40,event.width-(48 if label.master!=self else 33 if label is getattr(self,"context_label",None) else 4)))
         if hasattr(self,"title"): self.title.configure(wraplength=max(40,event.width-72))
