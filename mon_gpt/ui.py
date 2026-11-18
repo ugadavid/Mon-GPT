@@ -56,6 +56,10 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         self.status = tk.StringVar(value=warning or "Prêt · sélectionnez une ligne ; ↗ ouvre le fil.")
         self.query, self.tag, self.category = tk.StringVar(), tk.StringVar(), tk.StringVar()
         self.sort = tk.StringVar(value="Manuel")
+        self.quick_click_tag=f"QuickDraftClick{root}"
+        root.bind_class(self.quick_click_tag,"<ButtonPress-1>",self.dismiss_quick_draft)
+        root.bind("<Map>",lambda e:self.tag_quick_click(e.widget),add="+")
+        self.tag_quick_click(root)
         self.build_menus()
         self.build_shell()
         self.bind_keys()
@@ -142,7 +146,7 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
 
     def update_view_buttons(self):
         for key,button in self.view_buttons.items():
-            button.tone="chip" if self.view.get()==key else "quiet"
+            button.tone="chip" if self.view.get()==key else "segment"
             button.draw()
         if self.view.get()=="detail":
             self.detail_sort_button.pack(side="right")
@@ -268,8 +272,9 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         self.search_entry.bind("<Return>",self.search_enter)
         self.search_entry.bind("<KeyRelease>",self.search_changed)
         self.search_entry.bind("<Down>",self.focus_suggestions)
-        self.mode_buttons_frame=ttk.Frame(line)
-        self.mode_buttons_frame.pack(side="right",padx=(6,0))
+        view_group=Surface(line,width=100,height=39,padding=3)
+        view_group.pack(side="right",padx=(30,0))
+        self.mode_buttons_frame=view_group.body
         self.search_filters=self.icon_button(line,"Filtres","\ue71c",lambda:self.show_suggestions(True))
         self.search_clear=self.icon_button(line,"Effacer les filtres","\ue75c",self.clear_filters)
         self.search_clear.pack(side="right")
@@ -352,7 +357,7 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         self.work_error=tk.StringVar()
         self.work_content=ttk.Frame(self.work,style="Paper.TFrame")
         self.work_content.pack(fill="x")
-        error_label=ttk.Label(self.work,textvariable=self.work_error,style="Error.TLabel",background=COLORS["paper"],wraplength=650)
+        self.work_error_label=error_label=ttk.Label(self.work,textvariable=self.work_error,style="Error.TLabel",background=COLORS["paper"],wraplength=650)
         self.work_error.trace_add("write",lambda *args:error_label.pack(anchor="w",pady=(6,0)) if self.work_error.get() else error_label.pack_forget())
         self.results_box=box=ttk.Frame(self.middle,padding=(3,3,3,8))
         box.pack(fill="both",expand=True)
@@ -855,12 +860,31 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
             self.results.hide_tip()
             self.results.tip_timer=self.results.after(450,lambda:self.results.show_open_tip(identity,event.y))
 
+    def tag_quick_click(self,widget):
+        # Un bindtag en tête voit aussi les boutons Canvas qui consomment le clic.
+        if isinstance(widget,tk.Misc) and self.quick_click_tag not in widget.bindtags():
+            widget.bindtags((self.quick_click_tag,*widget.bindtags()))
+
+    def dismiss_quick_draft(self,event):
+        draft=self.draft
+        if not draft or draft["kind"]!="item" or self.root.grab_current():
+            return
+        widget=event.widget
+        while widget!=self.root:
+            if widget==self.work or isinstance(widget,(tk.Menu,tk.Toplevel)) or widget is None:
+                return
+            widget=widget.master
+        # Laisser la cible recevoir son clic, même si refermer le formulaire
+        # déplace cette cible ou si son action ouvre un autre brouillon.
+        self.root.after_idle(lambda:self.clear_work() if self.draft is draft else None)
+
     def clear_work(self):
         for child in self.work_content.winfo_children():
             child.destroy()
         self.work_error.set("")
         self.draft = None
         self.work.pack_forget()
+        self.work_error_label.configure(foreground=COLORS["error"])
         if not self.quick_bar.winfo_manager():
             self.quick_bar.pack(side="bottom",fill="x",padx=3)
 
@@ -895,6 +919,7 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         self.draft = {"kind": "item", "parent": parent}
         self.quick_bar.pack_forget()
         self.work.pack(side="bottom",fill="x")
+        self.work_error_label.configure(foreground=COLORS["form_hint"])
         heading=ttk.Frame(self.work_content,style="Paper.TFrame")
         heading.pack(fill="x")
         ttk.Label(heading,text="Nouveau fil",style="WorkTitle.TLabel").pack(side="left")
@@ -912,8 +937,8 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         self.new_url.grid(row=1,column=1,sticky="ew",padx=(4,0))
         row=ttk.Frame(self.work_content,style="Paper.TFrame")
         row.pack(fill="x")
-        self.button(row,text="Ajouter le fil",style="Primary.TButton",command=self.submit_item).pack(side="right")
-        self.button(row,text="Annuler · Échap",command=self.clear_work).pack(side="left")
+        self.button(row,text="→ Ajouter",style="Chip.TButton",command=self.submit_item).pack(side="right")
+        self.button(row,text="Annuler · Échap",command=self.clear_work).pack(side="right",padx=(0,20))
         for entry in (self.new_title, self.new_url):
             entry.bind("<Return>", self.submit_item)
         self.root.update_idletasks()

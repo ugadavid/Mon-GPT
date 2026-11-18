@@ -56,7 +56,7 @@ class PillButton(tk.Canvas):
     def draw(self, event=None):
         self.delete("all")
         w, h = self.winfo_width(), self.winfo_height()
-        fills = {"primary": C["pine"], "warm": C["terracotta"], "chip": C["selection"], "quiet": C["paper"]}
+        fills = {"primary": C["pine"], "warm": C["terracotta"], "chip": C["selection"], "quiet": C["paper"], "segment": C["paper"]}
         fill = fills[self.tone]
         if self.hovered:
             fill = "#254C3F" if self.tone == "primary" else C["hover"]

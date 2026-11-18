@@ -4,7 +4,7 @@ from tkinter import ttk
 
 COLORS = {
     "ivory": "#FAF5F0", "sand": "#F4EBE2", "pine": "#326442",
-    "terracotta": "#BE7549", "ink": "#23282A", "line": "#E6DCD1",
+    "form_hint": "#905C45", "terracotta": "#BE7549", "ink": "#23282A", "line": "#E6DCD1",
     "muted": "#655F58", "selection": "#E8EDD4", "hover": "#F4EBDF",
     "link": "#884320", "error": "#923C2D", "invalid": "#F3D9CE",
     "paper": "#FCF8F4", "tag": "#E4EBDD", "category": "#F5E3D1",

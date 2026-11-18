@@ -74,14 +74,19 @@ class ContextMasthead(Masthead):
             self.configure(height=height)
         description,categories,tags=self.scope_info
         title,caption=getattr(self,"context",("", ""))
-        info_width=min(202,max(134,width//4)) if not compact else max(80,width-235)
-        text_x=width-info_width+4
-        # La couverture occupe l’espace entre la signature et la fiche projet.
         left=222
-        right=text_x-12 if not compact else width-5
-        art_height=height-4 if not compact else 51
-        art_width=min(520,max(0,right-left))
-        left+=max(0,(right-left-art_width)//2)
+        if compact:
+            info_width=max(80,width-235)
+            text_x=width-info_width+4
+            art_width=max(0,width-left-5)
+            art_height=51
+        else:
+            # L’image grandit moins vite que la colonne de texte. Au-delà de
+            # sa largeur utile, tout nouvel espace revient aux informations.
+            art_width=min(580,(width-left)*2//5)
+            art_height=height-4
+            text_x=left+art_width+18
+            info_width=width-text_x-6
         self.draw_cover(left,art_width,art_height)
         if compact:
             y=63
