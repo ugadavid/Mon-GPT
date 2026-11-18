@@ -201,8 +201,14 @@ class IdentityControl(tk.Canvas):
     def draw(self,event=None):
         self.delete("all")
         w,h=self.winfo_width(),self.winfo_height()
-        if self.command:
-            rounded(self,1,1,w-1,h-1,8,fill=C["paper"],outline=C["pine"] if self.focus_get()==self else C["line"],width=2 if self.focus_get()==self else 1)
+        # Les trois segments partagent un contour continu, avec un filet intérieur.
+        left=1 if self.kind=="image" else -9
+        right=w-1 if self.kind=="color" else w+9
+        rounded(self,left,1,right,h-1,9,fill=C["inspector_ivory"],outline=C["line"])
+        if self.kind!="image":
+            self.create_line(0,8,0,h-8,fill=C["line"])
+        if self.command and self.focus_get()==self:
+            rounded(self,1,1,w-1,h-1,8,fill="",outline=C["pine"],width=2)
         if self.picture: self.create_image(w/2,h/2,image=self.picture)
 
 
@@ -218,8 +224,8 @@ class ProjectVisualStrip(ttk.Frame):
         for kind in ("image","icon","color"):
             button=IdentityControl(self,kind,(lambda k=kind:choose(k)) if choose else None)
             if not choose:
-                button.configure(width=86 if kind=="image" else 31)
-            button.pack(side="left",padx=(0,7 if choose else 2))
+                button.configure(width=88 if kind=="image" else 34,height=51)
+            button.pack(side="left")
             self.buttons[kind]=button
             button.tip=ControlTip(button,lambda k=kind:self.control_name(k))
         self.refresh()

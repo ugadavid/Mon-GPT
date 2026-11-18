@@ -8,6 +8,8 @@ COLORS = {
     "muted": "#655F58", "selection": "#E8EDD4", "hover": "#F4EBDF",
     "link": "#884320", "error": "#923C2D", "invalid": "#F3D9CE",
     "paper": "#FCF8F4", "tag": "#E4EBDD", "category": "#F5E3D1",
+    "inspector_ivory": "#F9F3EA", "inspector_sage": "#F1F4EB",
+    "inspector_rule": "#E5E1D6",
     "stripe": "#F8F0E6", "shadow": "#EDE2D8", "leaf": "#789366",
 }
 FONT = ("Segoe UI", 11)

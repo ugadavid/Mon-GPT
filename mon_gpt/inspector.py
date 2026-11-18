@@ -92,7 +92,7 @@ class InspectorAction(PillButton):
 
 class InspectorBadges(tk.Canvas):
     def __init__(self,parent,values,category):
-        super().__init__(parent,height=28,highlightthickness=0,background=C["paper"])
+        super().__init__(parent,height=28,highlightthickness=0,background=parent.cget("background"))
         self.values,self.category=values,category
         self.font=Font(self,font=("Segoe UI",9))
         self.bind("<Configure>",self.draw)
@@ -120,12 +120,16 @@ class InspectorBadges(tk.Canvas):
 class InspectorNotes(ttk.Frame):
     def __init__(self,parent,value):
         super().__init__(parent,style="Paper.TFrame")
+        paper=parent.cget("background")
+        ttk.Style(self).configure("InspectorNotes.TFrame",background=paper)
+        self.configure(style="InspectorNotes.TFrame")
         self.value=value
         self.expanded=len(value)<=600
-        self.body=ttk.Label(self,text=value or "Aucune note",style="Paper.TLabel",font=("Segoe UI",10),foreground=C["ink"] if value else C["muted"],wraplength=280,justify="left")
+        self.body=ttk.Label(self,background=paper,text=value or "Aucune note",style="Paper.TLabel",font=("Segoe UI",10),foreground=C["ink"] if value else C["muted"],wraplength=280,justify="left")
         self.button=None
         if len(value)>600:
             self.button=PillButton(self,text="",command=self.toggle,height=27,width=245)
+            self.button.configure(background=paper)
             self.button.pack(anchor="w")
         self.bind("<Configure>",self.fit)
         self.render()
@@ -145,11 +149,36 @@ class InspectorNotes(ttk.Frame):
         if self.button: self.button.configure(width=max(40,min(245,event.width)))
 
 
+class InspectorBlock(tk.Canvas):
+    """Un fond arrondi qui suit la largeur du volet et la hauteur du contenu."""
+    def __init__(self,parent,color):
+        super().__init__(parent,background=C["paper"],highlightthickness=0,width=1,height=52)
+        self.color=color
+        self.body=tk.Frame(self,background=color)
+        self.window=self.create_window(9,6,anchor="nw",window=self.body)
+        self.bind("<Configure>",self.fit)
+        self.body.bind("<Configure>",self.fit_height)
+
+    def fit_height(self,event):
+        height=event.height+12
+        if int(self.cget("height"))!=height:
+            self.configure(height=height)
+
+    def fit(self,event):
+        self.itemconfigure(self.window,width=max(1,event.width-18))
+        self.delete("fond")
+        rounded(self,1,1,event.width-1,event.height-1,10,fill=self.color,
+                outline=C["inspector_rule"],tags="fond")
+        self.tag_lower("fond")
+
+
 class InspectorSummary(ttk.Frame):
     def __init__(self,parent,record,project_label,close,open_thread,copy_link,edit,title_icon=None):
         super().__init__(parent,style="Paper.TFrame")
         self.labels=[]
         self.actions={}
+        self.block=None
+        self.section_index=0
         self.bind("<Configure>",self.fit)
         top=ttk.Frame(self,style="Paper.TFrame")
         top.pack(fill="x",pady=(0,10))
@@ -196,11 +225,11 @@ class InspectorSummary(ttk.Frame):
         if not locations: self.text("À classer" if record.kind=="item" else "À la racine",muted=True)
         for label,values,category in [("Catégories",record.categories,True),("Tags",record.tags,False)]:
             self.section(label)
-            if values: InspectorBadges(self,values,category).pack(fill="x",padx=(28,0))
+            if values: InspectorBadges(self.block.body,values,category).pack(fill="x",padx=(25,0))
             else: self.text("Aucune catégorie" if category else "Aucun tag",muted=True)
         self.section("Notes")
-        self.notes=InspectorNotes(self,record.notes)
-        self.notes.pack(fill="x",padx=(28,0))
+        self.notes=InspectorNotes(self.block.body,record.notes)
+        self.notes.pack(fill="x",padx=(25,0))
         self.section("Informations")
         for key,value in record.metadata.items(): self.text(f"{key} : {value}",pady=(0,3))
         if not record.metadata: self.text("Aucune information personnalisée",muted=True)
@@ -214,22 +243,60 @@ class InspectorSummary(ttk.Frame):
         self.action_row.pack(side="top" if stacked else "right",anchor="w")
 
     def section(self,title):
-        symbols={"Description":"\ue70f","Résumé":"\ue70f","Emplacements":"\ue707","Catégories":"\ue8ec","Tags":"\ue168","Notes":"\ue8a5","Informations":"\ue946"}
-        self.section_started=True
-        tk.Frame(self,height=1,background=C["line"]).pack(fill="x",pady=(9,5))
-        row=tk.Frame(self,background=C["paper"])
-        row.pack(fill="x",pady=(0,2))
-        tk.Label(row,text=symbols[title],background=C["paper"],foreground=C["pine"],
-                 font=("Segoe MDL2 Assets",11)).pack(side="left",padx=(5,8),pady=4)
-        tk.Label(row,text=title,background=C["paper"],foreground=C["ink"],
+        color=C["inspector_sage" if self.section_index%2 else "inspector_ivory"]
+        self.section_index+=1
+        self.block=InspectorBlock(self,color)
+        self.block.pack(fill="x",pady=(4,0))
+        row=tk.Frame(self.block.body,background=color)
+        row.pack(fill="x",pady=(0,1))
+        icon=tk.Canvas(row,width=22,height=24,highlightthickness=0,background=color)
+        icon.pack(side="left",padx=(0,3))
+        self.section_icon(icon,title)
+        tk.Label(row,text=title,background=color,foreground=C["ink"],
                  font=("Segoe UI",11,"bold")).pack(side="left")
 
+    @staticmethod
+    def section_icon(canvas,title):
+        color=C["pine"]
+        def line(*points):
+            canvas.create_line(*points,fill=color,width=1.4,capstyle="round",joinstyle="round")
+
+        if title in ("Description","Résumé"):
+            line(4,18,5,14,15,4,18,7,8,17,4,18)
+            line(13,6,16,9)
+            line(4,20,17,20)
+        elif title=="Emplacements":
+            canvas.create_line(11,20,3,10,7,4,15,4,19,10,11,20,
+                               smooth=True,fill=color,width=1.5)
+            canvas.create_oval(9,7,13,11,outline=color)
+        elif title=="Catégories":
+            line(4,12,12,4,18,4,18,10,10,18,4,12)
+            canvas.create_oval(14,6,16,8,fill=color,outline="")
+        elif title=="Tags":
+            line(9,5,7,19)
+            line(15,5,13,19)
+            line(5,10,18,10)
+            line(4,15,17,15)
+        elif title=="Notes":
+            line(5,4,14,4,18,8,18,20,5,20,5,4)
+            line(13,4,13,9,18,9)
+            line(8,12,15,12)
+            line(8,16,14,16)
+        else:
+            canvas.create_oval(3,4,19,20,outline=color,width=1.4)
+            canvas.create_oval(10,7,12,9,fill=color,outline="")
+            line(11,12,11,16)
+
     def text(self,value,muted=False,pady=0,font=("Segoe UI",10),color=None):
-        label=ttk.Label(self,text=value,style="Paper.TLabel",font=font,foreground=color or C["muted" if muted else "ink"],wraplength=280,justify="left")
-        label.pack(fill="x",pady=pady,padx=(28,0) if getattr(self,"section_started",False) else 0)
+        parent=self.block.body if self.block is not None else self
+        background=self.block.color if self.block is not None else C["paper"]
+        label=ttk.Label(parent,text=value,style="Paper.TLabel",font=font,background=background,
+                        foreground=color or C["muted" if muted else "ink"],wraplength=240,justify="left")
+        label.pack(fill="x",pady=pady,padx=(25,0) if self.block is not None else 0)
         self.labels.append(label)
         return label
 
     def fit(self,event):
-        for label in self.labels: label.configure(wraplength=max(40,event.width-28))
+        for label in self.labels:
+            label.configure(wraplength=max(40,event.width-(48 if label.master!=self else 4)))
         if hasattr(self,"title"): self.title.configure(wraplength=max(40,event.width-72))
