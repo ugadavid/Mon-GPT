@@ -243,7 +243,7 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         self.panes.add(self.left,weight=0)
         self.panes.add(self.middle,weight=1)
         self.left.configure(width=252)
-        self.masthead=ContextMasthead(self.middle,self.store.images)
+        self.masthead=ContextMasthead(self.middle,self.store.images,lambda:self.inspector_visible)
         self.masthead.pack(fill="x",padx=4)
         self.search_area=search_area = ttk.Frame(self.middle, padding=(8, 4, 8, 6))
         search_area.pack(fill="x")

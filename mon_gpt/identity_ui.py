@@ -42,7 +42,8 @@ def choice_name(kind,value):
 
 
 class ContextMasthead(Masthead):
-    def __init__(self,parent,library):
+    def __init__(self,parent,library,inspector_visible):
+        self.inspector_visible=inspector_visible
         self.library,self.identity=library,None
         self.photo_key,self.photo=None,None
         self.scope_info=("",(),())
@@ -83,9 +84,14 @@ class ContextMasthead(Masthead):
         else:
             # L’image grandit moins vite que la colonne de texte. Au-delà de
             # sa largeur utile, tout nouvel espace revient aux informations.
-            art_width=min(580,(width-left)*2//5)
+            illustration_slot=min(580,(width-left)*2//5)
+            text_x=left+illustration_slot+18
+            # Prélever les deux marges dans l’espace de l’image conserve
+            # exactement la largeur de lecture acquise par le projet.
+            gutter=0 if self.inspector_visible() else min(32,(width-590)//12)
+            left+=gutter
+            art_width=illustration_slot-2*gutter
             art_height=height-4
-            text_x=left+art_width+18
             info_width=width-text_x-6
         self.draw_cover(left,art_width,art_height)
         if compact:
