@@ -149,7 +149,8 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
             button.tone="chip" if self.view.get()==key else "segment"
             button.draw()
         if self.view.get()=="detail":
-            self.detail_sort_controls.pack(side="right")
+            # Marge du cadre (3), gouttière (8) et retrait de la carte (5).
+            self.detail_sort_controls.pack(side="right",padx=(0,16),pady=(1,3))
         else:
             self.detail_sort_controls.pack_forget()
         if self.view.get()=="mosaic":
@@ -163,8 +164,8 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         caption="Tri" if narrow else self.sort_caption
         width=42 if narrow else self.mosaic_sort_button.font.measure(caption)+24
         self.mosaic_sort_button.configure(text=caption,width=width)
-        choice=BY_KEY[self.sort_column].label+(" ↓" if self.sort_reverse else " ↑")+"  ▾"
-        self.detail_sort_button.configure(text=choice,width=self.detail_sort_button.font.measure(choice)+24)
+        self.detail_sort_choice.set(BY_KEY[self.sort_column].label)
+        self.detail_sort_direction.configure(text="↓" if self.sort_reverse else "↑")
         self.mosaic_size_button.configure(text="Cartes · "+("Grand" if self.mosaic_size.get()=="large" else "Normal")+" ⌄")
 
     def mosaic_size_popup(self):
@@ -198,12 +199,17 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
             return self.context_menu(self.current,self.results.winfo_rootx()+int(x+width/2),self.results.winfo_rooty()+int(max(0,y)+30))
         return self.context_menu(self.current,self.results.winfo_rootx()+80,self.results.winfo_rooty()+80)
 
-    def detail_sort_popup(self,anchor=None):
+    def choose_detail_sort(self,event):
+        column=COLUMNS[self.detail_sort_choice.current()].key
+        if column!=self.sort_column:
+            self.sort_results(column)
+
+    def mosaic_sort_popup(self):
         menu=skin_menu(tk.Menu(self.root,tearoff=False))
         for key,label in ((c.key,c.label) for c in COLUMNS):
             menu.add_command(label=label+(" ↓" if self.sort_reverse else " ↑") if key==self.sort_column else label,command=lambda k=key:self.sort_results(k))
         self.active_menu=menu
-        button=anchor or self.detail_sort_button
+        button=self.mosaic_sort_button
         menu.tk_popup(button.winfo_rootx(),button.winfo_rooty()+button.winfo_height())
 
     def set_view(self,view):
@@ -348,12 +354,25 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
             self.view_buttons[key]=button
         self.detail_sort_controls=ttk.Frame(self.viewbar)
         ttk.Label(self.detail_sort_controls,text="Trier par :",foreground=COLORS["muted"]).pack(side="left",padx=(0,7))
-        self.detail_sort_button=self.button(self.detail_sort_controls,text="Titre ↑  ▾",command=self.detail_sort_popup,height=28)
-        self.detail_sort_button.pack(side="left")
+        choice_style="DetailSort.TCombobox"
+        style=ttk.Style(self.detail_sort_controls)
+        style.configure(choice_style,padding=(8,3),arrowsize=10,arrowcolor=COLORS["pine"],
+                        bordercolor=COLORS["line"],lightcolor=COLORS["paper"],darkcolor=COLORS["paper"])
+        style.map(choice_style,bordercolor=[("focus",COLORS["pine"])],
+                  selectbackground=[("readonly",COLORS["paper"])],selectforeground=[("readonly",COLORS["ink"])])
+        self.detail_sort_choice=ttk.Combobox(self.detail_sort_controls,name="detail_sort",state="readonly",style=choice_style,
+                                             values=[column.label for column in COLUMNS],width=12,font=FONT)
+        for option,color in (("background","paper"),("foreground","ink"),("selectBackground","selection"),("selectForeground","pine")):
+            self.root.option_add("*detail_sort*Listbox."+option,COLORS[color])
+        self.root.option_add("*detail_sort*Listbox.font",FONT)
+        self.detail_sort_choice.pack(side="left")
+        self.detail_sort_choice.bind("<<ComboboxSelected>>",self.choose_detail_sort)
+        self.detail_sort_direction=self.button(self.detail_sort_controls,text="↑",command=lambda:self.sort_results(self.sort_column),width=28,height=28)
+        self.detail_sort_direction.pack(side="left",padx=(4,0))
         self.mosaic_tools=ttk.Frame(self.viewbar)
         self.mosaic_size_button=self.button(self.mosaic_tools,text="Cartes · Normal ⌄",command=self.mosaic_size_popup,width=136,height=28)
         self.mosaic_size_button.pack(side="left")
-        self.mosaic_sort_button=self.button(self.mosaic_tools,text=self.sort_caption,command=lambda:self.detail_sort_popup(self.mosaic_sort_button),width=112,height=28)
+        self.mosaic_sort_button=self.button(self.mosaic_tools,text=self.sort_caption,command=self.mosaic_sort_popup,width=112,height=28)
         self.mosaic_sort_button.pack(side="right",padx=(5,0))
         self.viewbar.bind("<Configure>",self.layout_view_controls)
         self.update_view_buttons()
