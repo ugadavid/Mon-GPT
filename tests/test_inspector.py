@@ -32,6 +32,29 @@ class InspectorTests(unittest.TestCase):
         self.app.show_summary(identity,checked=True)
         self.root.update()
 
+    def test_explicit_click_on_current_project_restores_its_summary(self):
+        self.cat.attach(self.item.id,[self.project.id])
+        self.app.tree.selection_set(self.project.id)
+        self.root.update()
+        self.app.query.set("titre")
+        self.app.refresh_results()
+        self.app.results.selection_set(self.item.id)
+        self.root.update()
+        self.assertEqual(self.app.summary.context_label.cget("text"),self.project.title)
+        rows=self.app.results.get_children()
+        tree=self.app.tree.projects
+        x,y,w,h=tree.bbox(self.project.id)
+        for event in ("<ButtonPress-1>","<ButtonRelease-1>"):
+            tree.event_generate(event,x=x+w//2,y=y+h//2)
+            self.root.update()
+        self.assertEqual(self.app.current,self.project.id)
+        self.assertEqual(self.app.summary.title.cget("text"),self.project.title)
+        self.assertEqual(self.app.scope,self.project.id)
+        self.assertEqual(self.app.query.get(),"titre")
+        self.assertEqual(self.app.results.get_children(),rows)
+        self.assertFalse(hasattr(self.app.summary,"context_label"))
+        self.opener.assert_not_called()
+
     def test_three_actions_same_row_at_both_sizes_and_keyboard_callbacks(self):
         for width,height in [(1360,820),(1000,680)]:
             self.app.resize(width,height)
@@ -75,8 +98,10 @@ class InspectorTests(unittest.TestCase):
         self.show(self.project.id)
         self.assertEqual(set(self.app.summary.actions),{"edit"})
         text="\n".join(w.cget("text") for w in self.app.summary.labels)
-        for value in ("Pas de description","À la racine","Aucune catégorie","Aucun tag"):
+        for value in ("Pas de description","—","Aucune catégorie","Aucun tag"):
             self.assertIn(value,text)
+        self.assertFalse(hasattr(self.app.summary,"context_label"))
+        self.assertNotIn("À la racine",text)
         self.assertEqual(self.app.summary.notes.body.cget("text"),"Aucune note")
         self.opener.assert_not_called()
 

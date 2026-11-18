@@ -160,7 +160,7 @@ class InspectorSection(tk.Frame):
 
 
 class InspectorSummary(ttk.Frame):
-    def __init__(self,parent,record,project_label,close,open_thread,copy_link,edit,title_icon=None):
+    def __init__(self,parent,record,project_label,close,open_thread,copy_link,edit,title_icon,context_project,folder_icon):
         super().__init__(parent,style="Paper.TFrame")
         self.labels=[]
         self.actions={}
@@ -178,27 +178,37 @@ class InspectorSummary(ttk.Frame):
         title=ttk.Frame(top,style="Paper.TFrame")
         title.pack(side="left",fill="x",expand=True)
         title_font=("Segoe UI",15,"bold")
-        line_height=Font(title,font=title_font).metrics("linespace")+2
+        metrics=Font(title,font=title_font).metrics()
+        line_height=metrics["linespace"]+2
+        # Centrage optique sur les glyphes de la première ligne du libellé Tk.
+        center_y=(line_height+metrics["descent"])/2
         icon=tk.Canvas(title,width=24,height=line_height,background=C["paper"],highlightthickness=0)
         icon.pack(side="left",anchor="n",padx=(0,5))
         points=[3,18,3,6,9,6,12,9,21,9,21,18,3,18] if record.kind=="project" else [3,5,21,5,21,17,12,17,7,22,7,17,3,17,3,5]
         if title_icon:
-            icon.create_image(12,line_height/2,image=title_icon)
+            icon.create_image(12,center_y,image=title_icon)
         else:
             mark=icon.create_line(*points,fill=C["pine"],width=1.5,joinstyle="round")
-            icon.move(mark,0,line_height/2-13)
+            icon.move(mark,0,center_y-13)
         self.title=ttk.Label(title,text=record.title,font=title_font,foreground=C["ink"],style="Paper.TLabel",wraplength=230,justify="left")
         self.title.pack(side="left",fill="x",expand=True)
         locations=record.projects if record.kind=="item" else ([record.parent] if record.parent else [])
-        if len(locations)>1:
-            context=f"Discussion · {len(locations)} emplacement(s)"
-        elif locations:
-            context=project_label(locations[0])
+        if locations or record.kind=="item":
+            picture=folder_icon
+            if len(locations)==1:
+                context,picture=context_project(locations[0])
+            elif locations:
+                context=f"Discussion · {len(locations)} emplacement(s)"
+            else:
+                context="À classer"
+            row=ttk.Frame(self,style="Paper.TFrame")
+            row.pack(fill="x",padx=(10,0),pady=(2,8))
+            ttk.Label(row,image=picture,style="Paper.TLabel").pack(side="left",padx=(0,5))
+            self.context_label=ttk.Label(row,text=context,style="PaperMuted.TLabel",justify="left",wraplength=220)
+            self.context_label.pack(side="left",fill="x",expand=True)
+            self.labels.append(self.context_label)
         else:
-            context="À classer" if record.kind=="item" else "À la racine"
-        context_label=self.text(context,muted=True,pady=(1,9))
-        context_label.pack_configure(padx=(29,0))
-        self.context_label=context_label
+            top.pack_configure(pady=(0,7))
         self.visual_row=ttk.Frame(self,style="Paper.TFrame")
         self.visual_row.pack(fill="x",pady=(0,9))
         row=self.action_row=ttk.Frame(self.visual_row,style="Paper.TFrame")
@@ -214,7 +224,7 @@ class InspectorSummary(ttk.Frame):
         self.text(record.description or ("Pas de description" if record.kind=="project" else "Pas de résumé"),muted=not record.description)
         self.section("Emplacements")
         for pid in locations: self.text("▱  "+project_label(pid),muted=True,pady=(0,3))
-        if not locations: self.text("À classer" if record.kind=="item" else "À la racine",muted=True)
+        if not locations: self.text("À classer" if record.kind=="item" else "—",muted=True)
         for label,values,category in [("Catégories",record.categories,True),("Tags",record.tags,False)]:
             self.section(label)
             if values: InspectorBadges(self.block.body,values,category).pack(fill="x",padx=(25,0))
@@ -290,5 +300,5 @@ class InspectorSummary(ttk.Frame):
 
     def fit(self,event):
         for label in self.labels:
-            label.configure(wraplength=max(40,event.width-(48 if label.master!=self else 33 if label is getattr(self,"context_label",None) else 4)))
+            label.configure(wraplength=max(40,event.width-(48 if label.master!=self else 4)))
         if hasattr(self,"title"): self.title.configure(wraplength=max(40,event.width-72))

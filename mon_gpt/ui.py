@@ -744,9 +744,13 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
             child.destroy()
         record=self.cat.records.get(identity)
         visual=resolve_identity(self.cat,identity,self.scope)
+        def context_project(pid):
+            parent=self.cat.records[pid]
+            return parent.title,self.project_icons.for_project(parent,size=18)
+
         self.summary=InspectorSummary(self.editor,record,self.project_label,
             self.toggle_inspector,lambda:self.open_thread(identity),lambda:self.copy_link(identity),lambda:self.show_record(identity),
-            self.project_icons.get(visual.icon,visual.color,24))
+            self.project_icons.get(visual.icon,visual.color,24),context_project,self.project_icons.get(size=18))
         if record:
             base=inherited_identity(self.cat,record.id,self.scope)
             inherited={"image":base.image or DEFAULTS["image"],"icon":base.icon,"color":base.color} if record.kind=="item" else None
@@ -1256,6 +1260,14 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
                 else:self.drop_action(identity,target,"move",drag["origin"])
             return "break"
         if button==3:return self.context_menu(identity,event.x_root,event.y_root)
+        if (widget==self.tree and identity==drag["origin"]==self.scope and
+                identity in self.cat.records and target==identity and self.current!=identity):
+            # Seul un clic explicite terminé sur le projet courant reprend sa fiche.
+            # Les notifications de restauration et de rafraîchissement restent passives.
+            if self.can_leave():
+                self.results.selection_set(())
+                self.sync_group()
+                self.select_identity(identity,checked=True)
         if widget==self.results:
             if drag.get("open") and identity in self.cat.records and self.title_hit(event,identity):
                 self.results.pending_single=None;self.open_click(identity)
