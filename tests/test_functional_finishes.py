@@ -38,7 +38,10 @@ class FunctionalFinishesTests(unittest.TestCase):
                         box=self.table.bbox(item.id);tx,ty,tw,th=self.table.bbox(item.id,'title')
                         self.assertEqual(th,42)
                         self.assertEqual(self.table.identify_at(box[0]+10,box[1]+box[3]-3),item.id)
-                        if not labels:self.assertEqual(box[3],self.table.grid_layout().image_height+76)
+                        if not labels:
+                            drawn=set(self.table.find_withtag(item.id))
+                            self.assertTrue(drawn.intersection(self.table.find_withtag("context")))
+                            self.assertEqual(bool(drawn.intersection(self.table.find_withtag("dates"))),size=="large")
         self.assertEqual(encode(self.app.cat,self.app.adapter),snapshot);self.opener.assert_not_called()
 
     def test_scope_metadata_independent_of_thread_all_empty_and_compact(self):

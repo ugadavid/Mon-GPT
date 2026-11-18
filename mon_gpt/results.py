@@ -38,7 +38,10 @@ class ResultsView(MosaicRenderer,CatalogList):
 
     def card_extra(self,data):
         lines=len(self.excerpts(data));badges=bool(data.get('categories') or data.get('labels'))
-        return 16*lines+26*badges+10 if lines or badges else 0
+        large=self.mosaic_size=="large"
+        has_dates=any(data.get("cells",{}).get(key) for key in ("created","modified"))
+        excerpt_lines=2*lines if large else (2 if lines else 0)
+        return 20+17*excerpt_lines+26*badges+(40 if large and has_dates else 0)
 
     def insert(self,parent,index,iid,**kwargs):
         result=super().insert(parent,index,iid,**kwargs)
@@ -249,7 +252,10 @@ class ResultsView(MosaicRenderer,CatalogList):
 
     def set_mosaic_size(self,size):
         if size not in ("normal","large"): raise ValueError("Taille de cartes inconnue")
-        self.mosaic_size=size
+        if self.mosaic_size!=size:
+            self.mosaic_size=size
+            self.card_extras={identity:self.card_extra(data) for identity,data in self.rows.items()}
+            self.max_card_extra=max(self.card_extras.values(),default=0)
         if self.view=="mosaic":
             self.hide_tip();self.top=0;self.draw()
             if self.selected in self.rows: self.see(self.selected)

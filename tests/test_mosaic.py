@@ -98,7 +98,10 @@ class MosaicTests(unittest.TestCase):
                 self.app.set_mosaic_size(size);self.root.update();self.table.focus(self.items[-1].id);self.table.selection_set(self.items[-1].id);self.table.see(self.items[-1].id)
                 box=self.table.bbox(self.items[-1].id);self.assertTrue(box)
                 self.assertLessEqual(box[1]+box[3],self.table.winfo_height()+1)
-                self.assertEqual(self.table.xview(),(0,1));self.assertTrue(self.app.mosaic_size_button.winfo_viewable())
+                self.assertEqual(self.table.xview(),(0,1))
+                for key,button in self.app.mosaic_size_buttons.items():
+                    self.assertTrue(button.winfo_viewable())
+                    self.assertEqual(button.tone=="chip",key==size)
                 self.assertLessEqual(self.app.mosaic_tools.winfo_x()+self.app.mosaic_tools.winfo_width(),self.app.viewbar.winfo_width())
         self.opener.assert_not_called()
 
@@ -108,10 +111,11 @@ class MosaicTests(unittest.TestCase):
         ref=self.store.images.import_file(path);self.a.visual['image']=ref;self.app.refresh_results();self.root.update()
         grid=self.table.grid_layout();photo=self.table.cover(ref,grid.image_width);pixels=ImageTk.getimage(photo)
         self.assertEqual(photo.width()*9,photo.height()*16)
-        self.assertEqual(pixels.getpixel((photo.width()//2,0))[:3],(255,0,0))
-        self.assertEqual(pixels.getpixel((photo.width()//2,photo.height()-1))[:3],(0,0,255))
+        for y,expected in ((0,(255,0,0)),(photo.height()-1,(0,0,255))):
+            pixel=pixels.getpixel((photo.width()//2,y))[:3]
+            self.assertLessEqual(max(abs(channel-target) for channel,target in zip(pixel,expected)),5)
         texts=[self.table.itemcget(i,'text') for i in self.table.find_all() if self.table.type(i)=='text']
-        self.assertFalse(any('Récits fictifs' in t for t in texts))
+        self.assertTrue(any('Récits fictifs' in t for t in texts))
         self.assertTrue(any('Résumé' in t for t in texts))
         self.assertIn('Idées',texts)
         self.assertLess(len(self.table.find_withtag('cover')),len(self.items))

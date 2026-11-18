@@ -77,7 +77,15 @@ class IconButton(PillButton):
 
     def draw_caption(self,x,y):
         color=C["pine"]
-        if self.glyph=="eye":
+        if self.glyph in ("small_grid","large_grid"):
+            count=3 if self.glyph=="small_grid" else 2
+            step=18/count
+            for row in range(count):
+                for col in range(count):
+                    left=x-8+col*step
+                    top=y-8+row*step
+                    self.create_rectangle(left,top,left+step-3,top+step-3,outline=color)
+        elif self.glyph=="eye":
             self.create_line(x-9,y,x,y-7,x+9,y,x,y+7,x-9,y,smooth=True,fill=color,width=1.5)
             self.create_oval(x-2.5,y-2.5,x+2.5,y+2.5,outline=color,width=1.5)
         elif self.glyph=="dots":

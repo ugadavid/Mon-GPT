@@ -44,7 +44,6 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         self.restoring_workspace=True
         self.view=tk.StringVar(value=preferences.get("view","list"))
         self.mosaic_size=tk.StringVar(value=preferences.get("mosaic_size","normal"))
-        self.sort_caption="Tri · Titre ↑"
         apply_theme(root)
         self.icons = make_icons(root)
         self.project_icons=ProjectIconCache(root)
@@ -148,33 +147,28 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         for key,button in self.view_buttons.items():
             button.tone="chip" if self.view.get()==key else "segment"
             button.draw()
-        if self.view.get()=="detail":
+        if self.view.get() in ("detail","mosaic"):
             # Marge du cadre (3), gouttière (8) et retrait de la carte (5).
             self.detail_sort_controls.pack(side="right",padx=(0,16),pady=(1,3))
         else:
             self.detail_sort_controls.pack_forget()
         if self.view.get()=="mosaic":
-            self.mosaic_tools.pack(side="right")
+            self.mosaic_tools.pack(side="right",padx=(0,12))
         else:
             self.mosaic_tools.pack_forget()
         self.layout_view_controls()
 
     def layout_view_controls(self,event=None):
-        narrow=self.viewbar.winfo_width()<410
-        caption="Tri" if narrow else self.sort_caption
-        width=42 if narrow else self.mosaic_sort_button.font.measure(caption)+24
-        self.mosaic_sort_button.configure(text=caption,width=width)
         self.detail_sort_choice.set(BY_KEY[self.sort_column].label)
         self.detail_sort_direction.configure(text="↓" if self.sort_reverse else "↑")
-        self.mosaic_size_button.configure(text="Cartes · "+("Grand" if self.mosaic_size.get()=="large" else "Normal")+" ⌄")
-
-    def mosaic_size_popup(self):
-        menu=skin_menu(tk.Menu(self.root,tearoff=False))
-        for value,label in (("normal","Normal"),("large","Grand")):
-            menu.add_command(label=label+(" · actuel" if self.mosaic_size.get()==value else ""),command=lambda v=value:self.set_mosaic_size(v))
-        self.active_menu=menu
-        button=self.mosaic_size_button
-        menu.tk_popup(button.winfo_rootx(),button.winfo_rooty()+button.winfo_height())
+        if self.view.get()=="mosaic":
+            for size,button in self.mosaic_size_buttons.items():
+                button.tone="chip" if self.mosaic_size.get()==size else "segment"
+                button.draw()
+            if hasattr(self,"results"):
+                grid=self.results.grid_layout()
+                right=grid.box(grid.columns-1)[0]+grid.card_width
+                self.detail_sort_controls.pack_configure(padx=(0,11+max(0,grid.width-right)))
 
     def set_mosaic_size(self,size):
         if size not in ("normal","large"): return
@@ -203,14 +197,6 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         column=COLUMNS[self.detail_sort_choice.current()].key
         if column!=self.sort_column:
             self.sort_results(column)
-
-    def mosaic_sort_popup(self):
-        menu=skin_menu(tk.Menu(self.root,tearoff=False))
-        for key,label in ((c.key,c.label) for c in COLUMNS):
-            menu.add_command(label=label+(" ↓" if self.sort_reverse else " ↑") if key==self.sort_column else label,command=lambda k=key:self.sort_results(k))
-        self.active_menu=menu
-        button=self.mosaic_sort_button
-        menu.tk_popup(button.winfo_rootx(),button.winfo_rooty()+button.winfo_height())
 
     def set_view(self,view):
         if view not in ui_state.VIEWS or view==self.view.get(): return
@@ -370,10 +356,11 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         self.detail_sort_direction=self.button(self.detail_sort_controls,text="↑",command=lambda:self.sort_results(self.sort_column),width=28,height=28)
         self.detail_sort_direction.pack(side="left",padx=(4,0))
         self.mosaic_tools=ttk.Frame(self.viewbar)
-        self.mosaic_size_button=self.button(self.mosaic_tools,text="Cartes · Normal ⌄",command=self.mosaic_size_popup,width=136,height=28)
-        self.mosaic_size_button.pack(side="left")
-        self.mosaic_sort_button=self.button(self.mosaic_tools,text=self.sort_caption,command=self.mosaic_sort_popup,width=112,height=28)
-        self.mosaic_sort_button.pack(side="right",padx=(5,0))
+        self.mosaic_size_buttons={}
+        for size,label,glyph in (("normal","Cartes petites","small_grid"),("large","Cartes grandes","large_grid")):
+            button=self.icon_button(self.mosaic_tools,label,glyph,lambda value=size:self.set_mosaic_size(value),width=30)
+            button.pack(side="left")
+            self.mosaic_size_buttons[size]=button
         self.viewbar.bind("<Configure>",self.layout_view_controls)
         self.update_view_buttons()
         self.work=ttk.Frame(self.middle,padding=12,style="Paper.TFrame")
@@ -385,6 +372,7 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         self.results_box=box=ttk.Frame(self.middle,padding=(3,3,3,8))
         box.pack(fill="both",expand=True)
         self.results=ResultsView(box,self.store.images,self.project_icons,self.view.get(),self.mosaic_size.get())
+        self.results.bind("<Configure>",lambda e:self.layout_view_controls() if self.view.get()=="mosaic" else None,add="+")
         self.results.heading("#0",text="")
         self.results.column("#0",width=32,minwidth=32,stretch=False)
         for c in COLUMNS:
@@ -704,8 +692,6 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
         self.persist_columns()
 
     def update_sort_caption(self):
-        self.sort_caption="Tri · "+BY_KEY[self.sort_column].label+(" ↓" if self.sort_reverse else " ↑")
-        self.mosaic_sort_button.configure(text=self.sort_caption)
         self.layout_view_controls()
 
     def select_record(self, event=None):

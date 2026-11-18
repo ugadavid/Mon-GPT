@@ -2,7 +2,8 @@
 from dataclasses import dataclass
 import math
 import tkinter as tk
-from .atelier import rounded
+from .atelier import rounded, shorten
+from .list_columns import display_date
 from .identity import DEFAULTS
 from .theme import COLORS as C
 
@@ -29,7 +30,7 @@ class GridLayout:
 
     @property
     def image_width(self):
-        width=max(16,((self.card_width-20)//16)*16)
+        width=min(128 if self.size=="large" else 96,max(16,((self.card_width-20)//16)*16))
         return min(width,max(16,(self.image_limit//9)*16)) if self.image_limit is not None else width
 
     @property
@@ -93,7 +94,6 @@ class MosaicRenderer:
         for i,word in enumerate(words):
             candidate=(line+" "+word).strip()
             if font.measure(candidate)>width:
-                from .atelier import shorten
                 lines.append(line or shorten(font,word,width))
                 remainder=" ".join(([word] if line else [])+words[i+1:])
                 lines.append(shorten(font,remainder,width))
@@ -178,18 +178,35 @@ class MosaicRenderer:
             tx,ty,tw,_=self.mosaic_bbox(identity,"title")
             icon=self.icons.get(visual.icon if visual else None,visual.color if visual else None,20)
             self.create_image(x+22,ty+10,image=icon,tags=("identity",identity))
-            for line_number,line in enumerate(self.mosaic_lines(identity,tw)):
+            title_lines=self.mosaic_lines(identity,tw)
+            for line_number,line in enumerate(title_lines):
                 self.create_text(tx,ty+line_number*20,text=line,anchor="nw",font=self.detail_title_font,fill=C["ink"],tags=("title",identity))
+            cy=ty+max(1,len(title_lines))*20+5
             excerpts=self.excerpts(data)
-            from .atelier import shorten
-            for n,(key,label,text) in enumerate(excerpts):
-                self.create_text(x+12,ty+46+n*16,text=shorten(self.small_font,label+' : '+text,w-24),anchor='nw',font=self.small_font,fill=C['muted'],tags=(key,identity))
+            for key,label,text in excerpts:
+                caption=f"{label} : {text}"
+                lines=self.summary_lines(caption,w-24) if grid.size=="large" or len(excerpts)==1 else [shorten(self.small_font,caption,w-24)]
+                for line in lines:
+                    self.create_text(x+12,cy,text=line,anchor="nw",font=self.small_font,fill=C["ink"] if key=="summary" else C["muted"],tags=(key,identity))
+                    cy+=17
+            self.create_text(x+12,cy+2,text=shorten(self.small_font,"↳ "+data["values"][1],w-24),anchor="nw",font=self.small_font,fill=C["pine"],tags=("context",identity))
+            cy+=23
             cats,tags=data.get('categories',[]),data.get('labels',[])
             if cats or tags:
-                badge_width=w-24;cat_width=min(badge_width*.55,sum(self.small_font.measure(t)+21 for t in cats)+6) if cats else 0
-                cy=ty+46+len(excerpts)*16+16
-                self.draw_badges(cats,x+12,cy,cat_width,True)
-                self.draw_badges(tags,x+12+cat_width,cy,badge_width-cat_width,False)
+                badge_width=w-24
+                tag_space=min(badge_width*.45,sum(self.small_font.measure(t)+21 for t in tags)+6) if tags else 0
+                cat_width=min(badge_width-tag_space,sum(self.small_font.measure(t)+21 for t in cats)+6) if cats else 0
+                self.draw_badges(cats,x+12,cy+11,cat_width,True)
+                self.draw_badges(tags,x+12+cat_width,cy+11,badge_width-cat_width,False)
+            if grid.size=="large":
+                dates=[f"{label} · {display_date(data['cells'][key]).split()[0]}" for key,label in (("created","Créé"),("modified","Modifié")) if data.get("cells",{}).get(key)]
+                if dates:
+                    joined="     ".join(dates)
+                    lines=[joined] if self.detail_date_font.measure(joined)<=w-24 else dates
+                    footer=y+h-9-16*len(lines)
+                    self.create_line(x+12,footer-4,x+w-12,footer-4,fill=C["line"])
+                    for n,line in enumerate(lines):
+                        self.create_text(x+12,footer+16*n,text=line,anchor="nw",font=self.detail_date_font,fill=C["muted"],tags=("dates",identity))
             if "project" not in data.get("tags",()):
                 self.create_text(x+w-22,ty+10,text="↗",font=("Segoe UI",14),fill=C["pine"],tags=("open",identity))
         if not self.rows and height>100:
