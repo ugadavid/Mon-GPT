@@ -149,9 +149,9 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
             button.tone="chip" if self.view.get()==key else "segment"
             button.draw()
         if self.view.get()=="detail":
-            self.detail_sort_button.pack(side="right")
+            self.detail_sort_controls.pack(side="right")
         else:
-            self.detail_sort_button.pack_forget()
+            self.detail_sort_controls.pack_forget()
         if self.view.get()=="mosaic":
             self.mosaic_tools.pack(side="right")
         else:
@@ -161,9 +161,10 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
     def layout_view_controls(self,event=None):
         narrow=self.viewbar.winfo_width()<410
         caption="Tri" if narrow else self.sort_caption
-        width=42 if narrow else self.detail_sort_button.font.measure(caption)+24
-        for button in (self.detail_sort_button,self.mosaic_sort_button):
-            button.configure(text=caption,width=width)
+        width=42 if narrow else self.mosaic_sort_button.font.measure(caption)+24
+        self.mosaic_sort_button.configure(text=caption,width=width)
+        choice=BY_KEY[self.sort_column].label+(" ↓" if self.sort_reverse else " ↑")+"  ▾"
+        self.detail_sort_button.configure(text=choice,width=self.detail_sort_button.font.measure(choice)+24)
         self.mosaic_size_button.configure(text="Cartes · "+("Grand" if self.mosaic_size.get()=="large" else "Normal")+" ⌄")
 
     def mosaic_size_popup(self):
@@ -345,7 +346,10 @@ class App(ListColumnsUI,BatchActions,DetailEditor):
             button=self.icon_button(self.mode_buttons_frame,label,glyph,lambda k=key:self.set_view(k),width=30)
             button.pack(side="left")
             self.view_buttons[key]=button
-        self.detail_sort_button=self.button(self.viewbar,text="Tri · Titre ↑",command=self.detail_sort_popup,width=112,height=28)
+        self.detail_sort_controls=ttk.Frame(self.viewbar)
+        ttk.Label(self.detail_sort_controls,text="Trier par :",foreground=COLORS["muted"]).pack(side="left",padx=(0,7))
+        self.detail_sort_button=self.button(self.detail_sort_controls,text="Titre ↑  ▾",command=self.detail_sort_popup,height=28)
+        self.detail_sort_button.pack(side="left")
         self.mosaic_tools=ttk.Frame(self.viewbar)
         self.mosaic_size_button=self.button(self.mosaic_tools,text="Cartes · Normal ⌄",command=self.mosaic_size_popup,width=136,height=28)
         self.mosaic_size_button.pack(side="left")

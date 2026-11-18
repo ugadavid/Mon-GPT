@@ -11,6 +11,7 @@ from PIL import ImageTk
 from .atelier import CatalogList, rounded, shorten
 from .identity import DEFAULTS
 from .identity_ui import contained_picture
+from .list_columns import display_date
 from .theme import COLORS as C
 from .mosaic import MosaicRenderer
 
@@ -23,6 +24,7 @@ class ResultsView(MosaicRenderer,CatalogList):
         self.card_extras={};self.max_card_extra=0
         super().__init__(parent)
         self.detail_title_font=Font(self,font=("Segoe UI",11,"bold"))
+        self.detail_date_font=Font(self,font=("Segoe UI",8))
         self.bind("<Left>",lambda e:self.mosaic_navigate(-1,0) if self.view=="mosaic" else self.focus_action(False))
         self.bind("<Right>",lambda e:self.mosaic_navigate(1,0) if self.view=="mosaic" else self.focus_action(True))
         self.bind("<Configure>",self.mosaic_resize,add="+")
@@ -73,7 +75,8 @@ class ResultsView(MosaicRenderer,CatalogList):
         self.secondary_order=[]
         width=self.winfo_width()
         image_width=112 if width>=470 else 80
-        self.text_x=22+image_width+14
+        date_width=self.detail_date_font.measure("Modifié · 00/00/0000")
+        self.text_x=max(22+image_width+14,17+date_width+14)
         return {"#0":(10,image_width),"title":(self.text_x,max(30,width-self.text_x-42)),"open":(width-36,36)}
 
     def bbox(self,identity,column=None):
@@ -180,25 +183,38 @@ class ResultsView(MosaicRenderer,CatalogList):
             visual=data.get("visual")
             reference=visual.image if visual and visual.image else DEFAULTS["image"]
             picture=self.cover(reference,iw)
-            iy=y+25
+            iy=y+13
             rounded(self,15,iy-2,19+iw,iy+iw*9//16+2,5,fill=C["ivory"],outline=C["line"])
             self.create_image(17,iy,image=picture,anchor="nw",tags=("cover",identity))
+            cells=data.get("cells",{})
+            date_y=iy+iw*9//16+13
+            for key,label in (("created","Créé"),("modified","Modifié")):
+                if cells.get(key):
+                    date=display_date(cells[key]).split()[0]
+                    self.create_text(17,date_y,text=f"{label} · {date}",anchor="w",font=self.detail_date_font,fill=C["muted"],tags=(key,identity))
+                    date_y+=15
             icon=self.icons.get(visual.icon if visual else None,visual.color if visual else None,20)
             self.create_image(tx+9,y+23,image=icon,tags=("identity",identity))
             self.create_text(tx+27,y+23,text=shorten(self.detail_title_font,data["values"][0],tw-31),anchor="w",font=self.detail_title_font,fill=C["ink"],tags=("title",identity))
+            body_width=max(1,width-tx-16)
             excerpts=self.excerpts(data)
-            if len(excerpts)==1:
-                key,label,text=excerpts[0]
-                lines=[(key,line) for line in self.summary_lines(label+' : '+text,tw)]
-            else:lines=[(key,shorten(self.small_font,label+' : '+text,tw)) for key,label,text in excerpts]
-            for n,(key,line) in enumerate(lines):
-                self.create_text(tx,y+45+n*16,text=line,anchor="w",font=self.small_font,fill=C["muted"],tags=(key,identity))
-            self.create_text(tx,y+80,text=shorten(self.small_font,"↳ "+data["values"][1],tw),anchor="w",font=self.small_font,fill=C["pine"],tags=("context",identity))
+            lines_used=0
+            for excerpt_index,(key,label,text) in enumerate(excerpts):
+                caption=f"{label} : {text}"
+                remaining=3-lines_used-(len(excerpts)-excerpt_index-1)
+                lines=self.summary_lines(caption,body_width) if remaining>=2 else [shorten(self.small_font,caption,body_width)]
+                for line in lines:
+                    self.create_text(tx,y+43+lines_used*15,text=line,anchor="w",font=self.small_font,fill=C["ink"] if key=="summary" else C["muted"],tags=(key,identity))
+                    lines_used+=1
+            context_y=y+44+lines_used*15
+            self.create_text(tx,context_y,text=shorten(self.small_font,"↳ "+data["values"][1],body_width),anchor="w",font=self.small_font,fill=C["pine"],tags=("context",identity))
             cats=data.get("categories",[]);tags=data.get("labels",[])
-            badge_x,badge_width=(17,width-34) if width<470 else (tx,tw)
-            cat_width=min(badge_width*.54,sum(self.small_font.measure(t)+21 for t in cats)+6) if cats else 0
-            self.draw_badges(cats,badge_x,y+106,cat_width,True)
-            self.draw_badges(tags,badge_x+cat_width,y+106,badge_width-cat_width,False)
+            badge_x,badge_width=(17,width-34) if width<470 else (tx,body_width)
+            tag_space=min(badge_width*.46,sum(self.small_font.measure(t)+21 for t in tags)+6) if tags else 0
+            cat_width=min(badge_width-tag_space,sum(self.small_font.measure(t)+21 for t in cats)+6) if cats else 0
+            badge_y=max(context_y+22,y+109 if width<470 else y+67)
+            self.draw_badges(cats,badge_x,badge_y,cat_width,True)
+            self.draw_badges(tags,badge_x+cat_width,badge_y,badge_width-cat_width,False)
             if "project" not in data.get("tags",()):
                 ax=width-22
                 if selected and self.action_focus and self.focus_get()==self:
