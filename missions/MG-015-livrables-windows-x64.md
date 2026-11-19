@@ -102,14 +102,24 @@ Ne pas inclure :
 - données utilisateur ;
 - Collector Chrome sauf si une dépendance applicative réelle l’exige (a priori non).
 
-### Icône Windows
+### Icône Windows — référence validée
 
-Mon GPT<3 doit avoir une icône Windows cohérente avec son identité actuelle.
+L’icône de distribution a été **choisie et fournie par David** avant le lancement de la mission.
 
-- privilégier le **repère plume/feather déjà utilisé dans l’application** ;
-- ne pas inventer une nouvelle marque graphique ;
-- produire un `.ico` multi-tailles si nécessaire pour l’EXE, l’installateur et les raccourcis ;
-- si cela impose de redessiner une nouvelle identité, s’arrêter sur ce point et utiliser une solution neutre plutôt que lancer une mission graphique.
+Sources canoniques déjà présentes dans le dépôt :
+- `missions/MG-015-exe/Mon-GPT-robot.ico` — ICO Windows multi-tailles à utiliser pour l’EXE, l’installateur et les raccourcis ;
+- `missions/MG-015-exe/mon-gpt_icone_robot.png` — PNG source/référence visuelle.
+
+Le visuel représente le petit robot bleu tenant un cœur rouge : **c’est l’identité retenue pour cette livraison**.
+
+Règles :
+- utiliser le `.ico` fourni tel quel comme source de packaging ;
+- ne pas redessiner ni régénérer l’icône ;
+- ne pas créer ni committer de nouveaux blobs graphiques ;
+- si le build a besoin d’une copie dans un dossier de staging, la générer/localiser uniquement dans les artefacts de build ignorés par Git ;
+- l’icône doit apparaître sur l’EXE, le raccourci Démarrer, le raccourci Bureau éventuel et l’installateur/désinstalleur lorsque techniquement applicable.
+
+Le remplacement ultérieur de l’ancienne plume **dans l’interface applicative elle-même** est explicitement hors périmètre de MG-015.
 
 ### Métadonnées du binaire
 
@@ -298,7 +308,7 @@ Avant publication :
 - `gh auth status` : Marcel actif ;
 - identité Git locale : `Trucabule-M1 <marcel@trucabule.fr>`.
 
-Les binaires finaux ne doivent pas être commités dans le dépôt sauf décision explicite déjà prévue par le projet. Donner dans le rapport **leur chemin local exact sur CODEX_VM** pour que David puisse les copier vers Zenith Ice.
+Les binaires finaux ne doivent pas être commités dans le dépôt. Les deux fichiers graphiques déjà ajoutés volontairement par David sous `missions/MG-015-exe/` sont les seules ressources binaires de référence autorisées pour cette mission ; ne pas en ajouter d’autres. Donner dans le rapport **leur chemin local exact sur CODEX_VM** pour que David puisse les copier vers Zenith Ice.
 
 Commit/push `origin/main`, SHA distant vérifié, dépôt propre.
 
