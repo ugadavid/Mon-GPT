@@ -1,10 +1,29 @@
 # Mon GPT<3 — Suivi des finitions et idées après MG-009
 
-**Document de suivi / parking d'idées, pas une mission exécutable dans son ensemble.**  
-**Contexte :** première utilisation approfondie de Mon GPT<3 0.9.0 sur CODEX-VM, avec une bibliothèque locale d'environ **1 429 conversations** et les vrais projets importés depuis Chrome, le 16 novembre 2026.
+**Document de suivi / parking d'idées, pas une mission exécutable dans son ensemble.**
 
-**Cap décidé : un seul projet informatique actif, finir l'existant, avancer tranquillement.** Chaque lot doit être validé séparément avant de commencer le suivant. Ne pas développer le tableau de bord ou de nouveaux modules pendant les corrections de cette version.
+## État de pause — 19 novembre 2026
 
+**Mon GPT<3 0.9.4 est installé et utilisé sur Zenith Ice.** La passe graphique MG-014 (Liste, Détaillée, Mosaïque, inspecteur, bandeau et création rapide) est clôturée. MG-015 a livré le ZIP portable et l’installateur Windows x64 ; la recette humaine sur Zenith Ice est réussie, y compris relance et import d’un export réel du Collector.
+
+Les sections datées du 16 novembre et suivantes sont conservées ci-dessous comme **historique de décisions**. Les éléments déjà livrés ne doivent plus être relancés comme s’ils étaient à faire.
+
+### Parking réel pour une prochaine reprise
+
+- **Tableau de bord / statistiques** : idée appréciée et volontairement reportée. Étudier d’abord les besoins et une maquette : volumes projets/sous-projets/conversations, catégories/tags, À classer, fiches sans catégorie/note, progression de classement ; éviter les doubles comptes des fiches multi-rattachées.
+- **Identité robot dans l’application** : MG-015 utilise le petit robot bleu tenant un cœur rouge pour l’EXE, l’installateur et les raccourcis. Plus tard, étudier le remplacement cohérent de l’ancienne plume **dans l’interface elle-même** ; ne pas le faire automatiquement.
+- **Signature de code / SmartScreen** : les livrables 0.9.4 sont non signés. Décider plus tard s’il est utile d’acheter/configurer un certificat ; ne pas confondre cela avec la validité fonctionnelle des paquets.
+- **Images héritées répétées** : en Mosaïque, plusieurs fils héritant de la même couverture peuvent rendre l’ensemble monotone. À étudier graphiquement sans modifier les règles d’héritage ni inventer de données.
+- **Accessibilité** : l’accessibilité lecteur d’écran des contrôles Canvas personnalisés n’est pas évaluée.
+- **Échelle / performances** : l’utilisation réelle avec un gros import Collector est désormais possible, mais aucun benchmark massif formel n’a été mené.
+- **Glisser droit physique** : le menu équivalent et les gestionnaires sont validés ; conserver la réserve historique tant qu’une recette physique dédiée n’est pas faite.
+- **Collector** : reste un compagnon séparé ; pas de synchronisation continue avec ChatGPT ni lecture automatique du contenu des messages.
+
+### Règle de reprise
+
+À la prochaine ouverture du chantier, partir de l’état installé **0.9.4**, relire ce parking et [HISTOIRE_ET_DECISIONS.md](HISTOIRE_ET_DECISIONS.md), puis ouvrir **une mission à la fois**. Aucun élément du parking n’est un GO implicite.
+
+---
 
 ## Situation au soir du 16 novembre 2026 — après recette MG-011
 
