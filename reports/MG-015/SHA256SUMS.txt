@@ -1,0 +1,2 @@
+7a7629631ba0bd3343a6f7611d10220e628845c3f2af27be7f463bc9aa27ed0e  Mon-GPT-0.9.4-windows-x64.zip
+9d30ef2d12a0b0f50dfc51158a9bf91163df76877f62629adb75a81b8150cac8  Mon-GPT-0.9.4-windows-x64-setup.exe

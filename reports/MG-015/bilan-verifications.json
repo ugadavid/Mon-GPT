@@ -1,0 +1,159 @@
+{
+  "version": "0.9.4",
+  "artefacts": [
+    {
+      "file": "Mon-GPT-0.9.4-windows-x64.zip",
+      "size": 30872831,
+      "sha256": "7a7629631ba0bd3343a6f7611d10220e628845c3f2af27be7f463bc9aa27ed0e"
+    },
+    {
+      "file": "Mon-GPT-0.9.4-windows-x64-setup.exe",
+      "size": 26518619,
+      "sha256": "9d30ef2d12a0b0f50dfc51158a9bf91163df76877f62629adb75a81b8150cac8"
+    }
+  ],
+  "binaires": [
+    {
+      "file": "Mon-GPT.exe",
+      "machine": "AMD64",
+      "subsystem": "Windows GUI",
+      "metadata": {
+        "CompanyName": "Trucabule",
+        "FileDescription": "Mon GPT<3 — Organisation locale des discussions",
+        "FileVersion": "0.9.4.0",
+        "InternalName": "Mon-GPT",
+        "OriginalFilename": "Mon-GPT.exe",
+        "ProductName": "Mon GPT<3",
+        "ProductVersion": "0.9.4"
+      },
+      "reference_icon_frames": 10
+    },
+    {
+      "file": "Mon-GPT-0.9.4-windows-x64-setup.exe",
+      "machine": "AMD64",
+      "subsystem": "Windows GUI",
+      "metadata": {
+        "Comments": "This installation was built with Inno Setup.",
+        "CompanyName": "Trucabule",
+        "FileDescription": "Mon GPT<3 Setup",
+        "FileVersion": "0.9.4.0",
+        "LegalCopyright": "",
+        "OriginalFileName": "",
+        "ProductName": "Mon GPT<3",
+        "ProductVersion": "0.9.4"
+      },
+      "reference_icon_frames": 10
+    }
+  ],
+  "couvertures": 31,
+  "icone_sha256": "038a2835eeefbecee5d859cabf2da24fb36cd3c124c9da7dbdb6255c9bdf8670",
+  "fichiers_du_paquet": 1045,
+  "cycle": {
+    "installation-1.json": {
+      "start_menu": true,
+      "icon": "C:\\Users\\codex\\AppData\\Local\\Programs\\Mon GPT\\Mon-GPT.exe,0",
+      "desktop_absent": true,
+      "data_witness": "C:\\Users\\codex\\Documents\\Projets\\mon-gpt\\.recette\\MG015\\profil témoin\\MonGPT",
+      "target": "C:\\Users\\codex\\AppData\\Local\\Programs\\Mon GPT\\Mon-GPT.exe"
+    },
+    "mise-a-jour.json": {
+      "exit_code": 0,
+      "desktop_present": true
+    },
+    "desinstallation.json": {
+      "raccourci_demarrer_retire": true,
+      "raccourci_bureau_retire": true,
+      "application_retiree": true,
+      "exit_code": 0,
+      "entree_windows_retiree": true
+    },
+    "reinstallation.json": {
+      "bureau_absent": true,
+      "demarrer_present": true,
+      "exit_code": 0
+    },
+    "empreintes-apres-mise-a-jour.json": {
+      "phase": "apres-mise-a-jour",
+      "fichiers": 5,
+      "toutes_empreintes_identiques": true
+    },
+    "empreintes-apres-desinstallation.json": {
+      "phase": "apres-desinstallation",
+      "fichiers": 5,
+      "toutes_empreintes_identiques": true
+    },
+    "empreintes-apres-reinstallation.json": {
+      "phase": "apres-reinstallation",
+      "fichiers": 5,
+      "toutes_empreintes_identiques": true
+    },
+    "donnees-standard-resultat.json": {
+      "donnees_standard_inchangees": true,
+      "donnees_standard_surveilles": 2
+    },
+    "fichiers-installes.json": {
+      "fichiers_controles": 1045,
+      "installation_identique_au_zip": true
+    },
+    "desinstalleur-icone.json": {
+      "desinstalleur_x64": true,
+      "icone_canonique_complete": true,
+      "images_ico_controlees": 10
+    }
+  },
+  "empreintes_temoin": {
+    "catalogue.json": "090ebbfc41446237a47400860a8b482414f374f20837d88637c43bfb6f18e7fb",
+    "interface.json": "c7a4a739e42aa06ffff6271750f0e3640be8ffc41801e4de49afc896eb515e47",
+    "mon-gpt-sauvegarde.zip": "c86de61b26ff8129008c3efd90515daa96efaf8a39d5ad6cb042c7ceebda349b",
+    "temoin-avant.zip": "9ccd6da7a28957582954e799a0735528d43996b5c13fbdfa9cee113f9bf20d00",
+    "images/dda79b8afcd79c8d85f741255e11c751a38446f454d0dd10cda006b7adcc29d2.png": "dda79b8afcd79c8d85f741255e11c751a38446f454d0dd10cda006b7adcc29d2"
+  },
+  "temoin_apres_derniere_fermeture_identique": true,
+  "captures_locales": 8,
+  "temporaires_build_restants": 0,
+  "environnement_recette": {
+    "signatures": [
+      {
+        "status": "NotSigned",
+        "file": "Mon-GPT.exe"
+      },
+      {
+        "status": "NotSigned",
+        "file": "Mon-GPT-0.9.4-windows-x64-setup.exe"
+      }
+    ],
+    "administrateur": false,
+    "py_absent_du_path_recette": true,
+    "python_absent_du_path_recette": true
+  },
+  "modules_portable": [
+    {
+      "ModuleName": "python313.dll",
+      "FileName": "C:\\Users\\codex\\Documents\\Projets\\mon-gpt\\.recette\\MG015\\Portable espace et accents é\\Mon-GPT\\_internal\\python313.dll"
+    },
+    {
+      "ModuleName": "_tkinter.pyd",
+      "FileName": "C:\\Users\\codex\\Documents\\Projets\\mon-gpt\\.recette\\MG015\\Portable espace et accents é\\Mon-GPT\\_internal\\_tkinter.pyd"
+    },
+    {
+      "ModuleName": "tcl86t.dll",
+      "FileName": "C:\\Users\\codex\\Documents\\Projets\\mon-gpt\\.recette\\MG015\\Portable espace et accents é\\Mon-GPT\\_internal\\tcl86t.dll"
+    },
+    {
+      "ModuleName": "tk86t.dll",
+      "FileName": "C:\\Users\\codex\\Documents\\Projets\\mon-gpt\\.recette\\MG015\\Portable espace et accents é\\Mon-GPT\\_internal\\tk86t.dll"
+    },
+    {
+      "ModuleName": "_imaging.cp313-win_amd64.pyd",
+      "FileName": "C:\\Users\\codex\\Documents\\Projets\\mon-gpt\\.recette\\MG015\\Portable espace et accents é\\Mon-GPT\\_internal\\PIL\\_imaging.cp313-win_amd64.pyd"
+    },
+    {
+      "ModuleName": "_imagingft.cp313-win_amd64.pyd",
+      "FileName": "C:\\Users\\codex\\Documents\\Projets\\mon-gpt\\.recette\\MG015\\Portable espace et accents é\\Mon-GPT\\_internal\\PIL\\_imagingft.cp313-win_amd64.pyd"
+    },
+    {
+      "ModuleName": "_imagingtk.cp313-win_amd64.pyd",
+      "FileName": "C:\\Users\\codex\\Documents\\Projets\\mon-gpt\\.recette\\MG015\\Portable espace et accents é\\Mon-GPT\\_internal\\PIL\\_imagingtk.cp313-win_amd64.pyd"
+    }
+  ]
+}

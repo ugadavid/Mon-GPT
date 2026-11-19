@@ -1,0 +1,37 @@
+MON GPT<3 — DISTRIBUTION WINDOWS X64
+
+Le ZIP contient une application autonome en dossier. Extraire tout son contenu,
+puis ouvrir Mon-GPT.exe en laissant son dossier _internal à côté. Aucun Python
+externe n'est nécessaire. L'installateur place les mêmes fichiers sous
+%LOCALAPPDATA%\Programs\Mon GPT, pour le compte courant, sans élévation.
+
+Les deux formes utilisent les mêmes données : %LOCALAPPDATA%\MonGPT.
+« Portable » qualifie les binaires transportables, pas un catalogue stocké
+à côté de l'EXE. Fermer l'application avant de changer de forme ou de version.
+Mise à jour et désinstallation conservent le dossier des données. Les sauvegardes
+complètes ZIP s'effectuent depuis Fichier. Le Bureau est une option décochée
+initialement ; le raccourci Démarrer se nomme Mon GPT.
+
+Le binaire et l'installateur ne sont pas signés. Le comportement de SmartScreen
+dépend du poste et de la provenance du fichier ; aucun certificat n'est inclus.
+
+LICENCES ET PÉRIMÈTRE
+
+Cette distribution embarque CPython, Tcl/Tk et Pillow. Leurs notices se trouvent
+dans _internal/licenses et les textes de référence de MG-012 dans
+_internal/mon_gpt/notices, consultables depuis Aide → Licences et crédits.
+La description « depuis les sources » dans cet écran est la notice historique
+MG-012 : pour ce paquet autonome, les runtimes sont inclus, pas installés
+séparément. Les versions réellement exécutées restent affichées dans l'écran.
+_internal/distribution/distribution-build.json précise celles du build.
+
+Le bootloader provient de PyInstaller ; son COPYING et son exception de
+distribution sont conservés dans _internal/licenses/PyInstaller. PyInstaller
+est un outil de fabrication, pas une dépendance externe à installer pour lancer
+Mon GPT. Les avis complets de la wheel Pillow et du runtime CPython utilisés
+sont conservés, même lorsqu'ils décrivent des sous-composants non utilisés.
+La licence générale du code Trucabule n'est pas encore fixée. Aucune licence des
+tiers ne s'applique implicitement au code Trucabule ni à ses illustrations.
+Le Collector et Puppeteer ne sont pas inclus dans ce paquet.
+
+Voir le rapport MG-015 pour l'environnement testé, les empreintes et les limites.
